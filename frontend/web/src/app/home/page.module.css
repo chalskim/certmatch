@@ -1,0 +1,736 @@
+/* Home page specific styles */
+.appContent {
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: 60px;
+}
+
+/* Search Section */
+.searchSection {
+  background: white;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.searchTitle {
+  font-size: 18px;
+  margin-bottom: 15px;
+  color: #0066CC;
+}
+
+.searchBar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.searchInput {
+  flex: 1;
+  padding: 12px 15px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.searchButton {
+  padding: 12px 20px;
+  background: #0066CC;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.quickFilters {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.filterChip {
+  padding: 6px 12px;
+  background: #f0f0f0;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filterChip:hover, .filterChipActive {
+  background: #0066CC;
+  color: white;
+  border-color: #0066CC;
+}
+
+/* Banner Carousel */
+.bannerCarousel {
+  position: relative;
+  margin: 15px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.bannerContainer {
+  position: relative;
+  width: 100%;
+  height: 180px;
+  overflow: hidden;
+}
+
+.bannerSlides {
+  display: flex;
+  height: 100%;
+  transition: transform 0.5s ease-in-out;
+}
+
+.bannerSlide {
+  min-width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  text-align: center;
+}
+
+.bannerSlideActive {
+  opacity: 1;
+}
+
+.bannerContent {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  padding: 20px;
+}
+
+.bannerTitle {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.bannerDesc {
+  font-size: 14px;
+  margin-bottom: 15px;
+  opacity: 0.9;
+  text-align: center;
+  max-width: 90%;
+}
+
+.bannerButton {
+  padding: 10px 20px;
+  background: white;
+  color: #333;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.bannerButton:hover {
+  transform: scale(1.05);
+}
+
+.bannerDots {
+  position: absolute;
+  bottom: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 10;
+}
+
+.bannerDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.bannerDotActive {
+  background: white;
+  transform: scale(1.2);
+}
+
+/* Tab Container */
+.tabContainer {
+  margin: 15px;
+}
+
+.tabNav {
+  display: flex;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  margin-bottom: 15px;
+}
+
+.tabButton {
+  flex: 1;
+  padding: 12px;
+  background: white;
+  border: none;
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.tabButtonActive {
+  background: #0066CC;
+  color: white;
+}
+
+.tabContent {
+  display: none;
+}
+
+.tabContentActive {
+  display: block;
+}
+
+/* Section */
+.section {
+  margin: 15px;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.sectionTitle {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+}
+
+.sectionMore {
+  color: #0066CC;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+/* Recommended Experts Section */
+.expertsSection {
+  margin-bottom: 20px;
+}
+
+.expertsSectionTitle {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 12px;
+  padding: 0 5px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.expertsSectionTitle i {
+  color: #FFD700;
+  font-size: 18px;
+}
+
+/* Recommended Experts Horizontal Scroll */
+.expertsScrollContainer {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.expertsScroll {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  padding: 15px 20px 15px 20px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.expertsScroll::-webkit-scrollbar {
+  display: none;
+}
+
+.expertsScroll::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 30px;
+  background: linear-gradient(to right, #f5f6f8, transparent);
+  z-index: 10;
+  pointer-events: none;
+}
+
+.expertCard {
+  flex: 0 0 auto;
+  min-width: 280px;
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  color: #333;
+  border-radius: 12px;
+  padding: 15px;
+  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.expertCard::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+  animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.expertBadge {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.9);
+  color: #333;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  backdrop-filter: blur(10px);
+}
+
+.expertTitle {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  line-height: 1.3;
+  color: #333;
+}
+
+.expertCompany {
+  font-size: 12px;
+  color: #555;
+  margin-bottom: 10px;
+}
+
+.expertFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+}
+
+.expertPrice {
+  font-weight: bold;
+  font-size: 16px;
+  color: #333;
+}
+
+.expertRating {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.7);
+  padding: 3px 8px;
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+}
+
+.expertRating .star {
+  color: #FFB800;
+  font-size: 10px;
+}
+
+/* Urgent Recruitment Section */
+.urgentSection {
+  margin-bottom: 20px;
+}
+
+.urgentSectionTitle {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 12px;
+  padding: 0 5px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.urgentSectionTitle i {
+  color: #FF6B6B;
+  font-size: 18px;
+}
+
+/* Urgent Recruitment Horizontal Scroll */
+.urgentRecruitmentContainer {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.urgentRecruitmentScroll {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  padding: 15px 20px 15px 20px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.urgentRecruitmentScroll::-webkit-scrollbar {
+  display: none;
+}
+
+.urgentRecruitmentScroll::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 30px;
+  background: linear-gradient(to right, #f5f6f8, transparent);
+  z-index: 10;
+  pointer-events: none;
+}
+
+.urgentCard {
+  flex: 0 0 auto;
+  min-width: 280px;
+  background: linear-gradient(135deg, #87CEEB 0%, #B0E0E6 100%);
+  color: #333;
+  border-radius: 12px;
+  padding: 15px;
+  box-shadow: 0 4px 15px rgba(135, 206, 235, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.urgentCard::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+  animation: shimmer 3s infinite;
+}
+
+.urgentBadge {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.8);
+  color: #333;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  backdrop-filter: blur(10px);
+}
+
+.urgentTitle {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  line-height: 1.3;
+  color: #333;
+}
+
+.urgentCompany {
+  font-size: 12px;
+  color: #555;
+  margin-bottom: 10px;
+}
+
+.urgentFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+}
+
+.urgentPrice {
+  font-weight: bold;
+  font-size: 16px;
+  color: #333;
+}
+
+.urgentDeadline {
+  background: rgba(255, 255, 255, 0.6);
+  padding: 3px 8px;
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  color: #333;
+}
+
+/* General Recruitment Section */
+.generalSection {
+  margin-top: 25px;
+}
+
+.generalSectionTitle {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 15px;
+  padding: 0 5px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.generalSectionTitle i {
+  color: #0066CC;
+  font-size: 18px;
+}
+
+/* Card Grid */
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 15px;
+}
+
+.card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+}
+
+.cardImage {
+  width: 100%;
+  height: 120px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 36px;
+}
+
+.cardContent {
+  padding: 15px;
+}
+
+.cardBadge {
+  display: inline-block;
+  padding: 4px 8px;
+  background: #2EBD59;
+  color: white;
+  border-radius: 4px;
+  font-size: 11px;
+  margin-bottom: 8px;
+}
+
+.cardBadgeNew {
+  background: #FF8C42;
+}
+
+.cardBadgeHot {
+  background: #E74C3C;
+}
+
+.cardBadgeUrgent {
+  background: #FF4444;
+  animation: pulse 2s infinite;
+}
+
+.cardBadgeBreaking {
+  background: #FF1744;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.7; }
+  100% { opacity: 1; }
+}
+
+.cardTitle {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #333;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cardCompany {
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 10px;
+}
+
+.cardTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 10px;
+}
+
+.cardTag {
+  padding: 3px 8px;
+  background: #f0f0f0;
+  border-radius: 4px;
+  font-size: 11px;
+  color: #666;
+}
+
+.cardFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 10px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.cardPrice {
+  font-size: 16px;
+  font-weight: bold;
+  color: #0066CC;
+}
+
+.cardRating {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+}
+
+.star {
+  color: #FFB800;
+}
+
+/* List Style Cards */
+.listCard {
+  background: white;
+  border-radius: 12px;
+  padding: 15px;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  display: flex;
+  gap: 15px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.listCard:hover {
+  transform: translateX(4px);
+}
+
+.listCardIcon {
+  width: 50px;
+  height: 50px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #0066CC, #2EBD59);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.listCardContent {
+  flex: 1;
+}
+
+.listCardTitle {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #333;
+}
+
+.listCardDesc {
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 6px;
+}
+
+.listCardMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 11px;
+  color: #999;
+}
+
+/* Gradient backgrounds for list card icons */
+.gradient1 {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.gradient2 {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.gradient3 {
+  background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+}
+
+.gradient4 {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.gradient5 {
+  background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .cardGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .tabButton {
+    font-size: 10px;
+    padding: 10px 3px;
+  }
+  
+  .bannerTitle {
+    font-size: 18px;
+  }
+  
+  .bannerDesc {
+    font-size: 12px;
+  }
+}
