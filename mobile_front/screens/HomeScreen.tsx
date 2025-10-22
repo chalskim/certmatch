@@ -3,6 +3,10 @@ import { View, Text, ScrollView, TextInput, TouchableOpacity, Dimensions, FlatLi
 import { FontAwesome5 } from '@expo/vector-icons';
 import { styles } from './styles/styles';
 import { consultants, courses, notices, type Consultant, type Course } from './data/homeData';
+import JobsTab from './subform/JobsTab';
+import ConsultantsTab from './subform/ConsultantsTab';
+import EducationTab from './subform/EducationTab';
+import NoticeNewsTab from './subform/NoticeNewsTab';
 
 const { width } = Dimensions.get('window');
 
@@ -125,84 +129,16 @@ export const HomeScreen: React.FC = () => {
       {/* Tab Content (expanded) */}
       <View style={styles.tabContent}>
         {activeTab==='jobs' && (
-          <View>
-            <SectionTitle icon="fire" title="긴급 모집" />
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginVertical: 8 }}>
-              {urgentRecruitments.map((item, idx) => (
-                <UrgentCard key={idx} {...item} />
-              ))}
-            </ScrollView>
-
-            <SectionTitle icon="briefcase" title="일반 모집" />
-            <FlatList
-              data={generalJobs}
-              keyExtractor={(item, idx) => `${item.title}-${idx}`}
-              numColumns={2}
-              columnWrapperStyle={{ justifyContent: 'space-between' }}
-              contentContainerStyle={{ paddingBottom: 16 }}
-              renderItem={({ item }) => (
-                <JobCard
-                  badge={item.badge}
-                  badgeType={item.badgeType as 'new' | 'hot' | 'default'}
-                  title={item.title}
-                  company={item.company}
-                  tags={item.tags}
-                  price={item.price}
-                  deadline={item.deadline}
-                />
-              )}
-            />
-          </View>
+          <JobsTab />
         )}
         {activeTab==='consultants' && (
-          <View>
-            <SectionTitle icon="user-tie" title="전문가 매칭" />
-            {consultants
-              .reduce((rows: Consultant[][], item: Consultant, index: number) => {
-                if (index % 2 === 0) rows.push([item]);
-                else rows[rows.length - 1].push(item);
-                return rows;
-              }, [])
-              .map((row: Consultant[], rowIdx: number) => (
-                <View
-                  key={`consultant-row-${rowIdx}`}
-                  style={{ flexDirection: 'row', justifyContent: 'space-between' }}
-                >
-                  {row.map((c: Consultant, colIdx: number) => (
-                    <ConsultantCard key={`consultant-${c.name}-${colIdx}`} {...c} />
-                  ))}
-                </View>
-              ))}
-          </View>
+          <ConsultantsTab />
         )}
         {activeTab==='education' && (
-          <View>
-            <SectionTitle icon="graduation-cap" title="교육" />
-            {courses
-              .reduce((rows: Course[][], item: Course, index: number) => {
-                if (index % 2 === 0) rows.push([item]);
-                else rows[rows.length - 1].push(item);
-                return rows;
-              }, [])
-              .map((row: Course[], rowIdx: number) => (
-                <View
-                  key={`course-row-${rowIdx}`}
-                  style={{ flexDirection: 'row', justifyContent: 'space-between' }}
-                >
-                  {row.map((course: Course, colIdx: number) => (
-                    <EducationCard key={`course-${course.title}-${colIdx}`} {...course} />
-                  ))}
-                </View>
-              ))}
-          </View>
+          <EducationTab />
         )}
         {activeTab==='notices' && (
-          <View>
-            <SectionTitle icon="bullhorn" title="공지사항 및 뉴스" />
-            {notices.map((n, idx) => (
-              <NoticeItem key={idx} {...n} />
-            ))}
-          </View>
+          <NoticeNewsTab />
         )}
       </View>
     </ScrollView>
