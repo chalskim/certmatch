@@ -4,14 +4,15 @@
   "description": "인증 구인구직 플랫폼",
   "private": true,
   "workspaces": [
-    "frontend/*",
+    "frontend/web",
+    "mobile_front",
     "backend"
   ],
   "scripts": {
     "dev": "concurrently \"npm run dev:backend\" \"npm run dev:web\" \"npm run dev:mobile\"",
     "dev:backend": "cd backend && npm run start:dev",
     "dev:web": "cd frontend/web && npm run dev",
-    "dev:mobile": "cd frontend/mobile && npm run start",
+    "dev:mobile": "cd mobile_front && npm run start",
     "build": "npm run build:backend && npm run build:web",
     "build:backend": "cd backend && npm run build",
     "build:web": "cd frontend/web && npm run build",
@@ -21,7 +22,7 @@
     "lint": "npm run lint:backend && npm run lint:web",
     "lint:backend": "cd backend && npm run lint",
     "lint:web": "cd frontend/web && npm run lint",
-    "install:all": "npm install && cd backend && npm install && cd ../frontend/web && npm install && cd ../mobile && npm install"
+    "install:all": "npm install && cd backend && npm install && cd frontend/web && npm install && cd mobile_front && npm install"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"

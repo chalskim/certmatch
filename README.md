@@ -8,8 +8,8 @@
 certmatch/
 ├── backend/          # NestJS API 서버
 ├── frontend/         # 프론트엔드 애플리케이션
-│   ├── web/         # Next.js 웹 애플리케이션
-│   └── mobile/      # React Native 모바일 앱
+│   └── web/         # Next.js 웹 애플리케이션
+├── mobile_front/     # React Native 모바일 앱
 ├── doc/             # 프로젝트 문서
 └── mokup/           # UI 목업 파일
 ```
@@ -52,7 +52,7 @@ npm run dev:mobile
 - **문서**: [Frontend README](./frontend/README.md)
 
 ### 모바일 애플리케이션 (React Native)
-- **위치**: `frontend/mobile/`
+- **위치**: `mobile_front/`
 - **기술스택**: Expo, React Native, TypeScript
 - **플랫폼**: iOS, Android, Web
 

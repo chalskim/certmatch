@@ -11,6 +11,11 @@ pnpm-debug.log*
 /.next/
 /out/
 
+# Expo
+.expo/
+dist/
+web-build/
+
 # Runtime data
 pids
 *.pid
