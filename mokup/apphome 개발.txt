@@ -1,0 +1,313 @@
+
+
+## CertMatch 목업을 Monorepo 구조로 구현하는 단계별 가이드
+
+제안해주신 Monorepo 폴더 구조를 기반으로, CertMatch 앱 목업을 실제 프로그램으로 구현하는 구체적인 방법을 단계별로 설명하겠습니다.
+
+---
+
+### **0단계: 프로젝트 초기 설정**
+
+1.  **Monorepo 도구 설치:** `Turborepo` 또는 `Nx`를 사용하여 프로젝트를 생성합니다. (여기서는 Turborepo 기준으로 설명)
+    ```bash
+    npx create-turbo@latest
+    ```
+2.  **의존성 설치:** 프로젝트 루트에서 React Native, Next.js, 그리고 공유 패키지에 필요한 라이브러리들을 설치합니다.
+    ```bash
+    # 루트 디렉토리에서
+    npm install react-native react-native-elements react-native-vector-icons
+    npm install zustand react-hook-form @tanstack/react-query axios
+    npm install twrnc # NativeWind
+    npm install -D @types/react @types/react-native typescript
+    ```
+
+---
+
+### **1단계: `packages/` - 핵심 로직 구현 (데이터와 상태)**
+
+이 단계는 UI와 완전히 분리되어, 순수한 데이터 타입, API 통신, 상태 관리 로직을 만듭니다.
+
+#### **`packages/shared-types/index.ts`**
+먼저, 앱 전체에서 사용할 데이터의 타입을 정의합니다.
+
+```typescript
+// packages/shared-types/index.ts
+
+export interface User {
+  id: string;
+  name: string;
+  company: string;
+}
+
+export interface Job {
+  id: string;
+  title: string;
+  company: string;
+  location: string;
+  tags: string[];
+  price: string;
+  deadline: string;
+  badge?: 'new' | 'hot' | 'recommended';
+}
+
+export interface Expert {
+  id: string;
+  name: string;
+  field: string;
+  experience: string;
+  price: string;
+  rating: number;
+  reviewCount: number;
+  badge?: string;
+}
+
+export interface Filter {
+  id: string;
+  name: string;
+  isActive: boolean;
+}
+```
+
+#### **`packages/api/mockApi.ts` (실제 API 연동 전용 모의 API)**
+목업의 데이터를 기반으로 가짜 API 응답을 만듭니다.
+
+```typescript
+// packages/api/mockApi.ts
+import { Job, Expert } from '../shared-types';
+
+// 목업 데이터 (HTML에서 추출)
+const mockJobs: Job[] = [
+  { id: '1', title: '정보보호 담당자 (ISMS-P 경험 필수)', company: '㈜테크솔루션', location: '서울 강남구', tags: ['경력 3년↑', '정규직'], price: '5,000만원~', deadline: '~02.28', badge: 'hot' },
+  // ... 다른 Job 데이터들
+];
+
+const mockExperts: Expert[] = [
+  { id: 'e1', name: '김민수 컨설턴트', field: 'ISMS-P 전문', experience: '15년 경력', price: '일 200만원', rating: 4.9, reviewCount: 47, badge: '매칭률 95%' },
+  // ... 다른 Expert 데이터들
+];
+
+// API 함수들
+export const fetchJobs = async (): Promise<Job[]> => {
+  // 네트워크 지연 시뮬레이션
+  await new Promise(resolve => setTimeout(resolve, 500));
+  return mockJobs;
+};
+
+export const fetchExperts = async (): Promise<Expert[]> => {
+  await new Promise(resolve => setTimeout(resolve, 500));
+  return mockExperts;
+};
+```
+
+#### **`packages/api/useJobs.ts` (TanStack Query 훅)**
+API 호출 로직을 캡슐화합니다.
+
+```typescript
+// packages/api/useJobs.ts
+import { useQuery } from '@tanstack/react-query';
+import { fetchJobs } from './mockApi';
+import { Job } from '../shared-types';
+
+export const useJobs = () => {
+  return useQuery<Job[]>({
+    queryKey: ['jobs'], // 쿼리 키
+    queryFn: fetchJobs, // API 호출 함수
+    staleTime: 1000 * 60 * 5, // 5분간 데이터 신선함 유지
+  });
+};
+```
+
+#### **`packages/store/useUIStore.ts` (Zustand 스토어)**
+UI 관련 상태(탭, 필터, 메뉴 등)를 관리합니다.
+
+```typescript
+// packages/store/useUIStore.ts
+import { create } from 'zustand';
+import { Filter } from '../shared-types';
+
+interface UIState {
+  activeTab: 'jobs' | 'consultants' | 'education' | 'notices';
+  isSideMenuOpen: boolean;
+  activeFilter: string;
+  filters: Filter[];
+  setActiveTab: (tab: UIState['activeTab']) => void;
+  toggleSideMenu: () => void;
+  setActiveFilter: (filterId: string) => void;
+}
+
+export const useUIStore = create<UIState>((set) => ({
+  activeTab: 'jobs',
+  isSideMenuOpen: false,
+  activeFilter: '전체',
+  filters: [
+    { id: '1', name: '전체', isActive: true },
+    { id: '2', name: 'ISMS-P', isActive: false },
+    // ... 다른 필터들
+  ],
+  setActiveTab: (tab) => set({ activeTab: tab }),
+  toggleSideMenu: () => set((state) => ({ isSideMenuOpen: !state.isSideMenuOpen })),
+  setActiveFilter: (filterId) => set((state) => ({
+    activeFilter: filterId,
+    filters: state.filters.map(f => ({ ...f, isActive: f.id === filterId }))
+  })),
+}));
+```
+
+---
+
+### **2단계: `apps/mobile/` - React Native UI 구현**
+
+이제 `packages`에서 만든 로직을 가져와 React Native 화면을 구성합니다.
+
+#### **`apps/mobile/src/components/JobCard.tsx` (재사용 가능한 컴포넌트)**
+데이터를 받아 UI를 그리는 역할을 합니다.
+
+```jsx
+// apps/mobile/src/components/JobCard.tsx
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import tw from 'twrnc';
+import { Job } from '@certmatch/shared-types'; // 공유 타입 import
+
+interface JobCardProps {
+  job: Job;
+}
+
+const JobCard: React.FC<JobCardProps> = ({ job }) => {
+  return (
+    <View style={tw`bg-white p-4 rounded-lg shadow-md mb-4 border border-gray-200`}>
+      <View style={tw`flex-row justify-between items-start mb-2`}>
+        <Text style={tw`text-sm font-bold text-blue-600`}>{job.badge}</Text>
+        <Text style={tw`text-xs text-gray-500`}>{job.deadline}</Text>
+      </View>
+      <Text style={tw`text-base font-bold mb-1`}>{job.title}</Text>
+      <Text style={tw`text-sm text-gray-600 mb-2`}>{job.company} · {job.location}</Text>
+      <View style={tw`flex-row flex-wrap gap-2 mb-2`}>
+        {job.tags.map((tag, index) => (
+          <View key={index} style={tw`bg-gray-100 px-2 py-1 rounded-full`}>
+            <Text style={tw`text-xs text-gray-700`}>{tag}</Text>
+          </View>
+        ))}
+      </View>
+      <Text style={tw`text-lg font-bold text-green-600`}>{job.price}</Text>
+    </View>
+  );
+};
+
+export default JobCard;
+```
+
+#### **`apps/mobile/src/screens/JobsScreen.tsx` (탭 화면)**
+`useJobs` 훅으로 데이터를 가져와 `JobCard`로 목록을 렌더링합니다.
+
+```jsx
+// apps/mobile/src/screens/JobsScreen.tsx
+import React from 'react';
+import { View, ScrollView, Text, ActivityIndicator } from 'react-native';
+import tw from 'twrnc';
+import { useJobs } from '@certmatch/api'; // 공유 API 훅 import
+import JobCard from '../components/JobCard';
+
+const JobsScreen: React.FC = () => {
+  const { data: jobs, isLoading, error } = useJobs();
+
+  if (isLoading) {
+    return <ActivityIndicator size="large" style={tw`mt-10`} />;
+  }
+
+  if (error) {
+    return <Text style={tw`text-red-500 text-center mt-10`}>데이터를 불러오지 못했습니다.</Text>;
+  }
+
+  return (
+    <ScrollView style={tw`flex-1 bg-gray-50`}>
+      {/* 긴급 모집 섹션은 별도로 구현 */}
+      <Text style={tw`text-lg font-bold p-4`}>일반 모집</Text>
+      <View style={tw`px-4 pb-4`}>
+        {jobs?.map(job => <JobCard key={job.id} job={job} />)}
+      </View>
+    </ScrollView>
+  );
+};
+
+export default JobsScreen;
+```
+
+#### **`apps/mobile/src/navigation/AppNavigator.tsx` (네비게이션)**
+탭 네비게이션을 설정하여 각 화면을 전환합니다.
+
+```jsx
+// apps/mobile/src/navigation/AppNavigator.tsx
+import React from 'react';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { Icon } from 'react-native-elements';
+import JobsScreen from '../screens/JobsScreen';
+// ConsultantsScreen, EducationScreen, NoticesScreen import...
+
+const Tab = createBottomTabNavigator();
+
+const AppNavigator = () => {
+  return (
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        tabBarIcon: ({ focused, color, size }) => {
+          let iconName: string;
+          if (route.name === 'Jobs') iconName = 'briefcase';
+          else if (route.name === 'Consultants') iconName = 'user-tie';
+          // ... 다른 아이콘 설정
+          return <Icon name={iconName} type='font-awesome-5' size={size} color={color} />;
+        },
+      })}
+    >
+      <Tab.Screen name="Jobs" component={JobsScreen} options={{ tabBarLabel: '컨설팅 및 인력 모집' }} />
+      <Tab.Screen name="Consultants" component={ConsultantsScreen} options={{ tabBarLabel: '전문가 매칭' }} />
+      {/* ... 다른 Tab.Screen들 */}
+    </Tab.Navigator>
+  );
+};
+
+export default AppNavigator;
+```
+
+---
+
+### **3단계: 연동 및 실행**
+
+1.  **`App.tsx` 설정:** `apps/mobile/src/App.tsx`에서 `QueryClient`와 `AppNavigator`를 연결합니다.
+    ```jsx
+    import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+    import AppNavigator from './src/navigation/AppNavigator';
+
+    const queryClient = new QueryClient();
+
+    export default function App() {
+      return (
+        <QueryClientProvider client={queryClient}>
+          <AppNavigator />
+        </QueryClientProvider>
+      );
+    }
+    ```
+2.  **실행:** 각 플랫폼에 맞게 앱을 실행합니다.
+    ```bash
+    # iOS
+    npx react-native run-ios
+    # Android
+    npx react-native run-android
+    ```
+
+---
+
+### **결론 및 다음 단계**
+
+이 구조는 다음과 같은 강력한 이점을 제공합니다.
+
+*   **명확한 분리:** UI(`apps/mobile`)와 비즈니스 로직(`packages`)이 완벽히 분리되어 유지보수가 쉽습니다.
+*   **코드 재사용:** `packages`에 작성된 모든 코드는 향후 `apps/web` (Next.js)에서 **그대로 재사용**될 수 있습니다.
+*   **협업 효율:** 프론트엔드 개발자는 UI에, 백엔드/로직 개발자는 `packages`에 집중하여 병렬적으로 작업할 수 있습니다.
+
+**다음 단계:**
+1.  **`ConsultantsScreen`, `EducationScreen` 등** 다른 탭 화면을 `JobsScreen`과 동일한 방식으로 구현합니다.
+2.  **`BannerCarousel`, `SearchBar`** 등 더 복잡한 UI 컴포넌트를 만들어 `HomeScreen`에 조립합니다.
+3.  **`useUIStore`**를 활용하여 탭 전환, 필터링, 사이드 메뉴 열기/닫기 등의 상호작용을 구현합니다.
+4.  `mockApi.ts`를 **실제 백엔드 API 엔드포인트**로 교체합니다.

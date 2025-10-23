@@ -6,6 +6,7 @@
     <title>CertMatch - 인증 앱</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="mobile.css">
 </head>
 <body>
     <!-- App Header -->
@@ -38,7 +39,7 @@
         </div>
         <div class="side-menu-content">
             <!-- 메인 메뉴 리스트 -->
-            <a href="#" class="menu-item">
+            <a href="apphome.html" class="menu-item" aria-label="홈으로 이동">
                 <i class="fas fa-home"></i>
                 <span>홈</span>
             </a>
@@ -930,6 +931,75 @@
             }
             lastTouchEnd = now;
         }, false);
+    </script>
+    <nav class="bottom-nav" role="tablist" aria-label="하단 네비게이션">
+        <a href="apphome.html" class="bottom-nav-item active" role="tab" aria-selected="true">
+            <i class="fas fa-home" aria-hidden="true"></i>
+            <span>홈</span>
+        </a>
+        <a href="jobs.html" class="bottom-nav-item" role="tab" aria-selected="false">
+            <i class="fas fa-briefcase" aria-hidden="true"></i>
+            <span>모집</span>
+        </a>
+        <a href="consultants.html" class="bottom-nav-item" role="tab" aria-selected="false">
+            <i class="fas fa-user-tie" aria-hidden="true"></i>
+            <span>전문가</span>
+        </a>
+        <a href="education.html" class="bottom-nav-item" role="tab" aria-selected="false">
+            <i class="fas fa-graduation-cap" aria-hidden="true"></i>
+            <span>교육</span>
+        </a>
+        <a href="notices.html" class="bottom-nav-item" role="tab" aria-selected="false">
+            <i class="fas fa-bullhorn" aria-hidden="true"></i>
+            <span>공지</span>
+        </a>
+    </nav>
+
+    <script>
+    (function() {
+      const menuToggle = document.getElementById('menuToggle');
+      const sideMenu = document.getElementById('sideMenu');
+      const overlay = document.getElementById('overlay');
+
+      function openMenu() { sideMenu.classList.add('open'); overlay.classList.add('show'); }
+      function closeMenu() { sideMenu.classList.remove('open'); overlay.classList.remove('show'); }
+
+      if (menuToggle && sideMenu && overlay) {
+        menuToggle.addEventListener('click', (e) => { e.preventDefault(); if (sideMenu.classList.contains('open')) closeMenu(); else openMenu(); });
+        overlay.addEventListener('click', closeMenu);
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMenu(); });
+      }
+
+      // Banner carousel (auto-rotate)
+      const slides = document.querySelectorAll('.banner-slide');
+      const dots = document.querySelectorAll('.banner-dot');
+      let current = 0;
+      function showSlide(index) {
+        slides.forEach((s, i) => s.classList.toggle('active', i === index));
+        dots.forEach((d, i) => d.classList.toggle('active', i === index));
+        current = index;
+      }
+      dots.forEach((dot) => {
+        dot.addEventListener('click', () => {
+          const idx = Number(dot.dataset.slide || '0');
+          showSlide(idx);
+        });
+      });
+      setInterval(() => {
+        if (slides.length === 0) return;
+        const next = (current + 1) % slides.length;
+        showSlide(next);
+      }, 4000);
+
+      // Quick filters interaction
+      const filterChips = document.querySelectorAll('.filter-chip');
+      filterChips.forEach((chip) => {
+        chip.addEventListener('click', () => {
+          filterChips.forEach((c) => c.classList.remove('active'));
+          chip.classList.add('active');
+        });
+      });
+    })();
     </script>
 </body>
 </html>
