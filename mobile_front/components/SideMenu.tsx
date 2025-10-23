@@ -33,14 +33,32 @@ export const SideMenu: React.FC<SideMenuProps> = ({ visible, onClose }) => {
     });
   };
 
+  // Handle hardware back button on Android
+  const handleBackButton = () => {
+    handleClose();
+    return true;
+  };
+
   return (
-    <Modal visible={visible} animationType="fade" transparent>
-      <View style={styles.overlay}>
+    <Modal
+      visible={visible}
+      animationType="fade"
+      transparent
+      onRequestClose={handleBackButton}
+    >
+      <TouchableOpacity
+        style={styles.overlay}
+        onPress={handleClose}
+        activeOpacity={1}
+      >
         {/* 메뉴를 좌측에 배치하고 좌->우 슬라이드 애니메이션 적용 */}
-        <Animated.View style={[styles.menu, { transform: [{ translateX: slideAnim }] }]}>
+        <Animated.View
+          style={[styles.menu, { transform: [{ translateX: slideAnim }] }]}
+          onStartShouldSetResponder={() => true}
+        >
           <View style={styles.header}>
             <View style={styles.avatar}>
-              <FontAwesome5 name="user" size={20} color="#fff" />
+              <FontAwesome5 name="user" size={24} color="#0066CC" />
             </View>
             <View style={styles.userInfo}>
               <Text style={styles.userName}>홍길동</Text>
@@ -69,16 +87,14 @@ export const SideMenu: React.FC<SideMenuProps> = ({ visible, onClose }) => {
             <MenuItem icon="sign-out-alt" label="로그아웃" />
           </ScrollView>
         </Animated.View>
-        {/* 남은 영역 터치 시 닫기 애니메이션 후 종료 */}
-        <TouchableOpacity style={styles.overlayTouchable} onPress={handleClose} />
-      </View>
+      </TouchableOpacity>
     </Modal>
   );
 };
 
 const MenuItem = ({ icon, label }: { icon: any; label: string }) => (
   <TouchableOpacity style={styles.menuItem}>
-    <FontAwesome5 name={icon} size={18} color="#333" style={{ width: 24 }} />
+    <FontAwesome5 name={icon} size={18} color="#0066CC" style={{ width: 24 }} />
     <Text style={styles.menuLabel}>{label}</Text>
   </TouchableOpacity>
 );
@@ -86,63 +102,60 @@ const MenuItem = ({ icon, label }: { icon: any; label: string }) => (
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.35)',
-    flexDirection: 'row',
-  },
-  overlayTouchable: {
-    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
   },
   menu: {
     width: 280,
+    height: '100%',
     backgroundColor: '#fff',
     shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
     elevation: 10,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
-    backgroundColor: '#2d89ef',
+    padding: 20,
+    backgroundColor: '#0066CC',
+    gap: 15,
   },
   avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#1b5fbf',
-    marginRight: 12,
+    backgroundColor: '#fff',
   },
   userInfo: {},
   userName: {
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
+    marginBottom: 5,
   },
   userCompany: {
     color: '#e6f0ff',
-    marginTop: 2,
-    fontSize: 13,
+    fontSize: 12,
   },
   content: {
-    paddingHorizontal: 8,
+    paddingHorizontal: 0,
   },
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 8,
+    paddingVertical: 15,
+    paddingHorizontal: 20,
   },
   menuLabel: {
-    marginLeft: 10,
+    marginLeft: 15,
     fontSize: 15,
-    color: '#222',
+    color: '#333',
   },
   divider: {
     height: 1,
     backgroundColor: '#eee',
-    marginVertical: 8,
+    marginVertical: 10,
   },
 });
