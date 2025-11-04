@@ -1,13 +1,30 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 interface HeaderProps {
   onMenuPress: () => void;
   notificationCount?: number;
 }
 
+type RootStackParamList = {
+  Main: undefined;
+  Login: undefined;
+  Signup: undefined;
+};
+
+type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
+
 export const Header: React.FC<HeaderProps> = ({ onMenuPress, notificationCount = 3 }) => {
+  const navigation = useNavigation<NavigationProp>();
+
+  const handleProfilePress = () => {
+    // Navigate to login screen
+    navigation.navigate('Login');
+  };
+
   return (
     <View style={styles.container}>
       <TouchableOpacity style={styles.leftIcon} onPress={onMenuPress} accessibilityRole="button" accessibilityLabel="Open menu">
@@ -23,7 +40,10 @@ export const Header: React.FC<HeaderProps> = ({ onMenuPress, notificationCount =
             </View>
           )}
         </View>
-        <TouchableOpacity style={styles.rightIcon}>
+        <TouchableOpacity 
+          style={styles.rightIcon}
+          onPress={handleProfilePress}
+        >
           <FontAwesome5 name="user-circle" size={22} color="#fff" />
         </TouchableOpacity>
       </View>

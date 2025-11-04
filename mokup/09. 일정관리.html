@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CertMatch - 일정관리</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .app-content {
+            padding: 20px;
+            padding-bottom: 80px;
+        }
+
+        /* Calendar View Toggle */
+        .view-toggle {
+            display: flex;
+            background-color: white;
+            border-radius: 10px;
+            padding: 5px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .view-option {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            border: none;
+            background: none;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 5px;
+            color: #666;
+        }
+        .view-option.active {
+            background-color: #4a6fdc;
+            color: white;
+        }
+
+        /* Calendar Container */
+        .calendar-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .calendar-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+        .calendar-nav {
+            display: flex;
+            gap: 10px;
+        }
+        .calendar-nav button {
+            background: none;
+            border: none;
+            color: #4a6fdc;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        /* Month View Calendar */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+        .calendar-day-header {
+            text-align: center;
+            font-weight: bold;
+            font-size: 14px;
+            padding: 10px 0;
+            color: #666;
+        }
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            position: relative;
+        }
+        .calendar-day:hover {
+            background-color: #f1f3f4;
+        }
+        .calendar-day.other-month {
+            color: #ccc;
+        }
+        .calendar-day.today {
+            background-color: #e8f0fe;
+            color: #4a6fdc;
+            font-weight: bold;
+        }
+        .calendar-day.has-event {
+            background-color: #f8f9fa;
+        }
+        .day-number {
+            font-size: 14px;
+        }
+        .event-dots {
+            display: flex;
+            gap: 3px;
+            margin-top: 5px;
+            justify-content: center;
+        }
+        .event-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+        .event-dot.audit { background-color: #4a6fdc; }
+        .event-dot.education { background-color: #28a745; }
+        .event-dot.consulting { background-color: #ffc107; }
+
+        /* Week View Calendar */
+        .week-view {
+            display: none;
+        }
+        .week-grid {
+            display: grid;
+            grid-template-columns: 80px repeat(7, 1fr);
+            gap: 5px;
+        }
+        .time-slot {
+            padding: 10px 0;
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+            border-right: 1px solid #eee;
+        }
+        .week-day-column {
+            border-bottom: 1px solid #eee;
+            min-height: 60px;
+        }
+        .week-event {
+            background-color: #e8f0fe;
+            border-left: 3px solid #4a6fdc;
+            padding: 5px;
+            margin: 2px;
+            border-radius: 3px;
+            font-size: 12px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* Day View Calendar */
+        .day-view {
+            display: none;
+        }
+        .day-grid {
+            display: grid;
+            grid-template-columns: 80px 1fr;
+            gap: 5px;
+        }
+        .day-event {
+            background-color: #e8f0fe;
+            border-left: 3px solid #4a6fdc;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 3px;
+        }
+        .day-event-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .day-event-time {
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* Event List */
+        .event-list {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .event-list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .event-list-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+        .add-event-btn {
+            background-color: #4a6fdc;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .event-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .event-item:last-child {
+            border-bottom: none;
+        }
+        .event-color {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            margin-right: 15px;
+        }
+        .event-color.audit { background-color: #4a6fdc; }
+        .event-color.education { background-color: #28a745; }
+        .event-color.consulting { background-color: #ffc107; }
+        .event-info {
+            flex-grow: 1;
+        }
+        .event-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .event-meta {
+            font-size: 14px;
+            color: #666;
+        }
+
+        /* Settings Section */
+        .settings-section {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .settings-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+        .setting-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .setting-label i {
+            color: #4a6fdc;
+        }
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 26px;
+            background-color: #ccc;
+            border-radius: 13px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .toggle-switch.active {
+            background-color: #4a6fdc;
+        }
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background-color: white;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s;
+        }
+        .toggle-switch.active::after {
+            transform: translateX(24px);
+        }
+    </style>
+</head>
+<body>
+    <!-- App Header -->
+    <header class="app-header">
+        <div class="header-icon" id="menuToggle">
+            <i class="fas fa-bars"></i>
+        </div>
+        <div class="app-title">일정관리</div>
+        <div class="header-icons">
+            <div class="header-icon">
+                <i class="fas fa-bell"></i>
+                <span class="notification-badge">3</span>
+            </div>
+            <div class="header-icon">
+                <i class="fas fa-user-circle"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- App Content -->
+    <div class="app-content">
+        <!-- Calendar View Toggle -->
+        <div class="view-toggle">
+            <button class="view-option active" onclick="showCalendarView('month')">월</button>
+            <button class="view-option" onclick="showCalendarView('week')">주</button>
+            <button class="view-option" onclick="showCalendarView('day')">일</button>
+        </div>
+
+        <!-- Calendar Container -->
+        <div class="calendar-container">
+            <div class="calendar-header">
+                <div class="calendar-title">2024년 2월</div>
+                <div class="calendar-nav">
+                    <button><i class="fas fa-chevron-left"></i></button>
+                    <button><i class="fas fa-chevron-right"></i></button>
+                    <button><i class="fas fa-calendar-alt"></i></button>
+                </div>
+            </div>
+
+            <!-- Month View Calendar -->
+            <div id="monthView" class="month-view">
+                <div class="calendar-grid">
+                    <div class="calendar-day-header">일</div>
+                    <div class="calendar-day-header">월</div>
+                    <div class="calendar-day-header">화</div>
+                    <div class="calendar-day-header">수</div>
+                    <div class="calendar-day-header">목</div>
+                    <div class="calendar-day-header">금</div>
+                    <div class="calendar-day-header">토</div>
+                    
+                    <!-- Previous month days -->
+                    <div class="calendar-day other-month">
+                        <div class="day-number">28</div>
+                    </div>
+                    <div class="calendar-day other-month">
+                        <div class="day-number">29</div>
+                    </div>
+                    <div class="calendar-day other-month">
+                        <div class="day-number">30</div>
+                    </div>
+                    <div class="calendar-day other-month">
+                        <div class="day-number">31</div>
+                    </div>
+                    
+                    <!-- Current month days -->
+                    <div class="calendar-day">
+                        <div class="day-number">1</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">2</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">3</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">4</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">5</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">6</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">7</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">8</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">9</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">10</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">11</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">12</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">13</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">14</div>
+                    </div>
+                    <div class="calendar-day has-event">
+                        <div class="day-number">15</div>
+                        <div class="event-dots">
+                            <div class="event-dot audit"></div>
+                        </div>
+                    </div>
+                    <div class="calendar-day has-event">
+                        <div class="day-number">16</div>
+                        <div class="event-dots">
+                            <div class="event-dot audit"></div>
+                        </div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">17</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">18</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">19</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">20</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">21</div>
+                    </div>
+                    <div class="calendar-day has-event">
+                        <div class="day-number">22</div>
+                        <div class="event-dots">
+                            <div class="event-dot education"></div>
+                        </div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">23</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">24</div>
+                    </div>
+                    <div class="calendar-day has-event">
+                        <div class="day-number">25</div>
+                        <div class="event-dots">
+                            <div class="event-dot consulting"></div>
+                        </div>
+                    </div>
+                    <div class="calendar-day has-event">
+                        <div class="day-number">26</div>
+                        <div class="event-dots">
+                            <div class="event-dot consulting"></div>
+                        </div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">27</div>
+                    </div>
+                    <div class="calendar-day has-event">
+                        <div class="day-number">28</div>
+                        <div class="event-dots">
+                            <div class="event-dot audit"></div>
+                        </div>
+                    </div>
+                    <div class="calendar-day has-event">
+                        <div class="day-number">29</div>
+                        <div class="event-dots">
+                            <div class="event-dot audit"></div>
+                        </div>
+                    </div>
+                    <!-- Next month days -->
+                    <div class="calendar-day other-month">
+                        <div class="day-number">1</div>
+                    </div>
+                    <div class="calendar-day other-month">
+                        <div class="day-number">2</div>
+                    </div>
+                    <div class="calendar-day other-month">
+                        <div class="day-number">3</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Week View Calendar -->
+            <div id="weekView" class="week-view">
+                <div class="week-grid">
+                    <div class="time-slot"></div>
+                    <div class="calendar-day-header">일</div>
+                    <div class="calendar-day-header">월</div>
+                    <div class="calendar-day-header">화</div>
+                    <div class="calendar-day-header">수</div>
+                    <div class="calendar-day-header">목</div>
+                    <div class="calendar-day-header">금</div>
+                    <div class="calendar-day-header">토</div>
+                    
+                    <div class="time-slot">09:00</div>
+                    <div class="week-day-column"></div>
+                    <div class="week-day-column"></div>
+                    <div class="week-day-column"></div>
+                    <div class="week-day-column">
+                        <div class="week-event">㈜테크솔루션 ISMS-P 심사</div>
+                    </div>
+                    <div class="week-day-column">
+                        <div class="week-event">㈜테크솔루션 ISMS-P 심사</div>
+                    </div>
+                    <div class="week-day-column"></div>
+                    <div class="week-day-column"></div>
+                    
+                    <div class="time-slot">10:00</div>
+                    <div class="week-day-column"></div>
+                    <div class="week-day-column"></div>
+                    <div class="week-day-column"></div>
+                    <div class="week-day-column"></div>
+                    <div class="week-day-column"></div>
+                    <div class="week-day-column"></div>
+                    <div class="week-day-column"></div>
+                    
+                    <div class="time-slot">11:00</div>
+                    <div class="week-day-column"></div>
+                    <div class="week-day-column"></div>
+                    <div class="week-day-column"></div>
+                    <div class="week-day-column"></div>
+                    <div class="week-day-column"></div>
+                    <div class="week-day-column"></div>
+                    <div class="week-day-column"></div>
+                    
+                    <div class="time-slot">12:00</div>
+                    <div class="week-day-column"></div>
+                    <div class="week-day-column"></div>
+                    <div class="week-day-column"></div>
+                    <div class="week-day-column"></div>
+                    <div class="week-day-column"></div>
+                    <div class="week-day-column"></div>
+                    <div class="week-day-column"></div>
+                    
+                    <div class="time-slot">13:00</div>
+                    <div class="week-day-column"></div>
+                    <div class="week-day-column"></div>
+                    <div class="week-day-column"></div>
+                    <div class="week-day-column"></div>
+                    <div class="week-day-column"></div>
+                    <div class="week-day-column"></div>
+                    <div class="week-day-column"></div>
+                    
+                    <div class="time-slot">14:00</div>
+                    <div class="week-day-column"></div>
+                    <div class="week-day-column"></div>
+                    <div class="week-day-column"></div>
+                    <div class="week-day-column"></div>
+                    <div class="week-day-column"></div>
+                    <div class="week-day-column"></div>
+                    <div class="week-day-column"></div>
+                    
+                    <div class="time-slot">15:00</div>
+                    <div class="week-day-column"></div>
+                    <div class="week-day-column"></div>
+                    <div class="week-day-column"></div>
+                    <div class="week-day-column"></div>
+                    <div class="week-day-column"></div>
+                    <div class="week-day-column"></div>
+                    <div class="week-day-column"></div>
+                    
+                    <div class="time-slot">16:00</div>
+                    <div class="week-day-column"></div>
+                    <div class="week-day-column"></div>
+                    <div class="week-day-column"></div>
+                    <div class="week-day-column"></div>
+                    <div class="week-day-column"></div>
+                    <div class="week-day-column"></div>
+                    <div class="week-day-column"></div>
+                    
+                    <div class="time-slot">17:00</div>
+                    <div class="week-day-column"></div>
+                    <div class="week-day-column"></div>
+                    <div class="week-day-column"></div>
+                    <div class="week-day-column"></div>
+                    <div class="week-day-column"></div>
+                    <div class="week-day-column"></div>
+                    <div class="week-day-column"></div>
+                    
+                    <div class="time-slot">18:00</div>
+                    <div class="week-day-column"></div>
+                    <div class="week-day-column"></div>
+                    <div class="week-day-column"></div>
+                    <div class="week-day-column"></div>
+                    <div class="week-day-column"></div>
+                    <div class="week-day-column"></div>
+                    <div class="week-day-column"></div>
+                </div>
+            </div>
+
+            <!-- Day View Calendar -->
+            <div id="dayView" class="day-view">
+                <div class="day-grid">
+                    <div class="time-slot">09:00</div>
+                    <div class="day-column"></div>
+                    
+                    <div class="time-slot">10:00</div>
+                    <div class="day-column">
+                        <div class="day-event">
+                            <div class="day-event-title">㈜테크솔루션 ISMS-P 심사</div>
+                            <div class="day-event-time">10:00 - 17:00</div>
+                        </div>
+                    </div>
+                    
+                    <div class="time-slot">11:00</div>
+                    <div class="day-column"></div>
+                    
+                    <div class="time-slot">12:00</div>
+                    <div class="day-column"></div>
+                    
+                    <div class="time-slot">13:00</div>
+                    <div class="day-column"></div>
+                    
+                    <div class="time-slot">14:00</div>
+                    <div class="day-column"></div>
+                    
+                    <div class="time-slot">15:00</div>
+                    <div class="day-column"></div>
+                    
+                    <div class="time-slot">16:00</div>
+                    <div class="day-column"></div>
+                    
+                    <div class="time-slot">17:00</div>
+                    <div class="day-column"></div>
+                    
+                    <div class="time-slot">18:00</div>
+                    <div class="day-column"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Event List -->
+        <div class="event-list">
+            <div class="event-list-header">
+                <div class="event-list-title">다가오는 일정</div>
+                <button class="add-event-btn" onclick="showAddEventModal()">
+                    <i class="fas fa-plus"></i> 일정 추가
+                </button>
+            </div>
+            
+            <div class="event-item">
+                <div class="event-color audit"></div>
+                <div class="event-info">
+                    <div class="event-title">㈜테크솔루션 ISMS-P 심사</div>
+                    <div class="event-meta">2월 15일 (목) 10:00 - 17:00</div>
+                </div>
+            </div>
+            
+            <div class="event-item">
+                <div class="event-color audit"></div>
+                <div class="event-info">
+                    <div class="event-title">㈜테크솔루션 ISMS-P 심사</div>
+                    <div class="event-meta">2월 16일 (금) 10:00 - 17:00</div>
+                </div>
+            </div>
+            
+            <div class="event-item">
+                <div class="event-color education"></div>
+                <div class="event-info">
+                    <div class="event-title">ISMS-P 심사원 기본과정</div>
+                    <div class="event-meta">2월 22일 (목) 09:00 - 18:00</div>
+                </div>
+            </div>
+            
+            <div class="event-item">
+                <div class="event-color consulting"></div>
+                <div class="event-info">
+                    <div class="event-title">A은행 정보보호 컨설팅</div>
+                    <div class="event-meta">2월 25일 (일) 14:00 - 17:00</div>
+                </div>
+            </div>
+            
+            <div class="event-item">
+                <div class="event-color consulting"></div>
+                <div class="event-info">
+                    <div class="event-title">A은행 정보보호 컨설팅</div>
+                    <div class="event-meta">2월 26일 (월) 14:00 - 17:00</div>
+                </div>
+            </div>
+            
+            <div class="event-item">
+                <div class="event-color audit"></div>
+                <div class="event-info">
+                    <div class="event-title">㈡클라우드테크 ISO 27001 심사</div>
+                    <div class="event-meta">2월 28일 (수) 10:00 - 17:00</div>
+                </div>
+            </div>
+            
+            <div class="event-item">
+                <div class="event-color audit"></div>
+                <div class="event-info">
+                    <div class="event-title">㈡클라우드테크 ISO 27001 심사</div>
+                    <div class="event-meta">2월 29일 (목) 10:00 - 17:00</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Section -->
+        <div class="settings-section">
+            <div class="settings-title">일정 설정</div>
+            
+            <div class="setting-item">
+                <div class="setting-label">
+                    <i class="fas fa-bell"></i>
+                    <span>일정 알림</span>
+                </div>
+                <div class="toggle-switch active" onclick="toggleSwitch(this)"></div>
+            </div>
+            
+            <div class="setting-item">
+                <div class="setting-label">
+                    <i class="fas fa-share-alt"></i>
+                    <span>일정 공유</span>
+                </div>
+                <div class="toggle-switch" onclick="toggleSwitch(this)"></div>
+            </div>
+            
+            <div class="setting-item">
+                <div class="setting-label">
+                    <i class="fab fa-google"></i>
+                    <span>Google Calendar 연동</span>
+                </div>
+                <div class="toggle-switch" onclick="toggleSwitch(this)"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="#" class="nav-item">
+            <i class="fas fa-home"></i>
+            <span>홈</span>
+        </a>
+        <a href="#" class="nav-item">
+            <i class="fas fa-user-plus"></i>
+            <span>전문가 등록</span>
+        </a>        
+        <a href="#" class="nav-item active">
+            <i class="fas fa-calendar-alt"></i>
+            <span>일정관리</span>
+        </a>
+        <a href="#" class="nav-item">
+            <i class="fas fa-clipboard-check"></i>
+            <span>심사 지원</span>
+        </a>
+        <a href="#" class="nav-item">
+            <i class="fas fa-trophy"></i>
+            <span>성공사례</span>
+        </a>
+    </nav>
+
+    <!-- Add Event Modal (Hidden by default) -->
+    <div id="addEventModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>일정 추가</h3>
+                <button class="close-btn" onclick="hideAddEventModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">일정 유형</label>
+                    <select class="form-control">
+                        <option value="audit">심사 일정</option>
+                        <option value="education">교육 일정</option>
+                        <option value="consulting">컨설팅 일정</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">제목</label>
+                    <input type="text" class="form-control" placeholder="일정 제목을 입력하세요">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">시작일</label>
+                        <input type="date" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">종료일</label>
+                        <input type="date" class="form-control">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">시작시간</label>
+                        <input type="time" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">종료시간</label>
+                        <input type="time" class="form-control">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">장소</label>
+                    <input type="text" class="form-control" placeholder="일정 장소를 입력하세요">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">메모</label>
+                    <textarea class="form-control" rows="3" placeholder="메모를 입력하세요"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="hideAddEventModal()">취소</button>
+                <button class="btn btn-primary" onclick="addEvent()">추가</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Calendar View Toggle
+        function showCalendarView(view) {
+            // Deactivate all view options and views
+            document.querySelectorAll('.view-option').forEach(option => option.classList.remove('active'));
+            document.getElementById('monthView').style.display = 'none';
+            document.getElementById('weekView').style.display = 'none';
+            document.getElementById('dayView').style.display = 'none';
+            
+            // Activate the selected view
+            event.target.classList.add('active');
+            
+            if (view === 'month') {
+                document.getElementById('monthView').style.display = 'block';
+            } else if (view === 'week') {
+                document.getElementById('weekView').style.display = 'block';
+            } else if (view === 'day') {
+                document.getElementById('dayView').style.display = 'block';
+            }
+        }
+
+        // Toggle Switch
+        function toggleSwitch(element) {
+            element.classList.toggle('active');
+        }
+
+        // Add Event Modal
+        function showAddEventModal() {
+            document.getElementById('addEventModal').style.display = 'flex';
+        }
+
+        function hideAddEventModal() {
+            document.getElementById('addEventModal').style.display = 'none';
+        }
+
+        function addEvent() {
+            // In a real app, this would save the event to the database
+            alert('일정이 추가되었습니다.');
+            hideAddEventModal();
+        }
+
+        // Side Menu Toggle (from original code)
+        const menuToggle = document.getElementById('menuToggle');
+        const sideMenu = document.getElementById('sideMenu'); // Assuming sideMenu exists
+        const overlay = document.getElementById('overlay');   // Assuming overlay exists
+
+        if (menuToggle && sideMenu && overlay) {
+            menuToggle.addEventListener('click', function() {
+                sideMenu.classList.add('active');
+                overlay.classList.add('active');
+            });
+            overlay.addEventListener('click', function() {
+                sideMenu.classList.remove('active');
+                overlay.classList.remove('active');
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CertMatch - 심사 지원/결과</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        
+        .app-content {
+            padding-bottom: 80px;
+        }
+        
+        .container {
+            padding: 20px;
+        }
+        
+        /* 뷰 전환용 컨테이너 */
+        .view-container {
+            display: none;
+        }
+        
+        .view-container.active {
+            display: block;
+        }
+        
+        /* 헤더 */
+        .header-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .page-title {
+            font-size: 22px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        
+        /* 심사 요청 목록 스타일 */
+        .audit-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .audit-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+            cursor: pointer;
+        }
+        
+        .audit-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+        
+        .card-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .card-company {
+            font-size: 14px;
+            color: #666;
+            margin-top: 3px;
+        }
+        
+        .card-status {
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        
+        .status-requested { background-color: #fff3cd; color: #856404; }
+        .status-scheduled { background-color: #cce5ff; color: #004085; }
+        .status-in-progress { background-color: #d1ecf1; color: #0c5460; }
+        .status-reporting { background-color: #e2e3e5; color: #383d41; }
+        .status-completed { background-color: #d4edda; color: #155724; }
+        
+        .card-meta {
+            display: flex;
+            gap: 15px;
+            margin: 10px 0;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .card-meta-item {
+            display: flex;
+            align-items: center;
+        }
+        
+        .card-meta-item i {
+            margin-right: 5px;
+            color: #4a6fdc;
+        }
+        
+        /* 심사 상세 뷰 스타일 */
+        .detail-header {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .detail-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .detail-meta {
+            display: flex;
+            gap: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        /* 탭 네비게이션 */
+        .tab-nav {
+            display: flex;
+            background-color: white;
+            border-radius: 10px;
+            padding: 5px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .tab-button {
+            flex: 1;
+            padding: 12px;
+            background: none;
+            border: none;
+            font-size: 14px;
+            color: #666;
+            cursor: pointer;
+            border-radius: 7px;
+            transition: all 0.3s;
+        }
+        
+        .tab-button.active {
+            background-color: #4a6fdc;
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* 탭 콘텐츠 스타일 */
+        .content-section {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .section-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #333;
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-title i {
+            margin-right: 8px;
+            color: #4a6fdc;
+        }
+        
+        /* 진행 상황 타임라인 */
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background-color: #e9ecef;
+        }
+        
+        .timeline-item {
+            position: relative;
+            padding-bottom: 20px;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -25px;
+            top: 5px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #e9ecef;
+            border: 2px solid white;
+        }
+        
+        .timeline-item.active::before {
+            background-color: #4a6fdc;
+        }
+        
+        .timeline-item.completed::before {
+            background-color: #51cf66;
+        }
+        
+        .timeline-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .timeline-date {
+            font-size: 12px;
+            color: #999;
+        }
+        
+        /* 보고서 업로드 */
+        .file-upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+        
+        .file-upload-area:hover {
+            border-color: #4a6fdc;
+        }
+        
+        .file-upload-area i {
+            font-size: 36px;
+            color: #4a6fdc;
+            margin-bottom: 10px;
+        }
+        
+        .uploaded-file {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        
+        .uploaded-file-name {
+            display: flex;
+            align-items: center;
+        }
+        
+        .uploaded-file-name i {
+            margin-right: 8px;
+            color: #4a6fdc;
+        }
+        
+        /* 메시지 */
+        .message-thread {
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .message {
+            margin-bottom: 15px;
+        }
+        
+        .message-sent {
+            text-align: right;
+        }
+        
+        .message-received {
+            text-align: left;
+        }
+        
+        .message-bubble {
+            display: inline-block;
+            padding: 8px 12px;
+            border-radius: 15px;
+            max-width: 70%;
+            font-size: 14px;
+        }
+        
+        .message-sent .message-bubble {
+            background-color: #4a6fdc;
+            color: white;
+        }
+        
+        .message-received .message-bubble {
+            background-color: white;
+            color: #333;
+        }
+        
+        .message-time {
+            font-size: 11px;
+            color: #999;
+            margin-top: 3px;
+        }
+        
+        .message-input-container {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .message-input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+        
+        .send-button {
+            padding: 10px 15px;
+            background-color: #4a6fdc;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        
+        /* 액션 버튼 */
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            flex: 1;
+        }
+        
+        .btn-primary {
+            background-color: #4a6fdc;
+            color: white;
+        }
+        
+        .btn-success {
+            background-color: #51cf66;
+            color: white;
+        }
+        
+        .btn-danger {
+            background-color: #e03131;
+            color: white;
+        }
+        
+        /* 이력 목록 */
+        .history-item {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .history-info h4 {
+            margin: 0 0 5px 0;
+            font-size: 16px;
+        }
+        
+        .history-info p {
+            margin: 0;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .history-date {
+            font-size: 12px;
+            color: #999;
+        }
+        
+        /* 토스트 알림 */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0,0,0,0.7);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            display: none;
+            z-index: 1001;
+        }
+        
+        .toast.show {
+            display: block;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+        
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            color: #ddd;
+        }
+    </style>
+</head>
+<body>
+    <!-- App Header -->
+    <header class="app-header">
+        <div class="header-icon" id="backButton">
+            <i class="fas fa-arrow-left"></i>
+        </div>
+        <div class="app-title">심사 지원/결과</div>
+        <div class="header-icons">
+            <div class="header-icon">
+                <i class="fas fa-home" id="homeButton"></i>
+            </div>
+        </div>
+    </header>
+    
+    <!-- App Content -->
+    <div class="app-content">
+        <!-- 심사 요청 목록 뷰 -->
+        <div class="view-container active" id="auditListView">
+            <div class="container">
+                <div class="header-actions">
+                    <h1 class="page-title">심사 요청 목록</h1>
+                    <button class="btn-secondary" id="viewHistoryBtn">
+                        <i class="fas fa-history"></i>
+                        <span>심사 이력</span>
+                    </button>
+                </div>
+                
+                <div class="audit-list" id="auditList">
+                    <!-- 동적으로 채워짐 -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- 심사 상세 뷰 -->
+        <div class="view-container" id="auditDetailView">
+            <div class="container">
+                <div class="detail-header">
+                    <h2 class="detail-title" id="detailTitle">ISMS-P 인증 심사</h2>
+                    <div class="detail-meta">
+                        <span><i class="fas fa-building"></i> <span id="detailCompany">㈜테크솔루션</span></span>
+                        <span><i class="fas fa-calendar"></i> <span id="detailDate">2025-03-20</span></span>
+                        <span class="card-status" id="detailStatus">심사 중</span>
+                    </div>
+                </div>
+                
+                <!-- 탭 네비게이션 -->
+                <div class="tab-nav">
+                    <button class="tab-button active" data-tab="progress">진행 상황</button>
+                    <button class="tab-button" data-tab="schedule">일정 및 정보</button>
+                    <button class="tab-button" data-tab="report">보고서</button>
+                    <button class="tab-button" data-tab="messages">메시지</button>
+                </div>
+                
+                <!-- 탭 콘텐츠 -->
+                <!-- 진행 상황 -->
+                <div class="tab-content active" id="progress">
+                    <div class="content-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-tasks"></i>
+                            <span>심사 진행 단계</span>
+                        </h3>
+                        <div class="timeline" id="progressTimeline">
+                            <!-- 동적으로 채워짐 -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 일정 및 정보 -->
+                <div class="tab-content" id="schedule">
+                    <div class="content-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span>심사 일정</span>
+                        </h3>
+                        <p><strong>예정일:</strong> 2025년 3월 20일 (수) 09:00 - 18:00</p>
+                        <p><strong>심사장:</strong> 서울 강남구 테헤란로 123㈜테크솔루션 본사</p>
+                    </div>
+                    
+                    <div class="content-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-info-circle"></i>
+                            <span>업체 정보</span>
+                        </h3>
+                        <p><strong>담당자:</strong> 김민수 부장</p>
+                        <p><strong>연락처:</strong> 010-1234-5678</p>
+                        <p><strong>이메일:</strong> kimms@techsolution.co.kr</p>
+                    </div>
+                    
+                    <div class="content-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-clipboard-list"></i>
+                            <span>심사 범위</span>
+                        </h3>
+                        <p>㈜테크솔루션의 전사적인 정보보호 관리체계 및 관련 통제항목</p>
+                    </div>
+                </div>
+                
+                <!-- 보고서 -->
+                <div class="tab-content" id="report">
+                    <div class="content-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-file-alt"></i>
+                            <span>심사 보고서</span>
+                        </h3>
+                        
+                        <div id="reportUploadArea">
+                            <div class="file-upload-area" id="uploadButton">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p>보고서 파일 업로드</p>
+                                <p style="font-size: 12px; color: #999;">PDF, DOC, DOCX (최대 10MB)</p>
+                            </div>
+                            <input type="file" id="reportFileInput" accept=".pdf,.doc,.docx" style="display: none;">
+                            <div id="uploadedFileContainer"></div>
+                        </div>
+                        
+                        <div style="margin-top: 20px;">
+                            <label for="reportSummary" style="display: block; margin-bottom: 5px; font-weight: 500;">요약 및 의견</label>
+                            <textarea id="reportSummary" class="form-control" rows="4" placeholder="심사 결과에 대한 요약 및 의견을 입력하세요..."></textarea>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 메시지 -->
+                <div class="tab-content" id="messages">
+                    <div class="content-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-comments"></i>
+                            <span>업체와의 메시지</span>
+                        </h3>
+                        
+                        <div class="message-thread" id="messageThread">
+                            <!-- 동적으로 채워짐 -->
+                        </div>
+                        
+                        <div class="message-input-container">
+                            <input type="text" class="message-input" id="messageInput" placeholder="메시지를 입력하세요...">
+                            <button class="send-button" id="sendMessageBtn">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 액션 버튼 -->
+                <div class="action-buttons" id="actionButtons">
+                    <button class="btn btn-success" id="completeAuditBtn">심사 완료 처리</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 심사 이력 뷰 -->
+        <div class="view-container" id="auditHistoryView">
+            <div class="container">
+                <div class="header-actions">
+                    <h1 class="page-title">심사 이력</h1>
+                    <button class="btn-secondary" id="backToListBtn">
+                        <i class="fas fa-list"></i>
+                        <span>목록으로</span>
+                    </button>
+                </div>
+                
+                <div id="historyList">
+                    <!-- 동적으로 채워짐 -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+    
+    <script>
+        // Mock 데이터
+        const mockAudits = [
+            {
+                id: 1,
+                company: '㈜테크솔루션',
+                type: 'ISMS-P 인증 심사',
+                status: 'in-progress',
+                scheduledDate: '2025-03-20',
+                auditor: '김민수',
+                reportUploaded: false,
+                progress: [
+                    { step: '심사 요청', completed: true, date: '2025-03-10' },
+                    { step: '일정 확정', completed: true, date: '2025-03-12' },
+                    { step: '심사 진행 중', completed: false, date: null },
+                    { step: '보고서 작성', completed: false, date: null },
+                    { step: '심사 완료', completed: false, date: null }
+                ]
+            },
+            {
+                id: 2,
+                company: '㈜핀테크코리아',
+                type: 'ISO 27001 갱신 심사',
+                status: 'reporting',
+                scheduledDate: '2025-03-15',
+                auditor: '이지영',
+                reportUploaded: true,
+                progress: [
+                    { step: '심사 요청', completed: true, date: '2025-03-05' },
+                    { step: '일정 확정', completed: true, date: '2025-03-07' },
+                    { step: '심사 진행 중', completed: true, date: '2025-03-15' },
+                    { step: '보고서 작성', completed: false, date: null },
+                    { step: '심사 완료', completed: false, date: null }
+                ]
+            },
+            {
+                id: 3,
+                company: '㈜디지털이노베이션',
+                type: 'GS 인증 심사',
+                status: 'completed',
+                scheduledDate: '2025-02-20',
+                auditor: '박준호',
+                reportUploaded: true,
+                progress: [
+                    { step: '심사 요청', completed: true, date: '2025-02-10' },
+                    { step: '일정 확정', completed: true, date: '2025-02-12' },
+                    { step: '심사 진행 중', completed: true, date: '2025-02-20' },
+                    { step: '보고서 작성', completed: true, date: '2025-02-22' },
+                    { step: '심사 완료', completed: true, date: '2025-02-25' }
+                ]
+            }
+        ];
+        
+        const mockMessages = [
+            { sender: 'company', text: '심사일 확인했습니다. 준비하겠습니다.', time: '2025-03-12 14:30' },
+            { sender: 'auditor', text: '네, 확인 감사합니다. 필요한 서류는 미리 준비 부탁드립니다.', time: '2025-03-12 15:00' }
+        ];
+        
+        let currentAuditId = null;
+        
+        // 토스트 메시지 표시 함수
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+        
+        // 뷰 전환 함수
+        function showView(viewId) {
+            document.querySelectorAll('.view-container').forEach(view => {
+                view.classList.remove('active');
+            });
+            document.getElementById(viewId).classList.add('active');
+        }
+        
+        // 심사 카드 생성 함수
+        function createAuditCard(audit) {
+            const statusClass = `status-${audit.status.replace('_', '-')}`;
+            const statusText = {
+                'requested': '요청됨',
+                'scheduled': '일정 확정',
+                'in-progress': '심사 중',
+                'reporting': '보고서 작성 중',
+                'completed': '완료'
+            }[audit.status];
+            
+            return `
+                <div class="audit-card" onclick="showAuditDetail(${audit.id})">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">${audit.type}</div>
+                            <div class="card-company">${audit.company}</div>
+                        </div>
+                        <div class="card-status ${statusClass}">${statusText}</div>
+                    </div>
+                    <div class="card-meta">
+                        <div class="card-meta-item">
+                            <i class="fas fa-calendar"></i>
+                            <span>${audit.scheduledDate}</span>
+                        </div>
+                        <div class="card-meta-item">
+                            <i class="fas fa-user"></i>
+                            <span>${audit.auditor}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // 심사 목록 렌더링
+        function renderAuditList() {
+            const auditList = document.getElementById('auditList');
+            const activeAudits = mockAudits.filter(a => a.status !== 'completed');
+            
+            auditList.innerHTML = activeAudits.length > 0
+                ? activeAudits.map(audit => createAuditCard(audit)).join('')
+                : '<div class="empty-state"><i class="fas fa-clipboard-list"></i><p>진행중인 심사가 없습니다.</p></div>';
+        }
+        
+        // 심사 상세 보기
+        function showAuditDetail(auditId) {
+            currentAuditId = auditId;
+            const audit = mockAudits.find(a => a.id === auditId);
+            if (!audit) return;
+            
+            // 상세 정보 업데이트
+            document.getElementById('detailTitle').textContent = audit.type;
+            document.getElementById('detailCompany').textContent = audit.company;
+            document.getElementById('detailDate').textContent = audit.scheduledDate;
+            
+            const statusElement = document.getElementById('detailStatus');
+            statusElement.className = 'card-status';
+            const statusClass = `status-${audit.status.replace('_', '-')}`;
+            const statusText = {
+                'requested': '요청됨',
+                'scheduled': '일정 확정',
+                'in-progress': '심사 중',
+                'reporting': '보고서 작성 중',
+                'completed': '완료'
+            }[audit.status];
+            statusElement.classList.add(statusClass);
+            statusElement.textContent = statusText;
+            
+            // 진행 상황 타임라인 렌더링
+            renderProgressTimeline(audit.progress);
+            
+            // 보고서 상태 업데이트
+            updateReportSection(audit);
+            
+            // 메시지 렌더링
+            renderMessages();
+            
+            // 액션 버튼 상태 업데이트
+            updateActionButtons(audit);
+            
+            // 뷰 전환
+            showView('auditDetailView');
+        }
+        
+        // 진행 상황 타임라인 렌더링
+        function renderProgressTimeline(progress) {
+            const timeline = document.getElementById('progressTimeline');
+            const currentStepIndex = progress.findIndex(p => !p.completed);
+            const activeIndex = currentStepIndex === -1 ? progress.length - 1 : currentStepIndex;
+            
+            timeline.innerHTML = progress.map((step, index) => {
+                let itemClass = 'timeline-item';
+                if (step.completed) {
+                    itemClass += ' completed';
+                } else if (index === activeIndex) {
+                    itemClass += ' active';
+                }
+                
+                return `
+                    <div class="${itemClass}">
+                        <div class="timeline-title">${step.step}</div>
+                        <div class="timeline-date">${step.date || '예정'}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // 보고서 섹션 업데이트
+        function updateReportSection(audit) {
+            const uploadArea = document.getElementById('reportUploadArea');
+            const uploadedFileContainer = document.getElementById('uploadedFileContainer');
+            
+            if (audit.reportUploaded) {
+                uploadArea.style.display = 'none';
+                uploadedFileContainer.innerHTML = `
+                    <div class="uploaded-file">
+                        <div class="uploaded-file-name">
+                            <i class="fas fa-file-pdf"></i>
+                            <span>${audit.company}_심사보고서.pdf</span>
+                        </div>
+                        <button class="btn-small btn-view" onclick="viewReport()">보기</button>
+                    </div>
+                `;
+            } else {
+                uploadArea.style.display = 'block';
+                uploadedFileContainer.innerHTML = '';
+            }
+        }
+        
+        // 메시지 렌더링
+        function renderMessages() {
+            const messageThread = document.getElementById('messageThread');
+            messageThread.innerHTML = mockMessages.map(msg => `
+                <div class="message ${msg.sender === 'auditor' ? 'message-sent' : 'message-received'}">
+                    <div class="message-bubble">${msg.text}</div>
+                    <div class="message-time">${msg.time}</div>
+                </div>
+            `).join('');
+            
+            messageThread.scrollTop = messageThread.scrollHeight;
+        }
+        
+        // 액션 버튼 상태 업데이트
+        function updateActionButtons(audit) {
+            const actionButtons = document.getElementById('actionButtons');
+            
+            if (audit.status === 'reporting') {
+                actionButtons.innerHTML = '<button class="btn btn-primary" id="submitReportBtn">보고서 제출</button>';
+                document.getElementById('submitReportBtn').addEventListener('click', submitReport);
+            } else if (audit.status === 'in-progress') {
+                actionButtons.innerHTML = '<button class="btn btn-success" id="completeAuditBtn">심사 완료 처리</button>';
+                document.getElementById('completeAuditBtn').addEventListener('click', completeAudit);
+            } else {
+                actionButtons.innerHTML = '';
+            }
+        }
+        
+        // 보고서 제출
+        function submitReport() {
+            const audit = mockAudits.find(a => a.id === currentAuditId);
+            if (audit) {
+                audit.status = 'completed';
+                audit.progress[3].completed = true;
+                audit.progress[3].date = new Date().toISOString().split('T')[0];
+                audit.progress[4].completed = true;
+                audit.progress[4].date = new Date().toISOString().split('T')[0];
+                
+                showToast('보고서가 제출되었습니다.');
+                showAuditDetail(currentAuditId);
+            }
+        }
+        
+        // 심사 완료 처리
+        function completeAudit() {
+            const audit = mockAudits.find(a => a.id === currentAuditId);
+            if (audit) {
+                audit.status = 'reporting';
+                audit.progress[2].completed = true;
+                audit.progress[2].date = new Date().toISOString().split('T')[0];
+                
+                showToast('심사가 완료되었습니다. 보고서를 작성해주세요.');
+                showAuditDetail(currentAuditId);
+            }
+        }
+        
+        // 심사 이력 렌더링
+        function renderAuditHistory() {
+            const historyList = document.getElementById('historyList');
+            const completedAudits = mockAudits.filter(a => a.status === 'completed');
+            
+            historyList.innerHTML = completedAudits.length > 0
+                ? completedAudits.map(audit => `
+                    <div class="history-item">
+                        <div class="history-info">
+                            <h4>${audit.type}</h4>
+                            <p>${audit.company}</p>
+                        </div>
+                        <div class="history-date">${audit.scheduledDate}</div>
+                    </div>
+                `).join('')
+                : '<div class="empty-state"><i class="fas fa-history"></i><p>완료된 심사 이력이 없습니다.</p></div>';
+        }
+        
+        // 이벤트 리스너
+        document.addEventListener('DOMContentLoaded', function() {
+            // 초기 렌더링
+            renderAuditList();
+            
+            // 뒤로가기 버튼
+            document.getElementById('backButton').addEventListener('click', function() {
+                const activeView = document.querySelector('.view-container.active');
+                if (activeView.id === 'auditDetailView') {
+                    showView('auditListView');
+                } else {
+                    window.location.href = 'apphome.html';
+                }
+            });
+            
+            // 홈 버튼
+            document.getElementById('homeButton').addEventListener('click', function() {
+                window.location.href = 'apphome.html';
+            });
+            
+            // 심사 이력 버튼
+            document.getElementById('viewHistoryBtn').addEventListener('click', function() {
+                renderAuditHistory();
+                showView('auditHistoryView');
+            });
+            
+            // 목록으로 버튼
+            document.getElementById('backToListBtn').addEventListener('click', function() {
+                showView('auditListView');
+            });
+            
+            // 탭 전환
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.addEventListener('click', function() {
+                    const tabName = this.dataset.tab;
+                    
+                    // 모든 탭 버튼과 콘텐츠 비활성화
+                    document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                    
+                    // 선택된 탭 활성화
+                    this.classList.add('active');
+                    document.getElementById(tabName).classList.add('active');
+                });
+            });
+            
+            // 보고서 업로드
+            document.getElementById('uploadButton').addEventListener('click', function() {
+                document.getElementById('reportFileInput').click();
+            });
+            
+            document.getElementById('reportFileInput').addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const audit = mockAudits.find(a => a.id === currentAuditId);
+                    if (audit) {
+                        audit.reportUploaded = true;
+                        updateReportSection(audit);
+                        showToast('보고서가 업로드되었습니다.');
+                    }
+                }
+            });
+            
+            // 메시지 전송
+            document.getElementById('sendMessageBtn').addEventListener('click', function() {
+                const input = document.getElementById('messageInput');
+                const text = input.value.trim();
+                
+                if (text) {
+                    mockMessages.push({
+                        sender: 'auditor',
+                        text: text,
+                        time: new Date().toLocaleString('ko-KR', { 
+                            year: 'numeric', 
+                            month: '2-digit', 
+                            day: '2-digit', 
+                            hour: '2-digit', 
+                            minute: '2-digit' 
+                        }).replace(/\./g, '-').replace(/ /g, ' ')
+                    });
+                    
+                    renderMessages();
+                    input.value = '';
+                    showToast('메시지가 전송되었습니다.');
+                }
+            });
+            
+            // Enter 키로 메시지 전송
+            document.getElementById('messageInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    document.getElementById('sendMessageBtn').click();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

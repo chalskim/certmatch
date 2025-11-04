@@ -5,909 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>CertMatch - 인증 앱</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans KR', sans-serif;
-            background: #f5f6f8;
-            color: #333;
-            height: 100vh;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        /* App Header */
-        .app-header {
-            background: #0066CC;
-            color: white;
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            position: relative;
-            z-index: 100;
-        }
-        
-        .app-title {
-            font-size: 20px;
-            font-weight: bold;
-        }
-        
-        .header-icons {
-            display: flex;
-            gap: 15px;
-        }
-        
-        .header-icon {
-            position: relative;
-            cursor: pointer;
-        }
-        
-        .notification-badge {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background: #FF4444;
-            color: white;
-            border-radius: 10px;
-            padding: 2px 6px;
-            font-size: 11px;
-        }
-        
-        /* App Content */
-        .app-content {
-            flex: 1;
-            overflow-y: auto;
-            padding-bottom: 60px;
-        }
-        
-        /* Search Section */
-        .search-section {
-            background: white;
-            padding: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        }
-        
-        .search-title {
-            font-size: 18px;
-            margin-bottom: 15px;
-            color: #0066CC;
-        }
-        
-        .search-bar {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-        
-        .search-input {
-            flex: 1;
-            padding: 12px 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 14px;
-        }
-        
-        .search-button {
-            padding: 12px 20px;
-            background: #0066CC;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-        
-        .quick-filters {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-        
-        .filter-chip {
-            padding: 6px 12px;
-            background: #f0f0f0;
-            border: 1px solid #ddd;
-            border-radius: 20px;
-            font-size: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .filter-chip:hover, .filter-chip.active {
-            background: #0066CC;
-            color: white;
-            border-color: #0066CC;
-        }
-        
-        /* Banner Carousel */
-        .banner-carousel {
-            position: relative;
-            margin: 15px;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-        
-        .banner-container {
-            position: relative;
-            width: 100%;
-            height: 180px;
-            overflow: hidden;
-        }
-        
-        .banner-slide {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0;
-            transition: opacity 0.5s ease-in-out;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            text-align: center;
-        }
-        
-        .banner-slide.active {
-            opacity: 1;
-        }
-        
-        .banner-slide:nth-child(1) {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-        
-        .banner-slide:nth-child(2) {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: white;
-        }
-        
-        .banner-slide:nth-child(3) {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            color: white;
-        }
-        
-        .banner-slide:nth-child(4) {
-            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-            color: white;
-        }
-        
-        .banner-content {
-            max-width: 300px;
-        }
-        
-        .banner-title {
-            font-size: 20px;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-        
-        .banner-desc {
-            font-size: 14px;
-            margin-bottom: 15px;
-            opacity: 0.9;
-        }
-        
-        .banner-button {
-            padding: 10px 20px;
-            background: white;
-            color: #333;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        
-        .banner-button:hover {
-            transform: scale(1.05);
-        }
-        
-        .banner-dots {
-            position: absolute;
-            bottom: 15px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 8px;
-            z-index: 10;
-        }
-        
-        .banner-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.5);
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .banner-dot.active {
-            background: white;
-            transform: scale(1.2);
-        }
-        
-        /* Section */
-        .section {
-            margin: 15px;
-        }
-        
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        
-        .section-title {
-            font-size: 18px;
-            font-weight: bold;
-            color: #333;
-        }
-        
-        .section-more {
-            color: #0066CC;
-            text-decoration: none;
-            font-size: 14px;
-        }
-        
-        /* Recommended Experts Section */
-        .experts-section {
-            margin-bottom: 20px;
-        }
-        
-        .experts-section-title {
-            font-size: 16px;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 12px;
-            padding: 0 5px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .experts-section-title i {
-            color: #FFD700;
-            font-size: 18px;
-        }
-        
-        /* Recommended Experts Horizontal Scroll */
-        .experts-scroll-container {
-            position: relative;
-            margin-bottom: 20px;
-        }
-        
-        .experts-scroll {
-            display: flex;
-            gap: 12px;
-            overflow-x: auto;
-            scroll-behavior: smooth;
-            padding: 15px 20px 15px 20px;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-        }
-        
-        .experts-scroll::-webkit-scrollbar {
-            display: none;
-        }
-        
-        .experts-scroll::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 30px;
-            background: linear-gradient(to right, #f5f6f8, transparent);
-            z-index: 10;
-            pointer-events: none;
-        }
-        
-        .expert-card {
-            flex: 0 0 auto;
-            min-width: 280px;
-            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-            color: #333;
-            border-radius: 12px;
-            padding: 15px;
-            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .expert-card::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
-            animation: shimmer 3s infinite;
-        }
-        
-        @keyframes shimmer {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .expert-badge {
-            display: inline-block;
-            background: rgba(255, 255, 255, 0.9);
-            color: #333;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 600;
-            margin-bottom: 10px;
-            backdrop-filter: blur(10px);
-        }
-        
-        .expert-title {
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            line-height: 1.3;
-            color: #333;
-        }
-        
-        .expert-company {
-            font-size: 12px;
-            color: #555;
-            margin-bottom: 10px;
-        }
-        
-        .expert-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 12px;
-        }
-        
-        .expert-price {
-            font-weight: bold;
-            font-size: 16px;
-            color: #333;
-        }
-        
-        .expert-rating {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            background: rgba(255, 255, 255, 0.7);
-            padding: 3px 8px;
-            border-radius: 12px;
-            backdrop-filter: blur(10px);
-        }
-        
-        .expert-rating .star {
-            color: #FFB800;
-            font-size: 10px;
-        }
-        
-        /* Urgent Recruitment Section */
-        .urgent-section {
-            margin-bottom: 20px;
-        }
-        
-        .urgent-section-title {
-            font-size: 16px;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 12px;
-            padding: 0 5px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .urgent-section-title i {
-            color: #FF6B6B;
-            font-size: 18px;
-        }
-        
-        /* Urgent Recruitment Horizontal Scroll */
-        .urgent-recruitment-container {
-            position: relative;
-            margin-bottom: 20px;
-        }
-        
-        .urgent-recruitment-scroll {
-            display: flex;
-            gap: 12px;
-            overflow-x: auto;
-            scroll-behavior: smooth;
-            padding: 15px 20px 15px 20px;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-        }
-        
-        .urgent-recruitment-scroll::-webkit-scrollbar {
-            display: none;
-        }
-        
-        .urgent-recruitment-scroll::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 30px;
-            background: linear-gradient(to right, #f5f6f8, transparent);
-            z-index: 10;
-            pointer-events: none;
-        }
-        
-        .urgent-card {
-            flex: 0 0 auto;
-            min-width: 280px;
-            background: linear-gradient(135deg, #87CEEB 0%, #B0E0E6 100%);
-            color: #333;
-            border-radius: 12px;
-            padding: 15px;
-            box-shadow: 0 4px 15px rgba(135, 206, 235, 0.3);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .urgent-card::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
-            animation: shimmer 3s infinite;
-        }
-        
-        .urgent-badge {
-            display: inline-block;
-            background: rgba(255, 255, 255, 0.8);
-            color: #333;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 600;
-            margin-bottom: 10px;
-            backdrop-filter: blur(10px);
-        }
-        
-        .urgent-title {
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            line-height: 1.3;
-            color: #333;
-        }
-        
-        .urgent-company {
-            font-size: 12px;
-            color: #555;
-            margin-bottom: 10px;
-        }
-        
-        .urgent-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 12px;
-        }
-        
-        .urgent-price {
-            font-weight: bold;
-            font-size: 16px;
-            color: #333;
-        }
-        
-        .urgent-deadline {
-            background: rgba(255, 255, 255, 0.6);
-            padding: 3px 8px;
-            border-radius: 12px;
-            backdrop-filter: blur(10px);
-            color: #333;
-        }
-        
-        /* General Recruitment Section */
-        .general-section {
-            margin-top: 25px;
-        }
-        
-        .general-section-title {
-            font-size: 16px;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 15px;
-            padding: 0 5px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .general-section-title i {
-            color: #0066CC;
-            font-size: 18px;
-        }
-        
-        /* Card Grid */
-        .card-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 15px;
-        }
-        
-        .card {
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            transition: transform 0.2s, box-shadow 0.2s;
-            cursor: pointer;
-        }
-        
-        .card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
-        }
-        
-        .card-image {
-            width: 100%;
-            height: 120px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 36px;
-        }
-        
-        .card-content {
-            padding: 15px;
-        }
-        
-        .card-badge {
-            display: inline-block;
-            padding: 4px 8px;
-            background: #2EBD59;
-            color: white;
-            border-radius: 4px;
-            font-size: 11px;
-            margin-bottom: 8px;
-        }
-        
-        .card-badge.new {
-            background: #FF8C42;
-        }
-        
-        .card-badge.hot {
-            background: #E74C3C;
-        }
-        
-        .card-badge.urgent {
-            background: #FF4444;
-            animation: pulse 2s infinite;
-        }
-        
-        .card-badge.breaking {
-            background: #FF1744;
-            animation: pulse 1.5s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.7; }
-            100% { opacity: 1; }
-        }
-        
-        .card-title {
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 6px;
-            color: #333;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        
-        .card-company {
-            font-size: 12px;
-            color: #666;
-            margin-bottom: 10px;
-        }
-        
-        .card-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 5px;
-            margin-bottom: 10px;
-        }
-        
-        .card-tag {
-            padding: 3px 8px;
-            background: #f0f0f0;
-            border-radius: 4px;
-            font-size: 11px;
-            color: #666;
-        }
-        
-        .card-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-top: 10px;
-            border-top: 1px solid #f0f0f0;
-        }
-        
-        .card-price {
-            font-size: 16px;
-            font-weight: bold;
-            color: #0066CC;
-        }
-        
-        .card-rating {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            font-size: 12px;
-        }
-        
-        .star {
-            color: #FFB800;
-        }
-        
-        /* List Style Cards */
-        .list-card {
-            background: white;
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            display: flex;
-            gap: 15px;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        
-        .list-card:hover {
-            transform: translateX(4px);
-        }
-        
-        .list-card-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 8px;
-            background: linear-gradient(135deg, #0066CC, #2EBD59);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 20px;
-            flex-shrink: 0;
-        }
-        
-        .list-card-content {
-            flex: 1;
-        }
-        
-        .list-card-title {
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 6px;
-            color: #333;
-        }
-        
-        .list-card-desc {
-            font-size: 12px;
-            color: #666;
-            margin-bottom: 6px;
-        }
-        
-        .list-card-meta {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            font-size: 11px;
-            color: #999;
-        }
-        
-        /* Bottom Navigation */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: white;
-            display: flex;
-            justify-content: space-around;
-            padding: 10px 0;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-            z-index: 100;
-        }
-        
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            color: #666;
-            text-decoration: none;
-            font-size: 11px;
-            transition: color 0.2s;
-        }
-        
-        .nav-item.active {
-            color: #0066CC;
-        }
-        
-        .nav-item i {
-            font-size: 20px;
-            margin-bottom: 5px;
-        }
-        
-        /* Side Menu */
-        .side-menu {
-            position: fixed;
-            top: 0;
-            left: -280px;
-            width: 280px;
-            height: 100%;
-            background: white;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
-            z-index: 200;
-            transition: left 0.3s ease;
-            overflow-y: auto;
-        }
-        
-        .side-menu.active {
-            left: 0;
-        }
-        
-        .side-menu-header {
-            background: #0066CC;
-            color: white;
-            padding: 20px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .user-avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #0066CC;
-            font-size: 24px;
-        }
-        
-        .user-info h3 {
-            font-size: 16px;
-            margin-bottom: 5px;
-        }
-        
-        .user-info p {
-            font-size: 12px;
-            opacity: 0.8;
-        }
-        
-        .side-menu-content {
-            padding: 20px 0;
-        }
-        
-        .menu-item {
-            display: flex;
-            align-items: center;
-            padding: 15px 20px;
-            color: #333;
-            text-decoration: none;
-            transition: background-color 0.2s;
-        }
-        
-        .menu-item:hover {
-            background-color: #f5f6f8;
-        }
-        
-        .menu-item i {
-            width: 24px;
-            margin-right: 15px;
-            color: #0066CC;
-        }
-        
-        .menu-divider {
-            height: 1px;
-            background: #eee;
-            margin: 10px 0;
-        }
-        
-        /* Overlay */
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 150;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s, visibility 0.3s;
-        }
-        
-        .overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-        
-        /* Tab Container */
-        .tab-container {
-            margin: 15px;
-        }
-        
-        .tab-nav {
-            display: flex;
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            margin-bottom: 15px;
-        }
-        
-        .tab-button {
-            flex: 1;
-            padding: 12px;
-            background: white;
-            border: none;
-            font-size: 12px;
-            font-weight: 600;
-            color: #666;
-            cursor: pointer;
-            transition: all 0.2s;
-            white-space: nowrap;
-        }
-        
-        .tab-button.active {
-            background: #0066CC;
-            color: white;
-        }
-        
-        .tab-content {
-            display: none;
-        }
-        
-        .tab-content.active {
-            display: block;
-        }
-        
-        /* Responsive adjustments */
-        @media (max-width: 480px) {
-            .card-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .tab-button {
-                font-size: 10px;
-                padding: 10px 3px;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <!-- App Header -->
@@ -939,38 +37,160 @@
             </div>
         </div>
         <div class="side-menu-content">
+            <!-- 메인 메뉴 리스트 -->
             <a href="#" class="menu-item">
                 <i class="fas fa-home"></i>
                 <span>홈</span>
             </a>
+            
+            <div class="menu-divider"></div>
+            
+            <!-- 프로필 등록 -->
             <a href="#" class="menu-item">
-                <i class="fas fa-search"></i>
-                <span>검색</span>
+                <i class="fas fa-trophy"></i>
+                <span>회사 프로필 등록</span>
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fas fa-trophy"></i>
+                <span>개인 프로필 등록</span>
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fas fa-trophy"></i>
+                <span>교육 기관 프로필 등록</span>
+            </a>
+            
+            <div class="menu-divider"></div>
+            
+            <!-- 등록 -->
+            <a href="#" class="menu-item">
+                <i class="fas fa-briefcase"></i>
+                <span>인증 인력모집 등록</span>
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fas fa-user-tie"></i>
+                <span>인증 전문가 등록</span>
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fas fa-graduation-cap"></i>
+                <span>인증 교육 등록</span>
+            </a>
+            
+            <div class="menu-divider"></div>
+            
+            <!-- 인증 지원 -->
+            <a href="#" class="menu-item">
+                <i class="fas fa-clipboard-list"></i>
+                <span>인증 인력모집지원 결과</span>
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fas fa-user-check"></i>
+                <span>인증 전문가 등록 결과</span>
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fas fa-graduation-cap"></i>
+                <span>인증 교육 등록 결과</span>
+            </a>
+            
+            <div class="menu-divider"></div>
+            
+            <!-- 심사 -->
+            <a href="#" class="menu-item">
+                <i class="fas fa-user-plus"></i>
+                <span>심사 인증원 등록</span>
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fas fa-clipboard-list"></i>
+                <span>심사 지원/결과</span>
             </a>
             <a href="#" class="menu-item">
                 <i class="fas fa-calendar-alt"></i>
                 <span>일정관리</span>
             </a>
+            
+            <div class="menu-divider"></div>
+            
+            <!-- 인증 정보 지원 -->
             <a href="#" class="menu-item">
-                <i class="fas fa-history"></i>
-                <span>최근 본 항목</span>
+                <i class="fas fa-cog"></i>
+                <span>인증 종류</span>
             </a>
+            <a href="#" class="menu-item">
+                <i class="fas fa-question-circle"></i>
+                <span>인증 Q&A</span>
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fas fa-search"></i>
+                <span>인증 회사 검색</span>
+            </a>
+            
+            <div class="menu-divider"></div>
+            
             <a href="#" class="menu-item">
                 <i class="fas fa-trophy"></i>
-                <span>성공 사례</span>
+                <span>성공사례</span>
             </a>
+            
+            <!-- 결제 -->
             <div class="menu-divider"></div>
+            <a href="#" class="menu-item">
+                <i class="fas fa-credit-card"></i>
+                <span>결제</span>
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fas fa-credit-card"></i>
+                <span>결제내역</span>
+            </a>
+            
+            <div class="menu-divider"></div>
+            
+            <!-- 설정 -->
             <a href="#" class="menu-item">
                 <i class="fas fa-cog"></i>
                 <span>설정</span>
             </a>
             <a href="#" class="menu-item">
-                <i class="fas fa-question-circle"></i>
-                <span>도움말</span>
+                <i class="fas fa-user-circle"></i>
+                <span>마이페이지</span>
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fas fa-user-circle"></i>
+                <span>저장된 페이지</span>
             </a>
             <a href="#" class="menu-item">
                 <i class="fas fa-sign-out-alt"></i>
                 <span>로그아웃</span>
+            </a>
+            
+            <div class="menu-divider"></div>
+            
+            <!-- 관리자 환경 -->
+            <a href="#" class="menu-item">
+                <i class="fas fa-user-circle"></i>
+                <span>관리자 페이지</span>
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fas fa-question-circle"></i>
+                <span>인증 Q&A 답변</span>
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fas fa-trophy"></i>
+                <span>회사 프로필 검증</span>
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fas fa-trophy"></i>
+                <span>개인 프로필 검증</span>
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fas fa-trophy"></i>
+                <span>교육 기관 프로필 검증</span>
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fas fa-user-plus"></i>
+                <span>심사 인증원 검증</span>
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fas fa-clipboard-list"></i>
+                <span>광고 등록 </span>
             </a>
         </div>
     </div>
@@ -1049,94 +269,14 @@
         <!-- Tab Container -->
         <div class="tab-container">
             <div class="tab-nav">
-                <button class="tab-button active" data-tab="notices">공지사항 및 뉴스</button>
-                <button class="tab-button" data-tab="jobs">컨설팅 및 인력 모집</button>
+                <button class="tab-button active" data-tab="jobs">컨설팅 및 인력 모집</button>
                 <button class="tab-button" data-tab="consultants">전문가 매칭</button>
                 <button class="tab-button" data-tab="education">교육</button>
-            </div>
-            
-            <!-- 공지사항 및 뉴스 -->
-            <div class="tab-content active" id="notices">
-                <div class="list-card">
-                    <div class="list-card-icon">📰</div>
-                    <div class="list-card-content">
-                        <div class="list-card-title">[속보] 정보보호법 개정안 국회 본회의 통과</div>
-                        <div class="list-card-desc">개인정보보호 강화 조치, 내년 1월부터 시행 예정</div>
-                        <div class="list-card-meta">
-                            <span>📅 2025.01.15</span>
-                            <span>🏢 국회</span>
-                            <span style="color: #FF1744; font-weight: 600;">속보</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="list-card">
-                    <div class="list-card-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">📢</div>
-                    <div class="list-card-content">
-                        <div class="list-card-title">중소기업 정보보호 인증 지원사업 (2025년 1차)</div>
-                        <div class="list-card-desc">ISMS-P 인증 취득 비용 최대 70% 지원 (최대 3,000만원)</div>
-                        <div class="list-card-meta">
-                            <span>📅 신청기간: 2025.01.15 ~ 03.31</span>
-                            <span>🏢 과학기술정보통신부</span>
-                            <span style="color: #E74C3C; font-weight: 600;">마감 90일 전</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="list-card">
-                    <div class="list-card-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">🔥</div>
-                    <div class="list-card-content">
-                        <div class="list-card-title">2025년 상급종합병원 ISMS-P 의무인증 기한 안내</div>
-                        <div class="list-card-desc">전국 47개 상급종합병원 대상 2025.08.31까지 인증 취득 필수</div>
-                        <div class="list-card-meta">
-                            <span>📅 2025.01.10</span>
-                            <span>🏢 한국인터넷진흥원</span>
-                            <span style="color: #E74C3C; font-weight: 600;">긴급공지</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="list-card">
-                    <div class="list-card-icon" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">📈</div>
-                    <div class="list-card-content">
-                        <div class="list-card-title">ISO 27001 인증 기업, 평균 매출 23% 증가</div>
-                        <div class="list-card-desc">한국표준협회 조사: 정보보호 투자가 기업 성장에 직접적인 영향</div>
-                        <div class="list-card-meta">
-                            <span>📅 2025.01.08</span>
-                            <span>🏢 한국표준협회</span>
-                            <span style="color: #2196F3; font-weight: 600;">산업뉴스</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="list-card">
-                    <div class="list-card-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">💰</div>
-                    <div class="list-card-content">
-                        <div class="list-card-title">금융권 정보보호 컨설팅 바우처</div>
-                        <div class="list-card-desc">금융회사 대상 ISMS-P-FSI 컨설팅 비용 50% 지원</div>
-                        <div class="list-card-meta">
-                            <span>📅 신청기간: 2025.02.01 ~ 05.31</span>
-                            <span>🏢 금융보안원</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="list-card">
-                    <div class="list-card-icon" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">🌍</div>
-                    <div class="list-card-content">
-                        <div class="list-card-title">EU GDPR 대응 인증 수요 급증</div>
-                        <div class="list-card-desc">국내 기업 유럽 진출 증가로 ISO 27701 인증 문의 200% 증가</div>
-                        <div class="list-card-meta">
-                            <span>📅 2025.01.05</span>
-                            <span>🏢 무역협회</span>
-                            <span style="color: #4CAF50; font-weight: 600;">글로벌</span>
-                        </div>
-                    </div>
-                </div>
+                <button class="tab-button" data-tab="notices">공지사항 및 뉴스</button>
             </div>
             
             <!-- 컨설팅 및 인력 모집 -->
-            <div class="tab-content" id="jobs">
+            <div class="tab-content active" id="jobs">
                 <!-- 긴급 모집 섹션 -->
                 <div class="urgent-section">
                     <div class="urgent-section-title">
@@ -1218,7 +358,7 @@
                                 </div>
                                 <div class="card-footer">
                                     <div class="card-price">협의</div>
-                                    <div style="font-size: 12px; color: #999;">~03.15</div>
+                                    <div class="news-date">~03.15</div>
                                 </div>
                             </div>
                         </div>
@@ -1234,7 +374,7 @@
                                 </div>
                                 <div class="card-footer">
                                     <div class="card-price">8,000만원~</div>
-                                    <div style="font-size: 12px; color: #999;">~03.20</div>
+                                    <div class="news-date">~03.20</div>
                                 </div>
                             </div>
                         </div>
@@ -1250,7 +390,7 @@
                                 </div>
                                 <div class="card-footer">
                                     <div class="card-price">4,500만원~</div>
-                                    <div style="font-size: 12px; color: #999;">~03.25</div>
+                                    <div class="news-date">~03.25</div>
                                 </div>
                             </div>
                         </div>
@@ -1266,7 +406,7 @@
                                 </div>
                                 <div class="card-footer">
                                     <div class="card-price">4,800만원~</div>
-                                    <div style="font-size: 12px; color: #999;">~03.30</div>
+                                    <div class="news-date">~03.30</div>
                                 </div>
                             </div>
                         </div>
@@ -1282,7 +422,7 @@
                                 </div>
                                 <div class="card-footer">
                                     <div class="card-price">5,200만원~</div>
-                                    <div style="font-size: 12px; color: #999;">~04.05</div>
+                                    <div class="news-date">~04.05</div>
                                 </div>
                             </div>
                         </div>
@@ -1298,7 +438,7 @@
                                 </div>
                                 <div class="card-footer">
                                     <div class="card-price">3,800만원~</div>
-                                    <div style="font-size: 12px; color: #999;">~04.10</div>
+                                    <div class="news-date">~04.10</div>
                                 </div>
                             </div>
                         </div>
@@ -1314,7 +454,7 @@
                                 </div>
                                 <div class="card-footer">
                                     <div class="card-price">5,500만원~</div>
-                                    <div style="font-size: 12px; color: #999;">~04.15</div>
+                                    <div class="news-date">~04.15</div>
                                 </div>
                             </div>
                         </div>
@@ -1330,7 +470,7 @@
                                 </div>
                                 <div class="card-footer">
                                     <div class="card-price">7,000만원~</div>
-                                    <div style="font-size: 12px; color: #999;">~04.20</div>
+                                    <div class="news-date">~04.20</div>
                                 </div>
                             </div>
                         </div>
@@ -1346,7 +486,7 @@
                                 </div>
                                 <div class="card-footer">
                                     <div class="card-price">4,200만원~</div>
-                                    <div style="font-size: 12px; color: #999;">~04.25</div>
+                                    <div class="news-date">~04.25</div>
                                 </div>
                             </div>
                         </div>
@@ -1436,7 +576,6 @@
                 <!-- 전문가 리스트 -->
                 <div class="card-grid">
                     <div class="card">
-                        <div class="card-image">👨 💼</div>
                         <div class="card-content">
                             <span class="card-badge">추천</span>
                             <div class="card-title">한국컨설팅그룹</div>
@@ -1456,7 +595,6 @@
                     </div>
                     
                     <div class="card">
-                        <div class="card-image" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">👩 💼</div>
                         <div class="card-content">
                             <span class="card-badge new">신규</span>
                             <div class="card-title">글로벌인증컨설팅</div>
@@ -1476,7 +614,6 @@
                     </div>
                     
                     <div class="card">
-                        <div class="card-image" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">🏢</div>
                         <div class="card-content">
                             <span class="card-badge hot">인기</span>
                             <div class="card-title">보안컨설팅파트너스</div>
@@ -1496,7 +633,6 @@
                     </div>
                     
                     <div class="card">
-                        <div class="card-image" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">🔧</div>
                         <div class="card-content">
                             <span class="card-badge">할인</span>
                             <div class="card-title">㈜품질인증코리아</div>
@@ -1516,7 +652,6 @@
                     </div>
                     
                     <div class="card">
-                        <div class="card-image" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">💻</div>
                         <div class="card-content">
                             <span class="card-badge">추천</span>
                             <div class="card-title">㈜디지털보안솔루션</div>
@@ -1536,7 +671,6 @@
                     </div>
                     
                     <div class="card">
-                        <div class="card-image" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">🏥</div>
                         <div class="card-content">
                             <span class="card-badge new">신규</span>
                             <div class="card-title">메디컬인증파트너</div>
@@ -1561,7 +695,6 @@
             <div class="tab-content" id="education">
                 <div class="card-grid">
                     <div class="card">
-                        <div class="card-image" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">📖</div>
                         <div class="card-content">
                             <span class="card-badge new">신규</span>
                             <div class="card-title">ISMS-P 심사원 기본과정</div>
@@ -1581,7 +714,6 @@
                     </div>
                     
                     <div class="card">
-                        <div class="card-image" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">🎓</div>
                         <div class="card-content">
                             <span class="card-badge">인기</span>
                             <div class="card-title">ISO 27001 Lead Auditor 과정</div>
@@ -1601,7 +733,6 @@
                     </div>
                     
                     <div class="card">
-                        <div class="card-image" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">💻</div>
                         <div class="card-content">
                             <span class="card-badge">할인중</span>
                             <div class="card-title">정보보호 실무자 양성과정</div>
@@ -1621,7 +752,6 @@
                     </div>
                     
                     <div class="card">
-                        <div class="card-image" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">🔐</div>
                         <div class="card-content">
                             <span class="card-badge">무료</span>
                             <div class="card-title">ISMS-P 기초 입문과정</div>
@@ -1641,6 +771,86 @@
                     </div>
                 </div>
             </div>
+            
+            <!-- 공지사항 및 뉴스 -->
+            <div class="tab-content" id="notices">
+                <div class="list-card">
+                    <div class="list-card-icon">📰</div>
+                    <div class="list-card-content">
+                        <div class="list-card-title">[속보] 정보보호법 개정안 국회 본회의 통과</div>
+                        <div class="list-card-desc">개인정보보호 강화 조치, 내년 1월부터 시행 예정</div>
+                        <div class="list-card-meta">
+                            <span>📅 2025.01.15</span>
+                            <span>🏢 국회</span>
+                            <span class="breaking-news">속보</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="list-card">
+                    <div class="list-card-icon gradient-1">📢</div>
+                    <div class="list-card-content">
+                        <div class="list-card-title">중소기업 정보보호 인증 지원사업 (2025년 1차)</div>
+                        <div class="list-card-desc">ISMS-P 인증 취득 비용 최대 70% 지원 (최대 3,000만원)</div>
+                        <div class="list-card-meta">
+                            <span>📅 신청기간: 2025.01.15 ~ 03.31</span>
+                            <span>🏢 과학기술정보통신부</span>
+                            <span class="application-deadline">마감 90일 전</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="list-card">
+                    <div class="list-card-icon gradient-2">🔥</div>
+                    <div class="list-card-content">
+                        <div class="list-card-title">2025년 상급종합병원 ISMS-P 의무인증 기한 안내</div>
+                        <div class="list-card-desc">전국 47개 상급종합병원 대상 2025.08.31까지 인증 취득 필수</div>
+                        <div class="list-card-meta">
+                            <span>📅 2025.01.10</span>
+                            <span>🏢 한국인터넷진흥원</span>
+                            <span class="urgent-notice">긴급공지</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="list-card">
+                    <div class="list-card-icon gradient-3">📈</div>
+                    <div class="list-card-content">
+                        <div class="list-card-title">ISO 27001 인증 기업, 평균 매출 23% 증가</div>
+                        <div class="list-card-desc">한국표준협회 조사: 정보보호 투자가 기업 성장에 직접적인 영향</div>
+                        <div class="list-card-meta">
+                            <span>📅 2025.01.08</span>
+                            <span>🏢 한국표준협회</span>
+                            <span class="industry-news">산업뉴스</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="list-card">
+                    <div class="list-card-icon gradient-4">💰</div>
+                    <div class="list-card-content">
+                        <div class="list-card-title">금융권 정보보호 컨설팅 바우처</div>
+                        <div class="list-card-desc">금융회사 대상 ISMS-P-FSI 컨설팅 비용 50% 지원</div>
+                        <div class="list-card-meta">
+                            <span>📅 신청기간: 2025.02.01 ~ 05.31</span>
+                            <span>🏢 금융보안원</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="list-card">
+                    <div class="list-card-icon gradient-5">🌍</div>
+                    <div class="list-card-content">
+                        <div class="list-card-title">EU GDPR 대응 인증 수요 급증</div>
+                        <div class="list-card-desc">국내 기업 유럽 진출 증가로 ISO 27701 인증 문의 200% 증가</div>
+                        <div class="list-card-meta">
+                            <span>📅 2025.01.05</span>
+                            <span>🏢 무역협회</span>
+                            <span class="global-news">글로벌</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     
@@ -1650,6 +860,10 @@
             <i class="fas fa-home"></i>
             <span>홈</span>
         </a>
+        <a href="#" class="nav-item">
+            <i class="fas fa-user-plus"></i>
+            <span>전문가 등록</span>
+        </a>        
         <a href="#" class="nav-item">
             <i class="fas fa-clipboard-check"></i>
             <span>심사 지원</span>
@@ -1661,10 +875,6 @@
         <a href="#" class="nav-item">
             <i class="fas fa-trophy"></i>
             <span>성공사례</span>
-        </a>
-        <a href="#" class="nav-item">
-            <i class="fas fa-question-circle"></i>
-            <span>도움말</span>
         </a>
     </nav>
     

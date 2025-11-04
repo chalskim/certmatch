@@ -1,4 +1,4 @@
-pkill -f "npx start" && cd '/Users/nicchals/src/certmatch/mobile_front' && npx start --tunnel
+pkill -f "npx start" && cd '/Users/chalskim/src/certmatch/certmatch/mobile_front' && npm start
 
 
-pkill -f "npx start" && cd /Users/nicchals/src/certmatch/mobile_front && npx expo start --web
+pkill -f "npx start" && cd /Users/chalskim/src/certmatch/certmatch/mobile_front && npx expo start --web --tunnel

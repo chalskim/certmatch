@@ -1,6 +1,9 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Modal, ScrollView, Animated, Easing } from 'react-native';
+import { View, Text, TouchableOpacity, Modal, Animated, BackHandler, ScrollView, Alert, Easing, Image } from 'react-native';
+import { styles } from '../comstyles/SideMenu';
 import { FontAwesome5 } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import { useUser } from '../contexts/UserContext';
 
 interface SideMenuProps {
   visible: boolean;
@@ -9,6 +12,8 @@ interface SideMenuProps {
 
 export const SideMenu: React.FC<SideMenuProps> = ({ visible, onClose }) => {
   const slideAnim = useRef(new Animated.Value(-280)).current;
+  const navigation = useNavigation();
+  const { user, isAuthenticated: userIsAuthenticated, logout } = useUser();
 
   useEffect(() => {
     if (visible) {
@@ -39,6 +44,113 @@ export const SideMenu: React.FC<SideMenuProps> = ({ visible, onClose }) => {
     return true;
   };
 
+  const handleAuthAction = async () => {
+    if (userIsAuthenticated) {
+      // Logout using UserContext
+      try {
+        await logout();
+        handleClose();
+        // Navigate to home screen after logout
+        navigation.navigate('Home' as never);
+      } catch (error) {
+        console.error('Logout error:', error);
+      }
+    } else {
+      // Navigate to login
+      handleClose();
+      navigation.navigate('Login' as never);
+    }
+  };
+
+  // Handle navigation to Personal Registration screen
+  const handlePersonalRegistration = () => {
+    handleClose();
+    navigation.navigate('PersonalRegistration' as never);
+  };
+
+  // Handle navigation to Company Registration screen
+  const handleCompanyRegistration = () => {
+    handleClose();
+    navigation.navigate('CompanyRegistration' as never);
+  };
+
+  // 인증 인력모집 등록 화면으로 이동
+  const handleExpertRecruitment = () => {
+    handleClose();
+    navigation.navigate('ExpertRecruitment' as never);
+  };
+
+ // 인증 전문가모집 등록 화면으로 이동
+  const handleExpertProfessional = () => {
+    handleClose();
+    navigation.navigate('ExpertProfessional' as never);
+  };
+
+   // 인증 교육등록 화면으로 이동
+  const handleEducationRegistration = () => {
+    handleClose();
+    navigation.navigate('EducationRegistration' as never);
+  };
+
+   // 인증 인력모집 목록 화면으로 이동
+  const handleExpertRecruitmentList = () => {
+    handleClose();
+    navigation.navigate('ExpertRecruitmentList' as never);
+  };
+
+  // Function to get user type label
+  const getUserTypeLabel = (role: string) => {
+    switch (role) {
+      case 'company':
+        return '기업';
+      case 'consultant':
+        return '전문가';
+      case 'educator':
+        return '교육기관';
+      case 'admin':
+        return '관리자';
+      default:
+        return '사용자';
+    }
+  };
+
+  // Function to get user type icon
+  const getUserTypeIcon = (role: string) => {
+    switch (role) {
+      case 'company':
+        return 'building';
+      case 'consultant':
+        return 'user-tie';
+      case 'educator':
+        return 'graduation-cap';
+      case 'admin':
+        return 'shield-alt';
+      default:
+        return 'user';
+    }
+  };
+
+  // Function to check if profile is complete
+  const isProfileComplete = (user: any) => {
+    if (!user) return false;
+    
+    // Check if essential profile information is provided
+    const hasName = user.name && user.name.trim() !== '';
+    const hasEmail = user.email && user.email.trim() !== '';
+    
+    // For companies, check if company name and business registration number exist
+    if (user.role === 'company') {
+      return hasName && hasEmail; // Add more company-specific checks if needed
+    }
+    
+    // For consultants/experts, check additional fields
+    if (user.role === 'consultant') {
+      return hasName && hasEmail; // Add more expert-specific checks if needed
+    }
+    
+    return hasName && hasEmail;
+  };
+
   return (
     <Modal
       visible={visible}
@@ -58,20 +170,54 @@ export const SideMenu: React.FC<SideMenuProps> = ({ visible, onClose }) => {
         >
           <View style={styles.header}>
             <View style={styles.avatar}>
-              <FontAwesome5 name="user" size={24} color="#0066CC" />
+              <FontAwesome5 
+                name={userIsAuthenticated && user ? getUserTypeIcon(user.role) : "user"} 
+                size={24} 
+                color="#0066CC" 
+              />
             </View>
             <View style={styles.userInfo}>
-              <Text style={styles.userName}>홍길동</Text>
-              <Text style={styles.userCompany}>㈜테크솔루션</Text>
+              {userIsAuthenticated && user ? (
+                <>
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <Text style={styles.userName}>{user.name || '사용자'}</Text>
+                    <View style={styles.userTypeBadge}>
+                      <Text style={styles.userTypeText}>
+                        {getUserTypeLabel(user.role)}
+                      </Text>
+                    </View>
+                  </View>
+                  <Text style={styles.userCompany}>{user.email}</Text>
+                  {!isProfileComplete(user) && (
+                    <Text style={styles.profileMessage}>
+                      프로필 정보를 입력해주세요
+                    </Text>
+                  )}
+                </>
+              ) : (
+                <>
+                  {/* 로그인되지 않은 경우: 이름은 빈 칸, 이메일에는 안내 문구 */}
+                  <Text style={styles.userName}>{''}</Text>
+                  <Text style={styles.userCompany}>로그인 해주세요</Text>
+                </>
+              )}
             </View>
           </View>
           <ScrollView style={styles.content}>
             <MenuItem icon="home" label="홈" />
-            <MenuItem icon="bullhorn" label="공지사항 및 뉴스" />
-            <MenuItem icon="briefcase" label="컨설팅 및 인력 모집" />
-            <MenuItem icon="user-tie" label="전문가 매칭" />
-            <MenuItem icon="graduation-cap" label="전문가 교육" />
+            <MenuItem icon="bullhorn" label="개인 자격 등록" onPress={handlePersonalRegistration} />
+            <MenuItem icon="briefcase" label="기업 자격 등록" onPress={handleCompanyRegistration} />
+            
+            <View style={styles.divider} />
 
+            <MenuItem icon="user-tie" label="인증 인력모집 등록" onPress={handleExpertRecruitment} />
+            <MenuItem icon="user-tie" label="인증 전문가 등록" onPress={handleExpertProfessional} />
+            <MenuItem icon="graduation-cap" label="인증 교육 등록" onPress={handleEducationRegistration} />
+            <View style={styles.divider} />
+
+            <MenuItem icon="user-tie" label="인증 인력모집 목록" onPress={handleExpertRecruitmentList} />
+            <MenuItem icon="user-tie" label="인증 전문가등록 목록" onPress={handleExpertRecruitmentList} />
+            <MenuItem icon="user-tie" label="인증 교육 목록" onPress={handleExpertRecruitmentList} />
             <View style={styles.divider} />
 
             <MenuItem icon="user-plus" label="전문가 등록" />
@@ -84,7 +230,17 @@ export const SideMenu: React.FC<SideMenuProps> = ({ visible, onClose }) => {
             <MenuItem icon="cog" label="설정" />
             <MenuItem icon="question-circle" label="도움말" />
             <MenuItem icon="user-circle" label="내정보" />
-            <MenuItem icon="sign-out-alt" label="로그아웃" />
+            <TouchableOpacity style={styles.menuItem} onPress={handleAuthAction}>
+              <FontAwesome5 
+                name={userIsAuthenticated ? "sign-out-alt" : "sign-in-alt"} 
+                size={18} 
+                color="#0066CC" 
+                style={{ width: 24 }} 
+              />
+              <Text style={styles.menuLabel}>
+                {userIsAuthenticated ? "로그아웃" : "로그인"}
+              </Text>
+            </TouchableOpacity>
           </ScrollView>
         </Animated.View>
       </TouchableOpacity>
@@ -92,70 +248,9 @@ export const SideMenu: React.FC<SideMenuProps> = ({ visible, onClose }) => {
   );
 };
 
-const MenuItem = ({ icon, label }: { icon: any; label: string }) => (
-  <TouchableOpacity style={styles.menuItem}>
+const MenuItem = ({ icon, label, onPress }: { icon: any; label: string; onPress?: () => void }) => (
+  <TouchableOpacity style={styles.menuItem} onPress={onPress}>
     <FontAwesome5 name={icon} size={18} color="#0066CC" style={{ width: 24 }} />
     <Text style={styles.menuLabel}>{label}</Text>
   </TouchableOpacity>
 );
-
-const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-  },
-  menu: {
-    width: 280,
-    height: '100%',
-    backgroundColor: '#fff',
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-    elevation: 10,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 20,
-    backgroundColor: '#0066CC',
-    gap: 15,
-  },
-  avatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#fff',
-  },
-  userInfo: {},
-  userName: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 5,
-  },
-  userCompany: {
-    color: '#e6f0ff',
-    fontSize: 12,
-  },
-  content: {
-    paddingHorizontal: 0,
-  },
-  menuItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-  },
-  menuLabel: {
-    marginLeft: 15,
-    fontSize: 15,
-    color: '#333',
-  },
-  divider: {
-    height: 1,
-    backgroundColor: '#eee',
-    marginVertical: 10,
-  },
-});

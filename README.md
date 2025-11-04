@@ -115,3 +115,9 @@ npm run lint:web     # 웹 린트
 - [GitHub Repository](https://github.com/chalskim/certmatch)
 - [API 문서](http://localhost:3001/api)
 - [웹 애플리케이션](http://localhost:3000)
+
+서버 실행 
+cd /Users/chalskim/src/certmatch/certmatch/Server && npm run start:dev
+
+클라이언트 실행 
+cd '/Users/chalskim/src/certmatch/certmatch/mobile_front' && npm start

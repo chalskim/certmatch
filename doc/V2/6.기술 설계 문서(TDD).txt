@@ -1,0 +1,129 @@
+6. CertMatch 모바일 앱 – 기술 설계 문서(TDD)
+
+React Native 기반 인증 매칭 플랫폼
+
+1. 📄 문서 개요
+항목	내용
+제품명	CertMatch Mobile App
+플랫폼	iOS, Android (React Native)
+버전	v1.0 (MVP)
+작성일	2025년 10월 30일
+기술 스택	React Native (Expo), TypeScript, Redux Toolkit, React Navigation, Axios
+대상 기능	MVP 핵심 기능 (사용자 등록, 인증 선택, 매칭, 채팅, 프로필 관리)
+2. 🎯 기술 목표
+* 성능: 화면 로딩 ≤1.5초, 스크롤 프레임 드랍 없음
+* 안정성: 크래시율 ≤0.5% (Firebase Crashlytics 기준)
+* 유지보수성: TypeScript + ESLint + Prettier로 코드 일관성 확보
+* 확장성: 기능별 모듈화, 향후 SaaS 도구/채용 모듈 추가 용이
+* 오프라인 지원: 기본 프로필/채팅 기록 로컬 저장 (AsyncStorage + SQLite)
+
+3. 🧱 아키텍처 개요
+3.1 전체 구조 (Layered Architecture)
+src/
+├── assets/               # 이미지, 폰트, 아이콘
+├── components/           # 재사용 UI 컴포넌트 (Button, Card, Input 등)
+├── screens/              # 화면 단위 컴포넌트 (Home, Matching, Profile 등)
+├── navigation/           # React Navigation 설정
+├── store/                # Redux Toolkit (상태 관리)
+├── services/             # API 호출 (Axios 인스턴스, API 함수)
+├── utils/                # 공통 유틸 (date, validation, format 등)
+├── types/                # TypeScript 인터페이스/타입 정의
+├── hooks/                # 커스텀 훅 (useAuth, useApi 등)
+└── constants/            # 상수 (API URL, 색상, 키 등)
+3.2 상태 관리: Redux Toolkit
+* ** slices**:
+    * authSlice: 로그인 상태, 사용자 정보
+    * matchingSlice: 필터 조건, 매칭 결과
+    * chatSlice: 채팅 메시지, 채팅 목록
+    * profileSlice: 프로필 데이터
+✅ 이유: 복잡한 상태(예: 채팅 실시간 동기화)를 효율적으로 관리하기 위함
+
+4. 📱 핵심 기능별 기술 설계
+4.1 사용자 인증 (Auth)
+기능	기술 구현
+소셜 로그인	Expo AuthSession + Kakao/Naver/Google OAuth
+사업자 인증	사업자등록번호 입력 → 백엔드 API 연동 (공공데이터포털)
+JWT 토큰 관리	AsyncStorage에 저장, 요청 시 헤더에 자동 삽입
+자동 로그인	앱 실행 시 토큰 유효성 검사 → 무효 시 로그아웃
+4.2 인증 매칭 (Matching)
+기능	기술 구현
+필터 UI	react-native-slider, react-native-modal-selector
+매칭 목록	FlatList + Skeleton Loader (로딩 상태 시)
+AI 추천	백엔드에서 추천 결과 제공 → 프론트엔드는 렌더링만 담당
+견적 요청	POST /requests API 호출 → 성공 시 Toast 알림
+4.3 실시간 채팅 (Chat)
+기능	기술 구현
+메시지 전송/수신	WebSocket (Socket.IO) 또는 Firebase Realtime DB
+오프라인 지원	메시지 로컬 저장 → 온라인 시 동기화
+알림	Expo Push Notifications (백그라운드 알림)
+파일 첨부	이미지/문서 선택 → S3 업로드 후 URL 전송
+⚠️ MVP에서는 WebSocket 대신 폴링(Polling) 방식 적용 (복잡도 ↓)
+4.4 프로필 관리 (Profile)
+기능	기술 구현
+프로필 수정	Formik + Yup 유효성 검사
+자격증 이미지 업로드	Expo ImagePicker → S3 업로드
+리뷰 표시	FlatList + 별점 컴포넌트 (react-native-ratings)
+5. 🔌 API 연동 설계
+5.1 API 클라이언트 (services/api.ts)
+import axios from 'axios';
+
+const api = axios.create({
+  baseURL: 'https://api.certmatch.kr/v1',
+  timeout: 10000,
+});
+
+// 요청 인터셉터: 토큰 자동 삽입
+api.interceptors.request.use((config) => {
+  const token = getTokenFromStorage(); // AsyncStorage에서 가져옴
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
+
+export default api;
+5.2 주요 API 엔드포인트
+기능	엔드포인트	메서드
+로그인	/auth/login	POST
+프로필 조회	/users/me	GET
+매칭 목록	/matching	GET (쿼리: type, budget, region)
+견적 요청	/requests	POST
+채팅 목록	/chats	GET
+메시지 전송	/chats/{id}/messages	POST
+6. 🎨 UI/UX 기술 스펙
+항목	기술/라이브러리
+네비게이션	React Navigation (Stack + Bottom Tab)
+스타일링	Tailwind CSS (nativewind) + styled-components
+아이콘	react-native-vector-icons
+로딩 인디케이터	react-native-loading-spinner-overlay
+토스트 알림	react-native-toast-message
+폼 관리	Formik + Yup
+테마 관리	Context API 기반 테마 토글 (라이트/다크 모드 예정)
+7. 🧪 테스트 전략
+테스트 유형	도구	커버리지 목표
+유닛 테스트	Jest + React Native Testing Library	핵심 유틸/훅 ≥80%
+컴포넌트 테스트	Storybook + RTL	주요 UI 컴포넌트 100%
+E2E 테스트	Detox	로그인 → 매칭 → 채팅 플로우
+성능 테스트	Flipper + React DevTools	메모리 누수, 렌더링 최적화
+8. 🚀 빌드 및 배포
+플랫폼	도구	비고
+iOS	Expo Application Services (EAS) Build	TestFlight 배포
+Android	EAS Build	Google Play Internal Testing
+CI/CD	GitHub Actions	PR 머지 시 자동 빌드/테스트
+모니터링	Sentry + Firebase Crashlytics	실시간 오류 추적
+9. ⚠️ 의존성 및 제약사항
+* Expo 제한사항: 네이티브 모듈 필요 시 EAS Build 필수
+* iOS App Store 정책: 개인정보 수집 시 명시적 동의 필요 (PIPA 준수)
+* Android 권한: 카메라, 저장소 접근 권한 요청 필요
+* 네트워크: API 응답 지연 시 로컬 캐시 또는 오류 처리 필수
+
+10. 📅 개발 일정 (MVP 기준)
+주차	작업 내용
+Week 1	프로젝트 설정, Auth 기능 개발
+Week 2	Matching 화면 + API 연동
+Week 3	Chat 기능 (폴링 기반)
+Week 4	Profile 관리 + 리뷰 시스템
+Week 5	테스트, 버그 수정, 스토어 제출 준비
+이 TDD는 React Native 개발팀이 MVP를 일관성 있게 구현할 수 있도록 기술적 결정사항과 구조를 명확히 정의합니다.향후 WebSocket 전환, 오프라인 우선 아키텍처, SaaS 도구 통합은 Phase 2에서 고도화 예정입니다.
+✅ 다음 단계:
+*  Figma 디자인 ↔ 컴포넌트 매핑
+*  API 명세서와의 크로스 체크
+*  베타 빌드 생성 (TestFlight / Play Console)

@@ -1,0 +1,497 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+}
+
+// Removed applications model (not present in current DB). Reintroduce later when the table exists.
+
+model comments {
+  comment_id        String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  post_id           String     @db.Uuid
+  parent_comment_id String?    @db.Uuid
+  author_id         String     @db.Uuid
+  content           String
+  like_count        Int?       @default(0)
+  created_at        DateTime?  @default(now()) @db.Timestamp(6)
+  updated_at        DateTime?  @default(now()) @db.Timestamp(6)
+  deleted_at        DateTime?  @db.Timestamp(6)
+  users             User       @relation(fields: [author_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  comments          comments?  @relation("commentsTocomments", fields: [parent_comment_id], references: [comment_id], onDelete: NoAction, onUpdate: NoAction)
+  other_comments    comments[] @relation("commentsTocomments")
+  posts             posts      @relation(fields: [post_id], references: [post_id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([parent_comment_id], map: "idx_comments_parent")
+  @@index([post_id], map: "idx_comments_post")
+}
+
+model Company {
+  id               String             @id @default(dbgenerated("uuid_generate_v4()")) @map("company_id") @db.Uuid
+  userId           String             @map("user_id") @db.Uuid
+  companyName      String             @map("name") @db.VarChar(255)
+  businessRegNo    String?            @map("business_reg_no") @db.VarChar(50)
+  industry         String?            @db.VarChar(100)
+  size             company_size_enum?
+  address          String?            @map("location") @db.VarChar(255)
+  website          String?            @db.VarChar(255)
+  logoUrl          String?            @map("logo_url")
+  description      String?
+  employeeCount    Int?               @map("employee_count")
+  certType         cert_type_enum[]   @map("cert_type")
+  budget           Decimal?           @db.Decimal(15, 2)
+  desiredTimeline  String?            @map("desired_timeline") @db.VarChar(50)
+  status           String?            @default("preparing") @db.VarChar(50)
+  contactName      String?            @map("contact_name") @db.VarChar(100)
+  contactPhone     String?            @map("contact_phone") @db.VarChar(20)
+  contactEmail     String?            @map("contact_email") @db.VarChar(255)
+  createdAt        DateTime?          @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt        DateTime?          @default(now()) @map("updated_at") @db.Timestamp(6)
+  user             User               @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  contracts        contracts[]
+  proposals        proposals[]
+
+  @@map("companies")
+  @@index([industry], map: "idx_companies_industry")
+  @@index([address], map: "idx_companies_location")
+  @@index([size], map: "idx_companies_size")
+  @@index([userId], map: "idx_companies_user")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+// Removed legacy consultants model. Expert model below now maps to the same underlying table.
+
+model contracts {
+  contract_id             String                @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  company_id              String                @db.Uuid
+  consultant_id           String                @db.Uuid
+  proposal_id             String?               @db.Uuid
+  amount                  Decimal               @db.Decimal(15, 2)
+  fee                     Decimal?              @db.Decimal(15, 2)
+  net_amount              Decimal?              @db.Decimal(15, 2)
+  items                   Json?
+  terms                   String?
+  status                  contract_status_enum? @default(pending)
+  contract_pdf_url        String?
+  sign_url                String?
+  signed_by_company_at    DateTime?             @db.Timestamp(6)
+  signed_by_consultant_at DateTime?             @db.Timestamp(6)
+  start_date              DateTime?             @db.Date
+  end_date                DateTime?             @db.Date
+  created_at              DateTime?             @default(now()) @db.Timestamp(6)
+  updated_at              DateTime?             @default(now()) @db.Timestamp(6)
+  completed_at            DateTime?             @db.Timestamp(6)
+  companies               Company               @relation(fields: [company_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  consultants             Expert                @relation(fields: [consultant_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  proposals               proposals?            @relation(fields: [proposal_id], references: [proposal_id], onDelete: NoAction, onUpdate: NoAction)
+  payments                payments[]
+  reviews                 reviews[]
+
+  @@index([company_id], map: "idx_contracts_company")
+  @@index([consultant_id], map: "idx_contracts_consultant")
+  @@index([start_date, end_date], map: "idx_contracts_dates")
+  @@index([status], map: "idx_contracts_status")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model course_enrollments {
+  enrollment_id   String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  course_id       String    @db.Uuid
+  user_id         String    @db.Uuid
+  status          String?   @default("enrolled") @db.VarChar(20)
+  progress        Int?      @default(0)
+  completed_at    DateTime? @db.Timestamp(6)
+  certificate_url String?
+  created_at      DateTime? @default(now()) @db.Timestamp(6)
+  updated_at      DateTime? @default(now()) @db.Timestamp(6)
+  courses         courses   @relation(fields: [course_id], references: [course_id], onDelete: NoAction, onUpdate: NoAction)
+  users           User      @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([course_id, user_id], map: "unique_enrollment")
+}
+
+model courses {
+  course_id          String               @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  educator_id        String               @db.Uuid
+  course_name        String               @db.VarChar(255)
+  description        String?
+  instructor_name    String?              @db.VarChar(100)
+  level              String?              @db.VarChar(20)
+  duration_hours     Int?
+  duration_weeks     Int?
+  price              Decimal?             @db.Decimal(10, 2)
+  discount_price     Decimal?             @db.Decimal(10, 2)
+  schedule           Json?
+  start_date         DateTime?            @db.Date
+  end_date           DateTime?            @db.Date
+  format             String?              @db.VarChar(20)
+  max_students       Int?
+  enrolled_count     Int?                 @default(0)
+  is_active          Boolean?             @default(true)
+  rating             Decimal?             @default(0.00) @db.Decimal(3, 2)
+  review_count       Int?                 @default(0)
+  created_at         DateTime?            @default(now()) @db.Timestamp(6)
+  updated_at         DateTime?            @default(now()) @db.Timestamp(6)
+  course_enrollments course_enrollments[]
+  educators          educators            @relation(fields: [educator_id], references: [educator_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model educators {
+  educator_id      String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  user_id          String        @db.Uuid
+  institution_name String        @db.VarChar(255)
+  description      String?
+  location         String?       @db.VarChar(255)
+  website          String?       @db.VarChar(255)
+  is_verified      Boolean?      @default(false)
+  certifications   Json?
+  rating           Decimal?      @default(0.00) @db.Decimal(3, 2)
+  review_count     Int?          @default(0)
+  created_at       DateTime?     @default(now()) @db.Timestamp(6)
+  updated_at       DateTime?     @default(now()) @db.Timestamp(6)
+  courses          courses[]
+  users            User          @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  settlements      settlements[]
+}
+
+model Expert {
+  id               String       @id @default(dbgenerated("uuid_generate_v4()")) @map("consultant_id") @db.Uuid
+  userId           String       @map("user_id") @db.Uuid @unique
+  name             String       @db.VarChar(100)
+  bio              String?
+  specialty        Json?
+  experienceYears  Int?         @map("experience_years")
+  hourlyRate       Decimal?     @map("hourly_rate") @db.Decimal(10, 2)
+  dailyRate        Decimal?     @map("daily_rate") @db.Decimal(10, 2)
+  location         String?      @db.VarChar(255)
+  languages        String[]     @db.VarChar(100)
+  availability     Json?
+  isVerified       Boolean?     @default(false) @map("is_verified")
+  verifiedDate     DateTime?    @map("verified_date") @db.Timestamp(6)
+  certifications   Json?
+  rating           Decimal?     @default(0.00) @db.Decimal(3, 2)
+  reviewCount      Int?         @default(0) @map("review_count")
+  createdAt        DateTime?    @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt        DateTime?    @default(now()) @map("updated_at") @db.Timestamp(6)
+  user             User         @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  contracts        contracts[]
+  proposals        proposals[]
+  rating_aggregate rating_aggregates?
+  settlements      settlements[]
+
+  @@map("consultants")
+}
+
+model government_notices {
+  notice_id         String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  title             String    @db.VarChar(255)
+  content           String?
+  category          String?   @db.VarChar(50)
+  source            String?   @db.VarChar(100)
+  source_url        String?
+  application_start DateTime? @db.Date
+  application_end   DateTime? @db.Date
+  is_active         Boolean?  @default(true)
+  published_at      DateTime? @db.Timestamp(6)
+  created_at        DateTime? @default(now()) @db.Timestamp(6)
+  updated_at        DateTime? @default(now()) @db.Timestamp(6)
+}
+
+model notifications {
+  notification_id String                 @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  user_id         String                 @db.Uuid
+  type            notification_type_enum
+  title           String                 @db.VarChar(255)
+  message         String
+  data            Json?
+  is_read         Boolean?               @default(false)
+  read_at         DateTime?              @db.Timestamp(6)
+  action_url      String?
+  created_at      DateTime?              @default(now()) @db.Timestamp(6)
+  expires_at      DateTime?              @db.Timestamp(6)
+  users           User                   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([created_at(sort: Desc)], map: "idx_notifications_created")
+  @@index([is_read], map: "idx_notifications_read")
+  @@index([user_id], map: "idx_notifications_user")
+}
+
+model payments {
+  payment_id     String               @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  contract_id    String               @db.Uuid
+  amount         Decimal              @db.Decimal(15, 2)
+  fee            Decimal?             @db.Decimal(15, 2)
+  net_amount     Decimal?             @db.Decimal(15, 2)
+  status         payment_status_enum? @default(pending)
+  payment_method payment_method_enum?
+  transaction_id String?              @db.VarChar(100)
+  pg_provider    String?              @db.VarChar(50)
+  receipt_url    String?
+  created_at     DateTime?            @default(now()) @db.Timestamp(6)
+  completed_at   DateTime?            @db.Timestamp(6)
+  refunded_at    DateTime?            @db.Timestamp(6)
+  contracts      contracts            @relation(fields: [contract_id], references: [contract_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([contract_id], map: "idx_payments_contract")
+  @@index([created_at(sort: Desc)], map: "idx_payments_created")
+  @@index([status], map: "idx_payments_status")
+}
+
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
+model posts {
+  post_id                          String             @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  author_id                        String             @db.Uuid
+  category                         post_category_enum
+  title                            String             @db.VarChar(255)
+  content                          String
+  tags                             String[]           @db.VarChar(50)
+  view_count                       Int?               @default(0)
+  like_count                       Int?               @default(0)
+  comment_count                    Int?               @default(0)
+  is_adopted                       Boolean?           @default(false)
+  adopted_by_id                    String?            @db.Uuid
+  created_at                       DateTime?          @default(now()) @db.Timestamp(6)
+  updated_at                       DateTime?          @default(now()) @db.Timestamp(6)
+  published_at                     DateTime?          @db.Timestamp(6)
+  deleted_at                       DateTime?          @db.Timestamp(6)
+  comments                         comments[]
+  users_posts_adopted_by_idTousers User?             @relation("posts_adopted_by_idTousers", fields: [adopted_by_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users_posts_author_idTousers     User              @relation("posts_author_idTousers", fields: [author_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([author_id], map: "idx_posts_author")
+  @@index([category], map: "idx_posts_category")
+  @@index([created_at(sort: Desc)], map: "idx_posts_created")
+  @@index([tags], map: "idx_posts_tags", type: Gin)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model proposals {
+  proposal_id      String                @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  company_id       String                @db.Uuid
+  consultant_id    String                @db.Uuid
+  matching_score   Int?
+  matching_reason  String?
+  status           proposal_status_enum? @default(pending)
+  message_history  Json?
+  rejection_reason String?
+  expires_at       DateTime?             @db.Timestamp(6)
+  created_at       DateTime?             @default(now()) @db.Timestamp(6)
+  updated_at       DateTime?             @default(now()) @db.Timestamp(6)
+  contracts        contracts[]
+  companies        Company               @relation(fields: [company_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  consultants      Expert                @relation(fields: [consultant_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([company_id, consultant_id, created_at], map: "unique_proposal")
+  @@index([company_id], map: "idx_proposals_company")
+  @@index([consultant_id], map: "idx_proposals_consultant")
+  @@index([created_at(sort: Desc)], map: "idx_proposals_created")
+  @@index([status], map: "idx_proposals_status")
+}
+
+model rating_aggregates {
+  consultant_id      String      @id @db.Uuid
+  avg_rating         Decimal?    @default(0.00) @db.Decimal(3, 2)
+  review_count       Int?        @default(0)
+  rating_by_category Json?
+  updated_at         DateTime?   @default(now()) @db.Timestamp(6)
+  consultants        Expert      @relation(fields: [consultant_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model reviews {
+  review_id                        String              @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  contract_id                      String              @db.Uuid
+  reviewer_id                      String              @db.Uuid
+  reviewee_id                      String              @db.Uuid
+  rating                           Int
+  text                             String?
+  rating_by_category               Json?
+  status                           review_status_enum? @default(pending)
+  response                         String?
+  response_at                      DateTime?           @db.Timestamp(6)
+  created_at                       DateTime?           @default(now()) @db.Timestamp(6)
+  updated_at                       DateTime?           @default(now()) @db.Timestamp(6)
+  published_at                     DateTime?           @db.Timestamp(6)
+  contracts                        contracts           @relation(fields: [contract_id], references: [contract_id], onDelete: NoAction, onUpdate: NoAction)
+  users_reviews_reviewee_idTousers User                @relation("reviews_reviewee_idTousers", fields: [reviewee_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users_reviews_reviewer_idTousers User                @relation("reviews_reviewer_idTousers", fields: [reviewer_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([contract_id, reviewer_id], map: "unique_review")
+  @@index([contract_id], map: "idx_reviews_contract")
+  @@index([reviewee_id], map: "idx_reviews_reviewee")
+  @@index([status], map: "idx_reviews_status")
+}
+
+// Removed schedules model (not present in current DB). Reintroduce later when the table exists.
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model settlements {
+  settlement_id String                  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  consultant_id String?                 @db.Uuid
+  educator_id   String?                 @db.Uuid
+  period        String                  @db.VarChar(7)
+  total_earned  Decimal                 @db.Decimal(15, 2)
+  platform_fee  Decimal                 @db.Decimal(15, 2)
+  tax_withheld  Decimal?                @default(0) @db.Decimal(15, 2)
+  net_amount    Decimal                 @db.Decimal(15, 2)
+  status        settlement_status_enum? @default(pending)
+  bank_account  String?                 @db.VarChar(100)
+  transfer_date DateTime?               @db.Date
+  created_at    DateTime?               @default(now()) @db.Timestamp(6)
+  updated_at    DateTime?               @default(now()) @db.Timestamp(6)
+  consultants   Expert?                 @relation(fields: [consultant_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  educators     educators?              @relation(fields: [educator_id], references: [educator_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model User {
+  id                                String               @id @default(dbgenerated("uuid_generate_v4()")) @map("user_id") @db.Uuid
+  email                             String               @unique @db.VarChar(255)
+  password                          String               @map("password_hash") @db.VarChar(255)
+  role                              user_type_enum       @map("user_type")
+  name                              String?              @db.VarChar(100)
+  phone                             String?              @db.VarChar(20)
+  profileImageUrl                   String?              @map("profile_image_url")
+  profileCompletePct                Int?                 @default(0) @map("profile_complete_pct")
+  emailVerified                     Boolean?             @default(false) @map("email_verified")
+  emailVerifiedAt                   DateTime?            @map("email_verified_at") @db.Timestamp(6)
+  twoFactorEnabled                  Boolean?             @default(false) @map("two_factor_enabled")
+  twoFactorSecret                   String?              @map("two_factor_secret") @db.VarChar(32)
+  orgId                             String?              @map("org_id") @db.Uuid
+  isActive                          Boolean?             @default(true) @map("is_active")
+  lastLoginAt                       DateTime?            @map("last_login_at") @db.Timestamp(6)
+  createdAt                         DateTime?            @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt                         DateTime?            @default(now()) @map("updated_at") @db.Timestamp(6)
+  deletedAt                         DateTime?            @map("deleted_at") @db.Timestamp(6)
+  comments                          comments[]
+  companies                         Company[]
+  expert                            Expert?
+  course_enrollments                course_enrollments[]
+  educators                         educators[]
+  notifications                     notifications[]
+  posts_posts_adopted_by_idTousers  posts[]              @relation("posts_adopted_by_idTousers")
+  posts_posts_author_idTousers      posts[]              @relation("posts_author_idTousers")
+  reviews_reviews_reviewee_idTousers reviews[]           @relation("reviews_reviewee_idTousers")
+  reviews_reviews_reviewer_idTousers reviews[]           @relation("reviews_reviewer_idTousers")
+
+  @@map("users")
+  @@index([email], map: "idx_users_email")
+  @@index([orgId], map: "idx_users_org")
+  @@index([role], map: "idx_users_type")
+}
+
+enum ApplicationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  IN_PROGRESS
+  COMPLETED
+}
+
+enum ScheduleStatus {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum ScheduleType {
+  CONSULTATION
+  AUDIT
+  TRAINING
+  MEETING
+}
+
+enum UserRole {
+  USER
+  EXPERT
+  COMPANY
+  ADMIN
+}
+
+enum cert_type_enum {
+  ISMS
+  ISMS_P   @map("ISMS-P")
+  ISO27001
+  GS
+  CPPG
+  ISO27701
+  GDPR
+}
+
+enum company_size_enum {
+  small
+  medium
+  large
+  enterprise
+}
+
+enum contract_status_enum {
+  pending
+  signed
+  active
+  completed
+  cancelled
+}
+
+enum notification_type_enum {
+  matching
+  message
+  payment
+  settlement
+  community
+  system
+}
+
+enum payment_method_enum {
+  card
+  transfer
+  virtual
+  mobile
+}
+
+enum payment_status_enum {
+  pending
+  success
+  failed
+  refunded
+  cancelled
+}
+
+enum post_category_enum {
+  qa
+  success
+  tips
+  news
+}
+
+enum proposal_status_enum {
+  pending
+  accepted
+  rejected
+  expired
+  completed
+}
+
+enum review_status_enum {
+  pending
+  approved
+  rejected
+  hidden
+}
+
+enum settlement_status_enum {
+  pending
+  transferred
+  failed
+}
+
+enum user_type_enum {
+  company
+  consultant
+  educator
+  admin
+}
