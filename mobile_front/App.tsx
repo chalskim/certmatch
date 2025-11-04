@@ -14,13 +14,16 @@ import { UserProvider } from './contexts/UserContext';
 
 // 메뉴 화면들
 import { PersonalRegistration } from './screens/menu/PersonalRegistration';
-import CompanyQualificationRegistration from './screens/menu/CompanyRegistration';
+import  CompanyRegistration from './screens/menu/CompanyRegistration';
 
 import ExpertRecruitment from './screens/menu/ExpertRecruitment';
 import ExpertProfessional from './screens/menu/ExpertProfessional';
 import EducationRegistration from './screens/menu/EducationRegistration';
 
 import ExpertRecruitmentList from './screens/menu/ExpertRecruitmentList';
+import ExpertProfessionalDetail from './screens/menu/ExpertProfessionalDetail';
+import EducationList from './screens/menu/EducationList';
+
 // Create a native stack navigator
 const Stack = createNativeStackNavigator();
 
@@ -109,8 +112,8 @@ export default function App() {
               <Stack.Screen name="Login" component={LoginScreen} />
               <Stack.Screen name="Signup" component={SignupScreen} />
               <Stack.Screen name="PersonalRegistration" component={PersonalRegistration} />
-              <Stack.Screen name="CompanyQualificationRegistration"
-                component={CompanyQualificationRegistration}
+              <Stack.Screen name="CompanyRegistration"
+                component={CompanyRegistration}
               />
               <Stack.Screen
                 name="ExpertRecruitment"
@@ -128,6 +131,14 @@ export default function App() {
               <Stack.Screen
                 name="ExpertRecruitmentList"
                 component={ExpertRecruitmentList}
+              />
+              <Stack.Screen
+                name="ExpertProfessionalDetail"
+                component={ExpertProfessionalDetail}
+              />
+              <Stack.Screen
+                name="EducationList"
+                component={EducationList}
               />
             </Stack.Navigator>
             <StatusBar style="auto" />

@@ -98,6 +98,12 @@ export const SideMenu: React.FC<SideMenuProps> = ({ visible, onClose }) => {
     navigation.navigate('ExpertRecruitmentList' as never);
   };
 
+   // 인증 인력모집 목록 화면으로 이동
+  const handleExpertProfessionalDetail = () => {
+    handleClose();
+    navigation.navigate('ExpertProfessionalDetail' as never);
+  };
+
   // Function to get user type label
   const getUserTypeLabel = (role: string) => {
     switch (role) {
@@ -216,8 +222,8 @@ export const SideMenu: React.FC<SideMenuProps> = ({ visible, onClose }) => {
             <View style={styles.divider} />
 
             <MenuItem icon="user-tie" label="인증 인력모집 목록" onPress={handleExpertRecruitmentList} />
-            <MenuItem icon="user-tie" label="인증 전문가등록 목록" onPress={handleExpertRecruitmentList} />
-            <MenuItem icon="user-tie" label="인증 교육 목록" onPress={handleExpertRecruitmentList} />
+            <MenuItem icon="user-tie" label="인증 전문가등록 목록" onPress={handleExpertProfessionalDetail} />
+            <MenuItem icon="graduation-cap" label="인증 교육 목록" onPress={handleExpertProfessionalDetail} />
             <View style={styles.divider} />
 
             <MenuItem icon="user-plus" label="전문가 등록" />

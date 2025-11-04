@@ -115,9 +115,22 @@ npm run lint:web     # 웹 린트
 - [GitHub Repository](https://github.com/chalskim/certmatch)
 - [API 문서](http://localhost:3001/api)
 - [웹 애플리케이션](http://localhost:3000)
+## GitHub Update
+cd /Users/chalskim/src/certmatch/certmatch
+git status
+git add -A
+git commit -m "chore: 전체 업데이트 및 테스트 페이지 추가"
+git push origin main
+git remote -v
+git branch --show-current
+git push -u origin main or git push --force origin main
+git config --global credential.helper osxkeychain
+
 
 서버 실행 
 cd /Users/chalskim/src/certmatch/certmatch/Server && npm run start:dev
 
 클라이언트 실행 
 cd '/Users/chalskim/src/certmatch/certmatch/mobile_front' && npm start
+
+
