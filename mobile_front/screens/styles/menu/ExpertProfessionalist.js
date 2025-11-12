@@ -1,0 +1,46 @@
+import { StyleSheet } from 'react-native';
+
+function statusStyle(s: any) {
+  if (s === 'pending') return { backgroundColor: '#fff3cd', color: '#856404' } as any;
+  if (s === 'accepted') return { backgroundColor: '#d1ecf1', color: '#0c5460' } as any;
+  if (s === 'rejected') return { backgroundColor: '#f8d7da', color: '#721c24' } as any;
+  if (s === 'completed') return { backgroundColor: '#d4edda', color: '#155724' } as any;
+  if (s === 'ongoing') return { backgroundColor: '#cce5ff', color: '#004085' } as any;
+  return { backgroundColor: '#eee', color: '#333' } as any;
+}
+
+const styles = StyleSheet.create({
+  safe: { flex: 1, backgroundColor: '#f8f9fa' },
+  header: { height: 60, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 12, backgroundColor: '#fff' },
+  headerIcon: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center', borderRadius: 18 },
+  title: { fontSize: 18, fontWeight: '700' },
+  headerRight: { flexDirection: 'row', alignItems: 'center' },
+  tabNav: { flexDirection: 'row', backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#eee' },
+  tabButton: { flex: 1, paddingVertical: 12, alignItems: 'center' },
+  tabText: { color: '#666' },
+  tabActive: { borderBottomWidth: 3, borderBottomColor: '#4a6fdc' },
+  tabActiveText: { color: '#4a6fdc', fontWeight: '700' },
+  container: { flex: 1, paddingHorizontal: 12, paddingTop: 12 },
+  sectionHeader: { marginBottom: 12 },
+  welcome: { fontSize: 20, fontWeight: '700' },
+  sub: { color: '#666', marginTop: 4 },
+  statsRow: { flexDirection: 'row', gap: 12 },
+  statCard: { flex: 1, backgroundColor: '#fff', padding: 12, borderRadius: 10, alignItems: 'center', marginRight: 8 },
+  statValue: { fontSize: 20, fontWeight: '700' },
+  statLabel: { color: '#666', marginTop: 6 },
+  sectionTitle: { fontSize: 16, fontWeight: '700', marginBottom: 8 },
+  card: { backgroundColor: '#f8f9fa', padding: 12, borderRadius: 8, marginBottom: 10, borderLeftWidth: 4, borderLeftColor: '#4a6fdc' },
+  cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 },
+  cardTitle: { fontSize: 15, fontWeight: '700' },
+  cardCompany: { color: '#666', marginBottom: 4 },
+  cardMeta: { color: '#999', fontSize: 12 },
+  cardStatus: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 12, fontSize: 12 },
+  profileCard: { backgroundColor: '#fff', padding: 16, borderRadius: 8 },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'center', alignItems: 'center' },
+  modalBox: { width: '90%', backgroundColor: '#fff', padding: 16, borderRadius: 8 },
+  modalTitle: { fontSize: 16, fontWeight: '700' },
+  btnPrimary: { backgroundColor: '#4a6fdc', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 6, marginLeft: 8 },
+  btnSecondary: { backgroundColor: '#e0e0e0', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 6 },
+  btnText: { color: '#fff' },
+  toast: { position: 'absolute', bottom: 80, left: '50%', transform: [{ translateX: -150 }], backgroundColor: 'rgba(0,0,0,0.8)', padding: 12, borderRadius: 6, minWidth: 200, alignItems: 'center' },
+});
