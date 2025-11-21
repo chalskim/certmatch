@@ -159,8 +159,8 @@ export default function ExpertRecruitmentListDetail() {
 
         {/* Office images */}
         <View style={styles.officeImages}>
-          <Image source={{ uri: 'https://picsum.photos/seed/office1/800/400.jpg' }} style={styles.officeImage} />
-          <Image source={{ uri: 'https://picsum.photos/seed/office2/800/400.jpg' }} style={styles.officeImage} />
+        <Image source={require('../../assets/icon/office1.jpg')} style={styles.officeImage} />
+        <Image source={require('../../assets/icon/office2.jpg')} style={styles.officeImage} />
         </View>
 
         {/* Tabs */}

@@ -3,7 +3,9 @@ import { View, Text, ScrollView, TouchableOpacity, Modal } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { useNavigation, useRoute, NavigationProp, ParamListBase } from '@react-navigation/native';
 import SubformHeader from '../components/SubformHeader';
-import { styles } from '../styles/menu/EducationListDetail';
+// Import JS styles and cast to any to satisfy React Native StyleProp types in TSX
+import { styles as rawStyles } from '../styles/menu/EducationListDetail';
+const styles: any = rawStyles;
 
 type CourseStatus = 'before' | 'active' | 'full' | 'completed';
 

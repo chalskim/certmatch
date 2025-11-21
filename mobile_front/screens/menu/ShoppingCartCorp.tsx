@@ -1,0 +1,427 @@
+import React, { useMemo, useState } from 'react';
+import { View, Text, ScrollView, SafeAreaView, TouchableOpacity, TextInput, Alert } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+// Ensure correct SubformHeader import; fix any prior mistaken '../components/.SubformHeader'
+import SubformHeader from '../components/SubformHeader';
+import { styles } from '../styles/menu/ShoppingCartCorp'; 
+
+type Category = 'premium' | 'standard' | 'basic';
+
+type CartItem = {
+  id: string;
+  title: string;
+  description: string;
+  type: string;
+  category: Category;
+  price: number;
+  quantity: number;
+  duration: number;
+  startDate: string; // YYYY-MM-DD
+  endDate: string;   // YYYY-MM-DD
+  targetAudience: string;
+  company: string;
+  businessNumber: string;
+  department: string;
+  manager: string;
+  contact: string;
+  selected: boolean;
+};
+
+const initialCartItems: CartItem[] = [
+  {
+    id: 'item1',
+    title: '상단 배너 광고',
+    description: '메인 페이지 상단 노출 (일간)',
+    type: '배너',
+    category: 'premium',
+    price: 50000,
+    quantity: 1,
+    duration: 1,
+    startDate: '2025-11-10',
+    endDate: '2025-11-10',
+    targetAudience: '모든 사용자',
+    company: '테크솔루션',
+    businessNumber: '123-45-67890',
+    department: '마케팅팀',
+    manager: '김마케팅',
+    contact: '02-1234-5678',
+    selected: true,
+  },
+  {
+    id: 'item2',
+    title: '전문가 프로필 추천',
+    description: '검색 결과 상단 노출 (주간)',
+    type: '프로모션',
+    category: 'standard',
+    price: 350000,
+    quantity: 2,
+    duration: 7,
+    startDate: '2025-11-08',
+    endDate: '2025-11-14',
+    targetAudience: '기업 사용자',
+    company: '인사이트컨설팅',
+    businessNumber: '987-65-43210',
+    department: '영업팀',
+    manager: '이영업',
+    contact: '02-9876-5432',
+    selected: true,
+  },
+  {
+    id: 'item3',
+    title: '채용공고 하이라이트',
+    description: '긴급 채용 섹션 노출 (월간)',
+    type: '채용',
+    category: 'premium',
+    price: 800000,
+    quantity: 1,
+    duration: 30,
+    startDate: '2025-11-15',
+    endDate: '2025-12-14',
+    targetAudience: '취업 희망자',
+    company: 'HR퍼스트',
+    businessNumber: '456-78-90123',
+    department: '인사팀',
+    manager: '박인사',
+    contact: '02-5555-6666',
+    selected: false,
+  },
+  {
+    id: 'item4',
+    title: '교육과정 배너',
+    description: '교육 페이지 사이드 배너 (2주간)',
+    type: '배너',
+    category: 'standard',
+    price: 200000,
+    quantity: 1,
+    duration: 14,
+    startDate: '2025-10-27',
+    endDate: '2025-11-09',
+    targetAudience: '학생/전문가',
+    company: '에듀테크코리아',
+    businessNumber: '321-09-87654',
+    department: '교육사업팀',
+    manager: '최에듀',
+    contact: '02-3333-4444',
+    selected: true,
+  },
+  {
+    id: 'item5',
+    title: '인증컨설팅 팝업 광고',
+    description: '로그인 후 팝업 광고 (3일간)',
+    type: '팝업',
+    category: 'basic',
+    price: 150000,
+    quantity: 3,
+    duration: 3,
+    startDate: '2025-11-20',
+    endDate: '2025-11-22',
+    targetAudience: '신규 사용자',
+    company: '보안가드',
+    businessNumber: '654-32-10987',
+    department: 'IT팀',
+    manager: '정보안',
+    contact: '02-7777-8888',
+    selected: false,
+  },
+];
+
+function getCategoryText(category: Category): string {
+  const map: Record<Category, string> = {
+    premium: '프리미엄',
+    standard: '스탠다드',
+    basic: '베이직',
+  };
+  return map[category];
+}
+
+export default function ShoppingCartCorp() {
+  const navigation = useNavigation<any>();
+  const [cartItems, setCartItems] = useState<CartItem[]>(initialCartItems);
+  const [categoryFilter, setCategoryFilter] = useState<'all' | Category>('all');
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const filteredItems = useMemo(() => {
+    const lower = searchTerm.toLowerCase();
+    return cartItems.filter((item) => {
+      const categoryMatch = categoryFilter === 'all' || item.category === categoryFilter;
+      const searchMatch =
+        item.title.toLowerCase().includes(lower) || item.description.toLowerCase().includes(lower);
+      return categoryMatch && searchMatch;
+    });
+  }, [cartItems, categoryFilter, searchTerm]);
+
+  const selectedItems = useMemo(() => cartItems.filter((i) => i.selected), [cartItems]);
+  const subtotal = useMemo(() => selectedItems.reduce((sum, i) => sum + i.price * i.quantity, 0), [selectedItems]);
+  const tax = useMemo(() => Math.floor(subtotal * 0.1), [subtotal]);
+  const total = useMemo(() => subtotal + tax, [subtotal, tax]);
+
+  const handleBack = () => navigation.goBack();
+  const handleHome = () => navigation.navigate('Home');
+
+  const toggleItemSelection = (id: string) => {
+    setCartItems((prev) => prev.map((i) => (i.id === id ? { ...i, selected: !i.selected } : i)));
+  };
+
+  const removeItem = (id: string) => {
+    Alert.alert('삭제 확인', '이 상품을 장바구니에서 삭제하시겠습니까?', [
+      { text: '취소', style: 'cancel' },
+      {
+        text: '삭제',
+        style: 'destructive',
+        onPress: () => setCartItems((prev) => prev.filter((i) => i.id !== id)),
+      },
+    ]);
+  };
+
+  const deleteSelectedItems = () => {
+    const selectedCount = cartItems.filter((i) => i.selected).length;
+    if (selectedCount === 0) {
+      Alert.alert('알림', '삭제할 상품을 선택해주세요.');
+      return;
+    }
+    Alert.alert('삭제 확인', `선택된 ${selectedCount}개 상품을 장바구니에서 삭제하시겠습니까?`, [
+      { text: '취소', style: 'cancel' },
+      {
+        text: '삭제',
+        style: 'destructive',
+        onPress: () => setCartItems((prev) => prev.filter((i) => !i.selected)),
+      },
+    ]);
+  };
+
+  const increaseQuantity = (id: string) => {
+    setCartItems((prev) => prev.map((i) => (i.id === id ? { ...i, quantity: i.quantity + 1 } : i)));
+  };
+
+  const decreaseQuantity = (id: string) => {
+    setCartItems((prev) =>
+      prev.map((i) => (i.id === id && i.quantity > 1 ? { ...i, quantity: i.quantity - 1 } : i))
+    );
+  };
+
+  const updateQuantity = (id: string, value: string) => {
+    const num = parseInt(value, 10);
+    setCartItems((prev) => prev.map((i) => (i.id === id && num > 0 ? { ...i, quantity: num } : i)));
+  };
+
+  const handlePayment = () => {
+    const selected = cartItems.filter((i) => i.selected);
+    if (selected.length === 0) {
+      Alert.alert('알림', '결제할 상품을 선택해주세요.');
+      return;
+    }
+    const itemTitles = selected.map((i) => `${i.title} (${i.quantity}개)`).join(', ');
+    const subtotalVal = selected.reduce((sum, i) => sum + i.price * i.quantity, 0);
+    const taxVal = Math.floor(subtotalVal * 0.1);
+    const totalVal = subtotalVal + taxVal;
+
+    Alert.alert(
+      '결제 확인',
+      `다음 상품을 결제하시겠습니까?\n\n상품: ${itemTitles}\n상품 금액: ₩${subtotalVal.toLocaleString()}\n부가세: ₩${taxVal.toLocaleString()}\n총 결제 금액: ₩${totalVal.toLocaleString()}`,
+      [
+        { text: '취소', style: 'cancel' },
+        {
+          text: '결제하기',
+          onPress: () => {
+            Alert.alert('알림', '결제가 완료되었습니다!');
+            setCartItems((prev) => prev.filter((i) => !i.selected));
+          },
+        },
+      ]
+    );
+  };
+
+  const handleCancel = () => {
+    const selected = cartItems.filter((i) => i.selected);
+    if (selected.length > 0) {
+      Alert.alert('취소 확인', '선택된 상품을 모두 취소하시겠습니까?', [
+        { text: '아니오', style: 'cancel' },
+        {
+          text: '예',
+          onPress: () => setCartItems((prev) => prev.map((i) => ({ ...i, selected: false }))),
+        },
+      ]);
+    } else {
+      Alert.alert('알림', '선택된 상품이 없습니다.');
+    }
+  };
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <SubformHeader title="장바구니" onBack={handleBack} onHome={handleHome} />
+      <ScrollView contentContainerStyle={{ paddingBottom: 140 }}>
+        {/* 헤더 안내 블록 제거됨 */}
+
+        <View style={styles.controls}>
+          <View style={styles.filterGroup}>
+            <Text style={styles.filterLabel}>카테고리:</Text>
+            <View style={styles.filterButtons}>
+              {(
+                [
+                  { key: 'all', label: '전체' },
+                  { key: 'premium', label: '프리미엄' },
+                  { key: 'standard', label: '스탠다드' },
+                  { key: 'basic', label: '베이직' },
+                ] as const
+              ).map((opt) => (
+                <TouchableOpacity
+                  key={opt.key}
+                  style={[
+                    styles.filterBtn,
+                    categoryFilter === opt.key && styles.filterBtnActive,
+                  ]}
+                  onPress={() => setCategoryFilter(opt.key as any)}
+                >
+                  <Text
+                    style={[
+                      styles.filterBtnText,
+                      categoryFilter === opt.key && styles.filterBtnTextActive,
+                    ]}
+                  >
+                    {opt.label}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+            <TextInput
+              value={searchTerm}
+              onChangeText={setSearchTerm}
+              placeholder="상품명으로 검색..."
+              style={styles.searchInput}
+            />
+          </View>
+
+          <TouchableOpacity style={[styles.btn, styles.btnDanger]} onPress={deleteSelectedItems}>
+            <Text style={styles.btnText}>선택 삭제</Text>
+          </TouchableOpacity>
+        </View>
+
+        {filteredItems.length === 0 ? (
+          <View style={styles.emptyCart}>
+            <Text style={styles.emptyCartIcon}>🛒</Text>
+            <Text style={styles.emptyCartTitle}>장바구니가 비어있습니다</Text>
+            <Text style={styles.emptyCartDescription}>상품을 장바구니에 추가해주세요</Text>
+            <TouchableOpacity style={[styles.btn, styles.btnPrimary]} onPress={handleHome}>
+              <Text style={styles.btnText}>상품 보러가기</Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <View style={styles.cartContainer}>
+            {filteredItems.map((item) => (
+              <View key={item.id} style={styles.cartItem}>
+                <View style={styles.cartItemHeader}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <View
+                      style={[
+                        styles.categoryBadge,
+                        item.category === 'premium' && styles.categoryPremium,
+                        item.category === 'standard' && styles.categoryStandard,
+                        item.category === 'basic' && styles.categoryBasic,
+                      ]}
+                    >
+                      <Text style={styles.categoryBadgeText}>{getCategoryText(item.category)}</Text>
+                    </View>
+                    <Text style={{ marginLeft: 8, fontSize: 14, color: '#7f8c8d' }}>{item.company}</Text>
+                  </View>
+                  <TouchableOpacity style={[styles.btn, styles.btnDanger, styles.btnSm]} onPress={() => removeItem(item.id)}>
+                    <Text style={styles.btnText}>삭제</Text>
+                  </TouchableOpacity>
+                </View>
+
+                <View style={styles.cartItemBody}>
+                  <TouchableOpacity style={styles.itemCheckbox} onPress={() => toggleItemSelection(item.id)}>
+                    <View style={[styles.checkbox, item.selected && styles.checkboxChecked]}>
+                      {item.selected && <Text style={styles.checkboxMark}>✓</Text>}
+                    </View>
+                  </TouchableOpacity>
+
+                  <View style={styles.itemImage}>
+                    <Text style={{ color: '#7f8c8d', fontSize: 14 }}>상품 이미지</Text>
+                  </View>
+
+                  <View style={styles.itemDetails}>
+                    <Text style={styles.itemTitle}>{item.title}</Text>
+                    <Text style={styles.itemDescription}>{item.description}</Text>
+                    <View style={styles.itemMeta}>
+                      <View style={styles.metaItem}>
+                        <Text style={{ marginRight: 4 }}>📅</Text>
+                        <Text>{item.startDate} ~ {item.endDate}</Text>
+                      </View>
+                      <View style={styles.metaItem}>
+                        <Text style={{ marginRight: 4 }}>👥</Text>
+                        <Text>{item.targetAudience}</Text>
+                      </View>
+                      <View style={styles.metaItem}>
+                        <Text style={{ marginRight: 4 }}>👤</Text>
+                        <Text>{item.manager}</Text>
+                      </View>
+                    </View>
+                    <Text style={styles.itemPrice}>₩{(item.price * item.quantity).toLocaleString()}</Text>
+                    <View style={styles.itemActions}>
+                      <View style={styles.quantityControl}>
+                        <TouchableOpacity style={styles.quantityBtn} onPress={() => decreaseQuantity(item.id)}>
+                          <Text style={styles.quantityBtnText}>-</Text>
+                        </TouchableOpacity>
+                        <TextInput
+                          value={String(item.quantity)}
+                          onChangeText={(v) => updateQuantity(item.id, v)}
+                          keyboardType="number-pad"
+                          style={styles.quantityInput}
+                        />
+                        <TouchableOpacity style={styles.quantityBtn} onPress={() => increaseQuantity(item.id)}>
+                          <Text style={styles.quantityBtnText}>+</Text>
+                        </TouchableOpacity>
+                      </View>
+                      <View style={styles.actionButtons}>
+                        <TouchableOpacity style={[styles.btn, styles.btnPrimary, styles.btnSm]} onPress={() => Alert.alert('안내', '상세 정보는 준비 중입니다.')}> 
+                          <Text style={styles.btnText}>상세 정보</Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  </View>
+                </View>
+              </View>
+            ))}
+          </View>
+        )}
+      </ScrollView>
+
+      {/* 결제 요약 바텀시트 */}
+      <View style={styles.bottomSheet}>
+        <View style={styles.bottomSheetHandle} />
+        <View style={styles.bottomSheetContent}>
+          <View style={styles.sheetHeader}>
+            <Text style={styles.sheetTitle}>주문 요약</Text>
+            <Text>{selectedItems.length}개 상품 선택</Text>
+          </View>
+          <View style={styles.sheetSummary}>
+            <View style={styles.summaryItem}>
+              <Text style={styles.summaryLabel}>상품 금액</Text>
+              <Text style={styles.summaryValue}>₩{subtotal.toLocaleString()}</Text>
+            </View>
+            <View style={styles.summaryItem}>
+              <Text style={styles.summaryLabel}>부가세</Text>
+              <Text style={styles.summaryValue}>₩{tax.toLocaleString()}</Text>
+            </View>
+            <View style={styles.summaryItem}>
+              <Text style={[styles.summaryValue, styles.summaryTotal]}>₩{total.toLocaleString()}</Text>
+              <Text style={styles.summaryLabel}>합계</Text>
+            </View>
+          </View>
+          <View style={styles.sheetActions}>
+            <TouchableOpacity style={[styles.btn, styles.btnCancel]} onPress={handleCancel}>
+              <Text style={[styles.btnText, styles.btnStrong]}>취소</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.btn, styles.btnPayment]}
+              onPress={handlePayment}
+              disabled={selectedItems.length === 0}
+            >
+              <Text style={[styles.btnText, styles.btnStrong]}>결제하기</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+    </SafeAreaView>
+  );
+}

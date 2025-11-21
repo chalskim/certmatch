@@ -98,7 +98,7 @@ export const HomeScreen: React.FC = () => {
             </View>
           ))}
         </ScrollView>
-        <View style={styles.bannerDots} pointerEvents="box-none">
+        <View style={[styles.bannerDots, { pointerEvents: 'box-none' as any }]}>
           {banners.map((_, i) => (
             <TouchableOpacity
               key={i}

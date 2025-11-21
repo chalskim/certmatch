@@ -46,7 +46,7 @@ export const RecommendedEducationCard: React.FC<RecommendedEducationCardProps> =
             </View>
             <View style={styles.recommendedEducationFooter}>
                 <View style={styles.recommendedEducationRating}>
-                    <FontAwesome5 name="star" size={14} color="#f5a623" />
+                    <FontAwesome5 name="star" size={13} color="#f5a623" />
                     <Text style={styles.recommendedEducationRatingText}>{rating.toFixed(1)}</Text>
                 </View>
                 <Text style={styles.recommendedEducationStudents}>{students}명 수강</Text>

@@ -6,14 +6,11 @@ import {
   TouchableOpacity,
   ScrollView,
   TextInput,
-  StyleSheet,
   Alert,
-  Platform,
-  Image,
   FlatList,
-  Modal
 } from 'react-native';
-import { Ionicons, FontAwesome5, MaterialIcons } from '@expo/vector-icons';
+import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
+import SubformHeader from '../components/SubformHeader';
 import { styles } from '../styles/menu/CertAudRegistration';
 
 // TypeScript Interfaces
@@ -268,23 +265,11 @@ const CertAudRegistration = ({ navigation }: any) => {
   return (
     <SafeAreaView style={styles.safeArea}>
       {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color="#333" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>심사 인증원 등록</Text>
-        <View style={styles.headerIcons}>
-          <TouchableOpacity style={styles.iconButton}>
-            <Ionicons name="notifications" size={24} color="#333" />
-            <View style={styles.badge}>
-              <Text style={styles.badgeText}>3</Text>
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.iconButton}>
-            <Ionicons name="person-circle" size={24} color="#333" />
-          </TouchableOpacity>
-        </View>
-      </View>
+      <SubformHeader
+        title="심사 인증원 등록"
+        navigation={navigation as any}
+        onHome={() => navigation.navigate('Home')}
+      />
 
       <ScrollView style={styles.container}>
         {/* Certifications Section */}

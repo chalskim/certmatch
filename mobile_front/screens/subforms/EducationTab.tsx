@@ -23,7 +23,7 @@ export const EducationTab: React.FC<EducationTabProps> = ({
             {/* 추천 교육 섹션 */}
             <View style={styles.recommendedEducationSection}>
                 <SectionTitle icon="star" title="추천 교육" />
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 20 }}>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 12 }}>
                     {recommendedCourses.map((course: RecommendedCourse, index: number) => (
                         <RecommendedEducationCard
                             key={`recommended-course-${index}`}

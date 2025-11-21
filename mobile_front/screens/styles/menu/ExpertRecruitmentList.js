@@ -1,6 +1,6 @@
 import { StyleSheet, Platform } from 'react-native';
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f8f9fa' },
   header: {
     height: Platform.OS === 'ios' ? 56 : 56,
@@ -65,4 +65,3 @@ const styles = StyleSheet.create({
   textarea: { minHeight: 100, borderWidth: 1, borderColor: '#ddd', borderRadius: 8, padding: 8, textAlignVertical: 'top', backgroundColor: '#fff' },
   toastBox: { position: 'absolute', left: '50%', transform: [{ translateX: -120 }], bottom: 80, backgroundColor: 'rgba(0,0,0,0.7)', padding: 10, borderRadius: 6, width: 240, alignItems: 'center' },
 });
-export default styles;

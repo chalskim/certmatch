@@ -11,7 +11,7 @@ import {
   StyleSheet,
 } from 'react-native';
 
-import styles from '../styles/menu/ExpertProfessionalist';
+import { styles } from '../styles/menu/ExpertProfessionalist';
 
 type Proposal = {
   id: number;
@@ -246,4 +246,16 @@ function statusLabel(s: any) {
   if (s === 'rejected') return '거절';
   if (s === 'completed') return '완료';
   return s;
+}
+
+function statusStyle(s: any) {
+  const theme: Record<string, { bg: string; color: string }> = {
+    pending: { bg: '#fff3cd', color: '#856404' },
+    accepted: { bg: '#e6f7e6', color: '#2e7d32' },
+    rejected: { bg: '#ffebee', color: '#c62828' },
+    completed: { bg: '#e3f2fd', color: '#1976d2' },
+    ongoing: { bg: '#fff8e1', color: '#f57f17' },
+  };
+  const t = theme[s] || { bg: '#eee', color: '#333' };
+  return { backgroundColor: t.bg, color: t.color } as const;
 }

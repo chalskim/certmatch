@@ -1,0 +1,95 @@
+2. CertMatch 비즈니스 모델 & 아키텍처 설계서
+
+
+1. 🎯 비즈니스 모델 개요
+1.1 핵심 가치 제안 (Value Proposition)
+* 기업 사용자: 인증 준비 시간·비용 40~50% 절감, 신뢰성 있는 파트너 매칭, 정부 지원금 자동 안내
+* 컨설턴트/심사기관: 고품질 리드 확보, 프로필 노출 강화, 계약 체결 효율화
+* 교육기관: 타겟 수요자에게 정확한 교육 상품 노출, 수강생 유입 증대
+1.2 고객 세그먼트 (Customer Segments)
+고객군	설명
+의무/자율 인증 기업	ISMS, ISO 27001, CPPG, GS 등 인증 필요 기업 (중소기업 포함)
+인증 컨설턴트 및 심사기관	KISA, KFQ, KSA 등 공인 기관 소속 또는 독립 컨설턴트
+교육기관 및 심사원 수요자	심사원 양성기관, 보수교육 제공자, 자격증 취득 희망자
+1.3 수익 모델 (Revenue Streams)
+* 매칭 수수료: 컨설팅/심사/교육 매칭 성공 시 5~20% 수수료
+* 프리미엄 구독료: 기업·컨설턴트·기관 대상 월정액 서비스 (5~50만 원)
+* 광고/스폰서십: 브랜딩 배너, 추천 프로필 노출, 정부 공고 연계 광고
+* SaaS 라이선스: Gap 분석, 정책 생성, 위험 평가 자동화 도구 판매
+
+2. 🔗 플랫폼 아키텍처 설계
+2.1 시스템 구성도 (High-Level Architecture)
+[Frontend Layer]
+  ├─ Web (React + TypeScript)
+  └─ Mobile (React Native)
+
+[API Gateway]
+  └─ RESTful / GraphQL API
+
+[Microservices Layer]
+  ├─ User & Profile Service
+  ├─ Matching Engine (AI-based)
+  ├─ Certification Data Aggregator
+  ├─ Education & Course Catalog
+  ├─ Government Policy Sync
+  └─ Payment & Billing
+
+[Data Layer]
+  ├─ PostgreSQL (Core DB)
+  ├─ Elasticsearch (Search & Recommendation)
+  ├─ Redis (Caching)
+  └─ S3 / Object Storage (Document, Evidence)
+
+[External Integrations]
+  ├─ KISA, TTA, KFQ Open API
+  ├─ IAM (OAuth 2.0 / SSO)
+  ├─ Cloud (AWS / Azure)
+  └─ Notification (SMS, Email, Kakao)
+2.2 핵심 기술 스택 [[17], [23]]
+영역	기술
+Frontend	React, TypeScript, Tailwind CSS, React Query
+Mobile	React Native, Expo
+Backend	Node.js (NestJS), Python (AI Matching)
+DB	PostgreSQL, Redis, Elasticsearch
+Infra	AWS (EC2, RDS, S3, Lambda), Docker, Kubernetes
+AI/ML	Scikit-learn, TensorFlow (매칭 엔진, 리뷰 감정 분석)
+DevOps	GitHub Actions, Sentry, Datadog
+3. ⚙️ 핵심 기능 모듈
+모듈	기능 설명
+프로필 매니저	기업/컨설턴트/교육기관 프로필 생성, 자격증/경력/후기 등록
+AI 매칭 엔진	인증 유형, 산업군, 지역, 예산 기반 실시간 매칭
+정책 연계 시스템	KISA, TTA 등 정부 데이터 자동 수집 → 지원금/간편인증 안내
+교육 매칭	심사원 과정, 보수교육, DIY 패키지 추천 및 결제
+구인·구직 게시판	정보보호 인증 관련 채용 공고 게시 및 지원 관리
+SaaS 자동화 도구	Gap 분석, 정책 문서 생성, 위험 평가, 감사 준비 체크리스트
+4. 🔄 운영 프로세스
+4.1 매칭 플로우
+1. 기업: 인증 유형 선택 → 예산/지역/기간 입력
+2. 플랫폼: AI 기반 컨설턴트/교육기관 추천
+3. 사용자: 비교 → 문의 → 계약 체결
+4. 플랫폼: 수수료 처리 + 후기 수집 → 평판 시스템 반영
+4.2 품질 보증 체계
+* 컨설턴트 검증: 자격증, 실적, 후기 기반 등급제
+* 분쟁 해결: 중재 시스템 + 정책 기반 환불 가이드라인
+* 데이터 신뢰도: 정부 공식 API 연동으로 정보 정확성 확보
+
+5. 📈 시장 차별화 전략
+요소	CertMatch	기존 컨설팅	해외 SaaS	일반 교육 플랫폼
+한국 규제 최적화	✅	✅	❌	△
+통합 매칭	✅	❌	△	❌
+교육+채용 연계	✅	❌	❌	△
+자동화 도구	△	❌	✅	❌
+정부 데이터 연동	✅	❌	❌	❌
+✅: 강점, △: 부분적 제공, ❌: 미제공
+
+6. 🚀 로드맵
+단계	기간	목표
+Phase 1	0–6개월	MVP 출시, 의무인증 기업 500사 확보, 컨설팅사 5곳 파트너십
+Phase 2	6–18개월	SaaS 자동화 도구 출시, 구인·구직 모듈 추가, 월 600건 매칭 달성
+Phase 3	18–36개월	GS/CPPG 등 확장, 해외 진출 검토, 월 1,500건 이상 매칭
+7. 📌 핵심 성공 요인
+* 공공 데이터 연동: KISA, TTA, KFQ 등 정부 API 확보
+* 초기 신뢰 구축: 대형 컨설팅사와의 조인트 마케팅
+* AI 매칭 정확도: 머신러닝 기반 리드 품질 향상
+* 정부 정책 연계: 보조금·간편인증 정보 실시간 제공
+

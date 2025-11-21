@@ -21,7 +21,7 @@ export const RecommendedConsultantCard: React.FC<RecommendedConsultantCardProps>
     <View style={styles.recommendedCard}>
         <Text style={styles.recommendedBadge}>추천</Text>
         <View style={styles.recommendedHeader}>
-            <FontAwesome5 name="user-tie" size={18} color="#333" />
+            <FontAwesome5 name="user-tie" size={16} color="#333" />
             <View style={{ marginLeft: 10 }}>
                 <Text style={styles.recommendedName}>{name}</Text>
                 <Text style={styles.recommendedTitle}>{title}</Text>
@@ -36,7 +36,7 @@ export const RecommendedConsultantCard: React.FC<RecommendedConsultantCardProps>
         </View>
         <View style={styles.recommendedRating}>
             <View style={styles.recommendedRatingLeft}>
-                <FontAwesome5 name="star" size={16} color="#333" />
+                <FontAwesome5 name="star" size={14} color="#333" />
                 <Text style={styles.recommendedRatingText}>{rating.toFixed(1)}</Text>
             </View>
             <Text style={styles.recommendedLocation}>{location}</Text>

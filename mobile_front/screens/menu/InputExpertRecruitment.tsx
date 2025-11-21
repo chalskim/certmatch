@@ -3,6 +3,7 @@ import { View, Text, TextInput, ScrollView, TouchableOpacity, Alert, Switch, Pla
 import { FontAwesome5 } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { styles } from '../styles/menu/InputExpertRecruitment';
+import SubformHeader from '../components/SubformHeader';
 
 export const InputExpertRecruitment: React.FC = () => {
   const navigation = useNavigation();
@@ -200,13 +201,11 @@ export const InputExpertRecruitment: React.FC = () => {
   return (
     <ScrollView style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <FontAwesome5 name="arrow-left" size={20} color="#0066CC" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>인증 인력모집</Text>
-        <View style={{ width: 20 }} />
-      </View>
+      <SubformHeader
+        title="인증 인력모집"
+        navigation={navigation as any}
+        onHome={() => (navigation as any)?.navigate?.('Home')}
+      />
 
       {/* Form Container */}
       <View style={styles.formContainer}>

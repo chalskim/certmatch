@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity, Alert, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import { View, Text, TextInput,  ScrollView, TouchableOpacity, Alert, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard, Image } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 
 import { styles } from '../styles/menu/RegistrationPersonal';
+// Ensure correct component path; fix any prior mistaken '../components/.SubformHeader'
+import SubformHeader from '../components/SubformHeader';
 
 export const RegistrationPersonal: React.FC = () => {
-  const navigation = useNavigation();
+  // navigate 타입 오류 방지: 제네릭을 any로 지정
+  const navigation = useNavigation<any>();
   
   // Form state
   const [name, setName] = useState('');
@@ -26,6 +29,9 @@ const [selectedActivities, setSelectedActivities] = useState<string[]>([]);
   const [certifications, setCertifications] = useState<Array<{name: string, status: string, issueDate: string, expiryDate: string}>>([
     { name: '정보보호전문가', status: 'valid', issueDate: '2018.05', expiryDate: '2025.05' }
   ]);
+
+  // 프로필 사진 (이력서용)
+  const [profilePhoto, setProfilePhoto] = useState<{ uri: string; name?: string } | null>(null);
   
   // Available specialties and countries
   const availableSpecialties = ['금융', '의료', '제조', 'IT', '공공', '유통', '교육', '물류', '환경', '식품', 'ISMS-P', 'ISMS', 'ISO 27001', 'ISO 27701', 'GS 인증', 'CPPG', 'CSAP', 'ESPM'];
@@ -149,18 +155,54 @@ const [selectedActivities, setSelectedActivities] = useState<string[]>([]);
     Alert.alert('임시 저장', '임시 저장이 완료되었습니다.');
   };
 
+  // 프로필 사진 선택 (expo-image-picker 사용, 미설치 시 expo-document-picker 폴백)
+  const pickProfilePhoto = async () => {
+    try {
+      // @ts-ignore - optional dependency
+      const ImagePicker = await import('expo-image-picker');
+      const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (perm.status !== 'granted') {
+        Alert.alert('권한 필요', '사진 라이브러리 접근 권한이 필요합니다.');
+        return;
+      }
+      const res = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      });
+      if (!res.canceled && res.assets && res.assets.length > 0) {
+        const asset = res.assets[0];
+        setProfilePhoto({ uri: asset.uri, name: (asset as any).fileName || 'profile.jpg' });
+      }
+    } catch (err) {
+      // 폴백: expo-document-picker
+      try {
+        // @ts-ignore - optional dependency
+        const DocumentPicker = await import('expo-document-picker');
+        const res = await DocumentPicker.getDocumentAsync({ type: 'image/*' });
+        if (res.type === 'success') {
+          setProfilePhoto({ uri: res.uri, name: res.name });
+        }
+      } catch (err2) {
+        console.warn('Image selection failed:', err, err2);
+        Alert.alert('업로드 불가', '이미지 선택 기능을 사용하려면 expo-image-picker 또는 expo-document-picker를 설치하거나 네이티브 환경에서 실행하세요.');
+      }
+    }
+  };
+
+  const removeProfilePhoto = () => setProfilePhoto(null);
+
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
         <ScrollView style={styles.container} keyboardShouldPersistTaps="handled">
       {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <FontAwesome5 name="arrow-left" size={20} color="#0066CC" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>개인 자격 등록</Text>
-        <View style={{ width: 20 }} />
-      </View>
+      <SubformHeader
+        title="개인 자격 등록"
+        navigation={navigation}
+        onHome={() => (navigation as any)?.navigate?.('Home')}
+      />
       
       {/* Progress Indicator removed as per request */}
       
@@ -485,6 +527,35 @@ const [selectedActivities, setSelectedActivities] = useState<string[]>([]);
           <View style={styles.sectionHeader}>
             <FontAwesome5 name="file-upload" size={18} color="#0066CC" />
             <Text style={styles.sectionTitle}>서류 제출</Text>
+          </View>
+
+          {/* 프로필 사진 업로드 */}
+          <View style={[styles.formGroup, styles.fullWidth]}>
+            <Text style={styles.label}>프로필 사진</Text>
+            <View style={styles.avatarSection}>
+              <View style={styles.avatarPreview}>
+                {profilePhoto ? (
+                  <Image source={{ uri: profilePhoto.uri }} style={styles.avatarImage} />
+                ) : (
+                  <View style={styles.avatarPlaceholder}>
+                    <FontAwesome5 name="user" size={28} color="#999" />
+                  </View>
+                )}
+              </View>
+              <View style={styles.avatarButtons}>
+                <TouchableOpacity style={styles.avatarUploadBtn} onPress={pickProfilePhoto}>
+                  <FontAwesome5 name="cloud-upload-alt" size={14} color="#fff" />
+                  <Text style={styles.avatarUploadBtnText}>{profilePhoto ? '사진 변경' : '사진 업로드'}</Text>
+                </TouchableOpacity>
+                {profilePhoto && (
+                  <TouchableOpacity style={styles.avatarRemoveBtn} onPress={removeProfilePhoto}>
+                    <FontAwesome5 name="times" size={14} color="#e74c3c" />
+                    <Text style={styles.avatarRemoveBtnText}>삭제</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+            </View>
+            <Text style={styles.helpText}>정사각형 이미지 권장 (예: 400x400), JPG/PNG (최대 3MB)</Text>
           </View>
           
           <View style={styles.formGrid}>

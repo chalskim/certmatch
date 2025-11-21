@@ -25,8 +25,8 @@ export const UrgentCard: React.FC<UrgentCardProps> = ({
         <Text style={styles.cardCompany}>{company}</Text>
         <View style={styles.cardFooter}>
             <Text style={styles.cardPrice}>{price}</Text>
-            <View style={{ backgroundColor: 'rgba(255, 255, 255, 0.6)', padding: 3, paddingHorizontal: 8, borderRadius: 12 }}>
-                <Text style={{ color: '#333', fontSize: 12 }}>{deadline}</Text>
+            <View style={{ backgroundColor: 'rgba(255, 255, 255, 0.6)', padding: 2, paddingHorizontal: 6, borderRadius: 10 }}>
+                <Text style={{ color: '#333', fontSize: 11 }}>{deadline}</Text>
             </View>
         </View>
     </TouchableOpacity>

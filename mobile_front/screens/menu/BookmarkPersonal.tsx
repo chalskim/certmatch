@@ -3,13 +3,13 @@ import {
   SafeAreaView,
   View,
   Text,
-  StyleSheet,
   ScrollView,
   TouchableOpacity,
   TextInput,
 } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import SubformHeader from '../components/SubformHeader';
 import { styles } from '../styles/menu/BookmarkPersonal';
 
 type TabKey = 'jobs' | 'education' | 'government' | 'exams';
@@ -174,7 +174,7 @@ const initialExams: ExamItem[] = [
 ];
 
 const BookmarkPersonal: React.FC = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
   const [activeTab, setActiveTab] = useState<TabKey>('jobs');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -492,18 +492,13 @@ const BookmarkPersonal: React.FC = () => {
   return (
     <SafeAreaView style={styles.root}>
       {/* Header */}
-      <View style={styles.appHeader}>
-        <TouchableOpacity style={styles.headerIcon} onPress={() => navigation.goBack?.()}>
-          <FontAwesome5 name="arrow-left" size={16} color="#333" />
-        </TouchableOpacity>
-        <Text style={styles.appTitle}>개인 북마크</Text>
-        <View style={styles.headerIcons}>
-          <View style={styles.headerIcon}>
-            <FontAwesome5 name="bell" size={16} color="#333" />
-            <View style={styles.notificationBadge}><Text style={styles.badgeText}>5</Text></View>
-          </View>
-        </View>
-      </View>
+      <SubformHeader
+        title="개인 북마크"
+        showBack
+        showHome
+        navigation={navigation}
+        onHome={() => (navigation as any).navigate('Home')}
+      />
 
       {/* Tabs */}
       <View style={styles.tabNav}>

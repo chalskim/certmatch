@@ -3,7 +3,6 @@ import {
   SafeAreaView,
   View,
   Text,
-  StyleSheet,
   ScrollView,
   TouchableOpacity,
   TextInput,
@@ -11,6 +10,7 @@ import {
 import { FontAwesome5 } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { styles } from '../styles/menu/BookmarkCorporate';
+import SubformHeader from '../components/SubformHeader';
 
 type TabKey = 'experts' | 'personnel' | 'government';
 
@@ -261,18 +261,13 @@ const BookmarkCorporate: React.FC = () => {
   return (
     <SafeAreaView style={styles.root}>
       {/* Header */}
-      <View style={styles.appHeader}>
-        <TouchableOpacity style={styles.headerIcon} onPress={() => navigation.goBack?.()}>
-          <FontAwesome5 name="arrow-left" size={16} color="#333" />
-        </TouchableOpacity>
-        <Text style={styles.appTitle}>기업 북마크</Text>
-        <View style={styles.headerIcons}>
-          <View style={styles.headerIcon}>
-            <FontAwesome5 name="bell" size={16} color="#333" />
-            <View style={styles.notificationBadge}><Text style={styles.badgeText}>3</Text></View>
-          </View>
-        </View>
-      </View>
+      <SubformHeader
+        title="기업 북마크"
+        showBack
+        showHome
+        navigation={navigation as any}
+        onHome={() => (navigation as any).navigate('Home')}
+      />
 
       {/* Tabs */}
       <View style={styles.tabNav}>

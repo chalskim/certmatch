@@ -1,154 +1,476 @@
-// EduListDetail 화면 스타일 (React Native Web 호환)
-// 프로젝트의 다른 스타일 파일과 일관되도록 StyleSheet를 쓰지 않고 객체를 직접 export 합니다.
+import { StyleSheet } from 'react-native';
 
-export const styles = {
-  root: { backgroundColor: '#f9fafb', flex: 1 },
-  container: { padding: 16 },
-
-  // 상단 헤더(빵크럼, 타이틀 블록)
-  headerCard: {
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e9ecef',
-    paddingVertical: 16,
-    paddingHorizontal: 16,
-  },
-  breadcrumb: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', marginBottom: 12 },
-  breadcrumbText: { color: '#6c757d', fontSize: 13 },
-  breadcrumbDivider: { color: '#6c757d', marginHorizontal: 6 },
-
-  titleRow: { flexDirection: 'row', alignItems: 'flex-start' },
-  // 헤더 상단 좌/우 분할 행 (인라인 스타일 제거용)
-  headerSplitRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
-  providerLogo: {
-    width: 80,
-    height: 80,
-    borderRadius: 12,
-    backgroundColor: '#f5f7ff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  providerLogoText: { color: '#4a6cf7', fontWeight: '700', fontSize: 22 },
-  courseTitleInfo: { flex: 1 },
-  titleH1: { fontSize: 24, fontWeight: '800', color: '#222', marginBottom: 6 },
-  titleSub: { fontSize: 14, color: '#6c757d', marginBottom: 10 },
-
-  badges: { flexDirection: 'row', flexWrap: 'wrap', marginBottom: 10 },
-  badge: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 20, marginRight: 8, marginBottom: 8 },
-  badgeNew: { backgroundColor: 'rgba(23,162,184,0.1)' },
-  badgePopular: { backgroundColor: 'rgba(255,193,7,0.12)' },
-  badgeDefault: { backgroundColor: '#f0f0f0' },
-
-  actionsRow: { flexDirection: 'row', marginTop: 12, flexWrap: 'wrap' },
-  btnPrimary: { backgroundColor: '#4a6cf7', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 8, flexDirection: 'row', alignItems: 'center', marginRight: 10, marginBottom: 10 },
-  btnPrimaryText: { color: '#fff', fontWeight: '700' },
-  btnOutline: { borderWidth: 1, borderColor: '#4a6cf7', backgroundColor: '#fff', paddingHorizontal: 14, paddingVertical: 10, borderRadius: 8, flexDirection: 'row', alignItems: 'center', marginRight: 10, marginBottom: 10 },
-  btnOutlineText: { color: '#4a6cf7', fontWeight: '700' },
-  btnSecondary: { borderWidth: 1, borderColor: '#dee2e6', backgroundColor: '#fff', paddingHorizontal: 14, paddingVertical: 10, borderRadius: 8, flexDirection: 'row', alignItems: 'center', marginRight: 10, marginBottom: 10 },
-  btnSecondaryText: { color: '#6c757d', fontWeight: '700' },
-  btnIcon: { marginRight: 8 },
-
-  ratingRow: { flexDirection: 'row', alignItems: 'center' },
-  // 헤더 우측 요약 블록 정렬 (인라인 스타일 제거용)
-  ratingSummary: { alignItems: 'flex-end' },
-  ratingStar: { color: '#ffc107' },
-  ratingStarIcon: { marginRight: 4 },
-  ratingScore: { fontWeight: '700', color: '#333' },
-  ratingCount: { color: '#6c757d' },
-
-  heroImage: { width: '100%', height: 300, borderRadius: 12, marginVertical: 16 },
-
-  // 탭
-  tabsContainer: { marginBottom: 16 },
-  tabsBar: { flexDirection: 'row', borderBottomWidth: 2, borderBottomColor: '#e9ecef' },
-  tabButton: { paddingVertical: 12, paddingHorizontal: 16 },
-  tabButtonActive: { borderBottomWidth: 3, borderBottomColor: '#4a6cf7' },
-  tabButtonText: { color: '#6c757d', fontWeight: '700' },
-  tabButtonTextActive: { color: '#4a6cf7' },
-
-  // 레이아웃 (메인/사이드)
-  contentRow: { flexDirection: 'row' },
-  mainCol: { flex: 1, marginRight: 16 },
-  sidebar: { width: 320 },
-
-  // 공통 섹션 카드
-  sectionCard: { backgroundColor: '#fff', borderRadius: 12, padding: 16, marginBottom: 16, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 5, shadowOffset: { width: 0, height: 2 } },
-  sectionTitle: { fontSize: 18, fontWeight: '800', marginBottom: 12, paddingBottom: 8, borderBottomWidth: 2, borderBottomColor: '#f5f7ff' },
-  paragraph: { color: '#444', lineHeight: 20, marginBottom: 8 },
-
-  // 커리큘럼
-  module: { borderWidth: 1, borderColor: '#e9ecef', borderRadius: 8, marginBottom: 10, overflow: 'hidden' },
-  moduleHeader: { backgroundColor: '#f8f9fa', paddingVertical: 12, paddingHorizontal: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  moduleHeaderTitle: { fontWeight: '700', color: '#333' },
-  moduleContent: { padding: 12 },
-  lessonItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: 6 },
-  lessonIcon: { color: '#4a6cf7', marginRight: 8 },
-
-  // 강사 카드
-  instructorCard: { flexDirection: 'row', alignItems: 'center', padding: 16, borderWidth: 1, borderColor: '#e9ecef', borderRadius: 8, marginBottom: 10, backgroundColor: '#fff' },
-  instructorAvatar: { width: 80, height: 80, borderRadius: 40, backgroundColor: '#f0f0f0', marginRight: 16 },
-  instructorInfo: { flex: 1 },
-  instructorName: { fontSize: 16, fontWeight: '700' },
-  instructorOrg: { fontSize: 13, color: '#6c757d', marginBottom: 6 },
-  badgeRow: { flexDirection: 'row', flexWrap: 'wrap' },
-  badgePrimary: { backgroundColor: '#4a6cf7', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 20, marginRight: 6, marginBottom: 6 },
-  badgePrimaryText: { color: '#fff', fontSize: 12, fontWeight: '700' },
-
-  // 혜택
-  benefitItem: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 16 },
-  benefitIconWrap: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#f5f7ff', alignItems: 'center', justifyContent: 'center', marginRight: 12 },
-  benefitTitle: { fontSize: 15, fontWeight: '700' },
-  benefitDesc: { fontSize: 13, color: '#444' },
-
-  // 후기 카드
-  reviewCard: { borderWidth: 1, borderColor: '#e9ecef', borderRadius: 8, padding: 16, marginBottom: 10, backgroundColor: '#fff' },
-  reviewHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 },
-  reviewerInfo: { flexDirection: 'row', alignItems: 'center' },
-  reviewerAvatar: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#f5f7ff', alignItems: 'center', justifyContent: 'center' },
-  reviewerAvatarText: { color: '#4a6cf7', fontWeight: '700' },
-  reviewerMeta: { marginLeft: 8 },
-  reviewerName: { fontWeight: '700', fontSize: 14 },
-  reviewerSub: { color: '#6c757d', fontSize: 12 },
-
-  // 사이드바 카드
-  sidebarCard: { backgroundColor: '#fff', borderRadius: 12, padding: 16, marginBottom: 16, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 5, shadowOffset: { width: 0, height: 2 } },
-  sidebarTitle: { fontSize: 15, fontWeight: '800', color: '#4a6cf7', marginBottom: 10 },
-  priceDisplay: { fontSize: 24, fontWeight: '800', color: '#4a6cf7', textAlign: 'center', marginBottom: 6 },
-  priceNote: { textAlign: 'center', color: '#6c757d', fontSize: 12, marginBottom: 12 },
-  statItem: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#e9ecef' },
-  statLabel: { flexDirection: 'row', alignItems: 'center' },
-  statValue: { fontWeight: '700', color: '#333' },
-
-  // 제공 기관 정보 행 (인라인 스타일 제거용)
-  providerRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
-  providerInfo: { marginLeft: 12 },
-
-  relatedCard: { borderWidth: 1, borderColor: '#e9ecef', borderRadius: 8, padding: 12, marginBottom: 10, backgroundColor: '#fff' },
-  relatedTitle: { fontWeight: '700', marginBottom: 4 },
-  relatedProvider: { color: '#6c757d', fontSize: 12, marginBottom: 6 },
-  relatedPrice: { color: '#4a6cf7', fontWeight: '800' },
-
-  // 모달
-  modalBackdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', alignItems: 'center', justifyContent: 'center', padding: 16 },
-  modalContent: { width: '100%', maxWidth: 520, backgroundColor: '#fff', borderRadius: 12, padding: 16 },
-  modalHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 },
-  modalTitle: { fontSize: 18, fontWeight: '800' },
-  modalBody: {},
-  modalFooter: { flexDirection: 'row', justifyContent: 'flex-end', marginTop: 12 },
-  input: { borderWidth: 1, borderColor: '#dee2e6', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10 },
-
-  // 토스트
-  toastContainer: { position: 'absolute', bottom: 20, right: 20, backgroundColor: 'rgba(0,0,0,0.8)', borderRadius: 6, paddingHorizontal: 14, paddingVertical: 10 },
-  toastText: { color: '#fff', fontSize: 13 },
-};
-
-export const colors = {
+// Centralized color palette used throughout EduListDetail styles.
+// Define colors before styles to avoid temporal dead zone issues.
+const colors = {
   primary: '#4a6cf7',
   secondary: '#f5f7ff',
   success: '#28a745',
   warning: '#ffc107',
   info: '#17a2b8',
   text: '#333',
-  lightGray: '#f8f9fa',
   border: '#e9ecef',
+  lightGray: '#f8f9fa',
 };
+
+const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+    backgroundColor: '#f9fafb',
+  },
+  container: {
+    flex: 1,
+    paddingHorizontal: 16,
+  },
+  breadcrumb: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    marginBottom: 8,
+  },
+  breadcrumbText: {
+    color: '#6c757d',
+    fontSize: 13,
+  },
+  breadcrumbDivider: {
+    color: '#6c757d',
+    marginHorizontal: 6,
+  },
+  headerCard: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    marginTop: 12,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  headerSplitRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 12,
+    flex: 1,
+  },
+  providerLogo: {
+    width: 64,
+    height: 64,
+    backgroundColor: colors.secondary,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  providerLogoLarge: {
+    width: 72,
+    height: 72,
+    backgroundColor: colors.secondary,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  providerLogoText: {
+    color: colors.primary,
+    fontWeight: '700',
+    fontSize: 18,
+  },
+  courseTitleInfo: {
+    flex: 1,
+  },
+  titleH1: {
+    fontSize: 22,
+    fontWeight: '700',
+    marginBottom: 6,
+    color: colors.text,
+  },
+  titleSub: {
+    fontSize: 14,
+    color: '#6c757d',
+    marginBottom: 10,
+  },
+  badges: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+    marginBottom: 8,
+  },
+  badge: {
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderRadius: 20,
+  },
+  badgeNew: {
+    backgroundColor: 'rgba(23, 162, 184, 0.1)',
+  },
+  badgePopular: {
+    backgroundColor: 'rgba(255, 193, 7, 0.1)',
+  },
+  badgeDefault: {
+    backgroundColor: '#eee',
+  },
+  badgeTextBase: {
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  actionsRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginTop: 8,
+    flexWrap: 'wrap',
+  },
+  btnIcon: {
+    marginRight: 6,
+  },
+  btnPrimary: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.primary,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 8,
+  },
+  btnPrimaryText: {
+    color: '#fff',
+    fontWeight: '700',
+  },
+  btnOutline: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: colors.primary,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 8,
+  },
+  btnOutlineText: {
+    color: colors.primary,
+    fontWeight: '700',
+  },
+  btnSecondary: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: colors.border,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 8,
+  },
+  btnSecondaryText: {
+    color: '#6c757d',
+    fontWeight: '600',
+  },
+  ratingSummary: {
+    paddingLeft: 8,
+  },
+  ratingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  ratingStarIcon: {
+    marginRight: 2,
+  },
+  ratingScore: {
+    fontWeight: '700',
+    marginLeft: 8,
+    color: colors.text,
+  },
+  ratingCount: {
+    color: '#6c757d',
+    marginLeft: 6,
+  },
+  heroImage: {
+    width: '100%',
+    height: 220,
+    borderRadius: 12,
+    marginBottom: 16,
+  },
+  tuitionCard: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  sidebarTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: colors.primary,
+    marginBottom: 8,
+  },
+  priceDisplay: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: colors.primary,
+    textAlign: 'center',
+    marginBottom: 4,
+  },
+  priceNote: {
+    textAlign: 'center',
+    color: '#6c757d',
+    marginBottom: 12,
+  },
+  tabsContainer: {
+    marginBottom: 12,
+  },
+  tabsBar: {
+    flexDirection: 'row',
+    borderBottomWidth: 2,
+    borderBottomColor: colors.border,
+  },
+  tabButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+  },
+  tabButtonActive: {
+    borderBottomWidth: 3,
+    borderBottomColor: colors.primary,
+  },
+  tabButtonText: {
+    color: '#6c757d',
+    fontWeight: '600',
+  },
+  tabButtonTextActive: {
+    color: colors.primary,
+  },
+  sectionCard: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    marginBottom: 12,
+    paddingBottom: 6,
+    borderBottomWidth: 2,
+    borderBottomColor: colors.secondary,
+  },
+  paragraph: {
+    color: colors.text,
+    lineHeight: 20,
+    marginBottom: 8,
+  },
+  module: {
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 8,
+    marginBottom: 10,
+    overflow: 'hidden',
+  },
+  moduleHeader: {
+    backgroundColor: colors.lightGray,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  moduleHeaderTitle: {
+    fontWeight: '700',
+    color: colors.text,
+  },
+  moduleContent: {
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+  },
+  lessonItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 6,
+  },
+  lessonIcon: {
+    marginRight: 8,
+  },
+  instructorCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 8,
+    marginBottom: 10,
+  },
+  instructorAvatar: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+  },
+  instructorInfo: {
+    flex: 1,
+  },
+  instructorName: {
+    fontSize: 16,
+    fontWeight: '700',
+    marginBottom: 2,
+  },
+  instructorOrg: {
+    color: '#6c757d',
+    marginBottom: 6,
+  },
+  badgeRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+  },
+  badgePrimary: {
+    backgroundColor: colors.secondary,
+    borderRadius: 16,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+  },
+  badgePrimaryText: {
+    color: colors.primary,
+    fontWeight: '700',
+    fontSize: 12,
+  },
+  benefitItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 12,
+    marginBottom: 12,
+  },
+  benefitIconWrap: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: colors.secondary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  benefitTitle: {
+    fontWeight: '700',
+    marginBottom: 4,
+  },
+  benefitDesc: {
+    color: '#6c757d',
+  },
+  reviewCard: {
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 10,
+  },
+  reviewHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  reviewerInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  reviewerAvatar: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: colors.secondary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  reviewerAvatarText: {
+    color: colors.primary,
+    fontWeight: '700',
+  },
+  reviewerMeta: {
+    justifyContent: 'center',
+  },
+  reviewerName: {
+    fontWeight: '700',
+  },
+  reviewerSub: {
+    color: '#6c757d',
+  },
+  bottomContainer: {
+    marginTop: 8,
+  },
+  providerCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  providerName: {
+    fontWeight: '700',
+    fontSize: 16,
+    marginBottom: 4,
+    color: colors.text,
+  },
+  providerDesc: {
+    color: '#6c757d',
+  },
+  btnOutlineSmall: {
+    borderWidth: 1,
+    borderColor: colors.primary,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: 6,
+  },
+  btnOutlineSmallText: {
+    color: colors.primary,
+    fontWeight: '700',
+  },
+  relatedCourseCard: {
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 10,
+  },
+  relatedCourseTitle: {
+    fontWeight: '700',
+    marginBottom: 2,
+  },
+  relatedCourseProvider: {
+    color: '#6c757d',
+    marginBottom: 4,
+  },
+  relatedCoursePrice: {
+    color: colors.primary,
+    fontWeight: '700',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 16,
+  },
+  modalCard: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    width: '100%',
+    maxWidth: 480,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    marginBottom: 8,
+  },
+  modalDesc: {
+    color: '#6c757d',
+    marginBottom: 12,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    marginBottom: 12,
+  },
+});
+
+export { styles, colors };

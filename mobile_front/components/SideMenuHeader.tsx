@@ -13,6 +13,9 @@ type RootStackParamList = {
   Main: undefined;
   Login: undefined;
   Signup: undefined;
+  ShoppingCartCorp: undefined;
+  ShoppingCartPerson: undefined;
+  AlarmManagement: undefined;
 };
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
@@ -25,21 +28,59 @@ export const Header: React.FC<HeaderProps> = ({ onMenuPress, notificationCount =
     navigation.navigate('Login');
   };
 
+  const handleShoppingCartCorp = () => {
+    navigation.navigate('ShoppingCartCorp');
+  };
+
+  const handleShoppingCartPerson = () => {
+    navigation.navigate('ShoppingCartPerson');
+  };
+
+  const handleAlarmManagement = () => {
+    navigation.navigate('AlarmManagement');
+  };
+
   return (
     <View style={styles.container}>
       <TouchableOpacity style={styles.leftIcon} onPress={onMenuPress} accessibilityRole="button" accessibilityLabel="Open menu">
         <FontAwesome5 name="bars" size={20} color="#fff" />
       </TouchableOpacity>
-      <Text style={styles.title}>CertLine</Text>
+      <TouchableOpacity onPress={handleAlarmManagement} accessibilityRole="button" accessibilityLabel="알림 관리로 이동">
+        <Text style={styles.title}>CertLine</Text>
+      </TouchableOpacity>
       <View style={styles.rightIcons}>
-        <View style={styles.iconWithBadge}>
-          <FontAwesome5 name="bell" size={20} color="#fff" />
+        {/* Corporate and Personal Shopping Cart icons */}
+        <TouchableOpacity
+          style={styles.rightIcon}
+          onPress={handleShoppingCartCorp}
+          accessibilityRole="button"
+          accessibilityLabel="기업 장바구니"
+        >
+          <FontAwesome5 name="shopping-cart" size={20} color="#fff" />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.rightIcon}
+          onPress={handleShoppingCartPerson}
+          accessibilityRole="button"
+          accessibilityLabel="개인 장바구니"
+        >
+          <FontAwesome5 name="shopping-basket" size={20} color="#fff" />
+        </TouchableOpacity>
+        
+        <TouchableOpacity
+          style={styles.iconWithBadge}
+          onPress={handleAlarmManagement}
+          accessibilityRole="button"
+          accessibilityLabel="알림 화면으로 이동"
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+        >
+          <FontAwesome5 name="bell" size={20} color="#fff" onPress={handleAlarmManagement} />
           {notificationCount > 0 && (
-            <View style={styles.badge}>
+            <View style={[styles.badge, { pointerEvents: 'none' as any }]}>
               <Text style={styles.badgeText}>{notificationCount}</Text>
             </View>
           )}
-        </View>
+        </TouchableOpacity>
         <TouchableOpacity 
           style={styles.rightIcon}
           onPress={handleProfilePress}
@@ -80,9 +121,14 @@ const styles = StyleSheet.create({
   iconWithBadge: {
     marginRight: 15,
     position: 'relative',
+    padding: 6,
+    marginHorizontal: 4,
+    // RN Web 전용: 클릭 UX 향상을 위한 커서 표시
+    cursor: 'pointer' as any,
   },
   rightIcon: {
     padding: 6,
+    marginHorizontal: 4,
   },
   badge: {
     position: 'absolute',

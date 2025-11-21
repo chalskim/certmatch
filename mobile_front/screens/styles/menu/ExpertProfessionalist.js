@@ -1,14 +1,5 @@
 import { StyleSheet } from 'react-native';
 
-function statusStyle(s: any) {
-  if (s === 'pending') return { backgroundColor: '#fff3cd', color: '#856404' } as any;
-  if (s === 'accepted') return { backgroundColor: '#d1ecf1', color: '#0c5460' } as any;
-  if (s === 'rejected') return { backgroundColor: '#f8d7da', color: '#721c24' } as any;
-  if (s === 'completed') return { backgroundColor: '#d4edda', color: '#155724' } as any;
-  if (s === 'ongoing') return { backgroundColor: '#cce5ff', color: '#004085' } as any;
-  return { backgroundColor: '#eee', color: '#333' } as any;
-}
-
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: '#f8f9fa' },
   header: { height: 60, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 12, backgroundColor: '#fff' },
@@ -44,3 +35,5 @@ const styles = StyleSheet.create({
   btnText: { color: '#fff' },
   toast: { position: 'absolute', bottom: 80, left: '50%', transform: [{ translateX: -150 }], backgroundColor: 'rgba(0,0,0,0.8)', padding: 12, borderRadius: 6, minWidth: 200, alignItems: 'center' },
 });
+
+export { styles };

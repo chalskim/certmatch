@@ -12,6 +12,9 @@ import { apiService } from './services/apiService';
 import { MessageProvider } from './hooks/useMessage';
 import { UserProvider } from './contexts/UserContext';
 
+// 알림 센터 화면
+import AlarmManagement from './screens/menu/AlarmManagement';
+
 // 메뉴 화면들
 import  RegistrationPersonal  from './screens/menu/RegistrationPersonal';
 import  RegistrationCompany from './screens/menu/RegistrationCompany';
@@ -24,7 +27,7 @@ import InputEducationRegistration from './screens/menu/InputEducationRegistratio
 //목록+추가버튼+상세화면
 import ExpertRecruitmentList from './screens/menu/ExpertRecruitmentList';
 import ExpertRecruitmentListDetail from './screens/menu/ExpertRecruitmentListDetail';
-import ExpertProfessionalDetail from './screens/menu/ExpertProfessionalDetail';
+import ExpertProfessionalList from './screens/menu/ExpertProfessionalList';
 import ProfessionalistDetail from './screens/menu/ProfessionalistDetail';
 import EducationList from './screens/menu/EducationList';
 
@@ -46,6 +49,30 @@ import BookmarkCorporate from './screens/menu/BookmarkCorporate';
 
 // Q&A 목록 화면
 import QnaList from './screens/menu/QnaList';
+
+
+// 새로운 화면들
+import CertificationTypes from './screens/menu/CertificationTypes';
+import SuccessCases from './screens/menu/SuccessCases';
+import PaymentManagementCorporate from './screens/menu/PaymentManagementCorporate';
+import PaymentManagementPersonal from './screens/menu/PaymentManagementPersonal';
+import Settings from './screens/menu/Settings';
+import MyPage from './screens/menu/MyPage';
+
+
+//관리자 메뉴
+
+import QA_Answers from './screens/menu/QA_Answers';
+import AnnounceManagement from './screens/menu/AnnounceManagement';
+import BannerManagement from './screens/menu/BannerManagement';
+import AdminManagement from './screens/menu/AdminManagement';
+import NoticeNewsList from './screens/menu/NoticeNewsList';
+import NoticeNewsReg from './screens/menu/NoticeNewsReg';
+
+// 장바구니 화면 (경로에서 .tsx 확장자 제거하여 TS 설정과 호환)
+import ShoppingCartCorp from './screens/menu/ShoppingCartCorp';
+import ShoppingCartPerson from './screens/menu/ShoppingCartPerson';
+
 
 // Create a native stack navigator
 const Stack = createNativeStackNavigator();
@@ -141,6 +168,8 @@ export default function App() {
               <Stack.Screen name="Login" component={LoginScreen} />
               <Stack.Screen name="Signup" component={SignupScreen} />
 
+              <Stack.Screen name="AlarmManagement" component={AlarmManagement} />
+              
               <Stack.Screen name="RegistrationPersonal" component={RegistrationPersonal} />
               <Stack.Screen name="RegistrationCompany" component={RegistrationCompany} />
               
@@ -166,8 +195,8 @@ export default function App() {
                 component={ExpertRecruitmentListDetail}
               />
               <Stack.Screen
-                name="ExpertProfessionalDetail"
-                component={ExpertProfessionalDetail}
+                name="ExpertProfessionalList"
+                component={ExpertProfessionalList}
               />
               {/* 전문가 상세 (React Native/TSX 변환본) */}
               <Stack.Screen
@@ -191,6 +220,15 @@ export default function App() {
               <Stack.Screen
                 name="NoticeItemlistDetail"
                 component={NoticeItemlistDetail}
+              />
+              {/* 공지사항 및 뉴스 목록/등록/수정 */}
+              <Stack.Screen
+                name="NoticeNewsList"
+                component={NoticeNewsList}
+              />
+              <Stack.Screen
+                name="NoticeNewsReg"
+                component={NoticeNewsReg}
               />
               <Stack.Screen
                 name="CertAudRegistration"
@@ -221,6 +259,59 @@ export default function App() {
               <Stack.Screen
                 name="QnaList"
                 component={QnaList}
+              />
+
+              {/* 새로운 화면들 */}
+              <Stack.Screen
+                name="CertificationTypes"
+                component={CertificationTypes}
+              />
+              <Stack.Screen
+                name="SuccessCases"
+                component={SuccessCases}
+              />
+              <Stack.Screen
+                name="PaymentManagementCorporate"
+                component={PaymentManagementCorporate}
+              />
+              <Stack.Screen
+                name="PaymentManagementPersonal"
+                component={PaymentManagementPersonal}
+              />
+              <Stack.Screen
+                name="Settings"
+                component={Settings}
+              />
+              <Stack.Screen
+                name="MyPage"
+                component={MyPage}
+              />
+
+              
+              <Stack.Screen
+                name="QA_Answers"
+                component={QA_Answers}
+              />
+              <Stack.Screen
+                name="AnnounceManagement"
+                component={AnnounceManagement}
+              />
+              <Stack.Screen
+                name="BannerManagement"
+                component={BannerManagement}
+              />
+              <Stack.Screen
+                name="AdminManagement"
+                component={AdminManagement}
+              />
+
+              <Stack.Screen
+                name="ShoppingCartCorp"
+                component={ShoppingCartCorp}
+              />
+              <Stack.Screen
+                name="ShoppingCartPerson"
+                component={ShoppingCartPerson}
               />
             </StackNavigatorAny>
             <StatusBar style="auto" />

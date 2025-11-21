@@ -10,11 +10,11 @@ import {
     SafeAreaView,
 } from 'react-native';
 
-import styles from '../styles/menu/ExpertRecruitmentList';
+import { styles } from '../styles/menu/ExpertRecruitmentList';
+import SubformHeader from '../components/SubformHeader';
 
 // Note: React hooks (useState/useEffect) must be called inside components.
 // The stateful hooks are declared inside the default exported component below.
-
 
 type JobPosting = {
 id: number;
@@ -236,15 +236,11 @@ export default function ExpertRecruitmentList({ navigation }: any) {
 
     return (
         <SafeAreaView style={styles.container}>
-        <View style={styles.header}>
-            <TouchableOpacity onPress={() => (navigation?.goBack ? navigation.goBack() : null)}>
-            <Text style={styles.headerLeft}>{'◀'}</Text>
-            </TouchableOpacity>
-            <Text style={styles.headerTitle}>인증 인력모집 지원 목록</Text>
-            <TouchableOpacity onPress={() => showToast('홈으로 이동 (데모)')}>
-            <Text style={styles.headerRight}>🏠</Text>
-            </TouchableOpacity>
-        </View>
+        <SubformHeader
+            title="인증 인력모집 지원 목록"
+            navigation={navigation}
+            onHome={() => (navigation?.navigate ? navigation.navigate('Home') : showToast('홈으로 이동 (데모)'))}
+        />
 
         <View style={styles.actionsTop}>
             <Text style={styles.pageTitle}>내 공고 목록</Text>

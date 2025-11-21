@@ -1,11 +1,13 @@
+
 import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Modal } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { styles } from '../styles/menu/ExpertProfessionalDetail';
+import SubformHeader from '../components/SubformHeader';
+import { styles } from '../styles/menu/ExpertProfessionalList';
 
-// 인증 전문가 등록 상세내역 화면
-export const ExpertProfessionalDetail: React.FC = () => {
+// 인증 전문가 등록 목록 화면
+export const ExpertProfessionalList: React.FC = () => {
   const navigation = useNavigation();
 
   // 데모용 상태 (실제 데이터 연동 시 services 사용 권장)
@@ -23,10 +25,10 @@ export const ExpertProfessionalDetail: React.FC = () => {
     period: { start: '2025-01-01', end: '2025-12-31' },
   };
 
-  const documents = [
+  const [documents, setDocuments] = useState([
     { name: '자격증_ISMS-P.pdf', size: '245KB', uploadedAt: '2025-02-10' },
     { name: '포트폴리오_컨설팅_사례.zip', size: '3.1MB', uploadedAt: '2025-02-12' },
-  ];
+  ]);
 
   const reviews = [
     {
@@ -55,15 +57,24 @@ export const ExpertProfessionalDetail: React.FC = () => {
   return (
     <ScrollView style={styles.root} contentContainerStyle={{ paddingBottom: 120 }}>
       {/* 상단 헤더 */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerIcon} accessibilityRole="button" accessibilityLabel="뒤로가기">
-          <FontAwesome5 name="arrow-left" size={18} color="#333" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>전문가 상세</Text>
-        <View style={{ width: 40 }} />
-      </View>
+      <SubformHeader
+        title="전문가 상세"
+        navigation={navigation as any}
+        onHome={() => (navigation as any)?.navigate?.('Home')}
+      />
 
       <View style={styles.container}>
+        {/* 헤더 아래 상단 액션 버튼 */}
+        <View style={{ marginBottom: 12 }}>
+          <TouchableOpacity
+            style={[styles.btn, styles.btnPrimary]}
+            onPress={() => (navigation as any).navigate('InputExpertProfessional')}
+            accessibilityRole="button"
+            accessibilityLabel="전문가 등록 새로 작성"
+          >
+            <Text style={styles.btnText}>전문가 등록 새로 작성</Text>
+          </TouchableOpacity>
+        </View>
         {/* 광고/프로필 영역 */}
         <View style={styles.adView}>
           <View style={styles.adHeader}>
@@ -125,7 +136,19 @@ export const ExpertProfessionalDetail: React.FC = () => {
         <View style={styles.dashboardSection}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>프로젝트 문서</Text>
-            <TouchableOpacity style={styles.uploadBtn}><Text style={styles.uploadBtnText}>문서 업로드</Text></TouchableOpacity>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              <TouchableOpacity style={styles.uploadBtn} accessibilityRole="button" accessibilityLabel="문서 업로드">
+                <Text style={styles.uploadBtnText}>문서 업로드</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.btn, { backgroundColor: '#dc3545' }]}
+                onPress={() => setDocuments([])}
+                accessibilityRole="button"
+                accessibilityLabel="문서 전체 삭제"
+              >
+                <Text style={styles.btnText}>전체 삭제</Text>
+              </TouchableOpacity>
+            </View>
           </View>
 
           {documents.length === 0 ? (
@@ -205,4 +228,4 @@ export const ExpertProfessionalDetail: React.FC = () => {
   );
 };
 
-export default ExpertProfessionalDetail;
+export default ExpertProfessionalList;

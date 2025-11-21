@@ -1,10 +1,7 @@
-
-
-
 import { StyleSheet } from 'react-native';
 
 // 스타일 파일에서 독자적으로 사용하는 컬러 팔레트
-const colors = {
+export const colors = {
   primary: '#4a6cf7',
   secondary: '#f5f7ff',
   success: '#28a745',
@@ -373,3 +370,5 @@ export const styles = StyleSheet.create({
     lineHeight: 20,
   },
 });
+
+export default styles;

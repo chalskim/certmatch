@@ -75,34 +75,16 @@ export const SideMenu: React.FC<SideMenuProps> = ({ visible, onClose }) => {
     navigation.navigate('RegistrationCompany' as never);
   };
 
-  // 인증 인력모집 등록 화면으로 이동
-  const handleExpertRecruitment = () => {
-    handleClose();
-    navigation.navigate('InputExpertRecruitment');
-  };
-
- // 인증 전문가모집 등록 화면으로 이동
-  const handleExpertProfessional = () => {
-    handleClose();
-    navigation.navigate('InputExpertProfessional' as never);
-  };
-
-  // 인증 교육등록 화면으로 이동
-   const handleEducationRegistration = () => {
-   console.log('Navigating to InputEducationRegistration');
-   navigation.navigate('InputEducationRegistration' as never);
-   };
-
   // 인증 인력모집 목록 화면으로 이동
   const handleExpertRecruitmentList = () => {
     handleClose();
     navigation.navigate('ExpertRecruitmentList' as never);
   };
 
-   // 전문가 등록 화면으로 이동
-  const handleExpertProfessionalDetail = () => {
+   // 전문가 등록 목록 화면으로 이동
+  const handleExpertProfessionalList = () => {
     handleClose();
-    navigation.navigate('ExpertProfessionalDetail' as never);
+    navigation.navigate('ExpertProfessionalList' as never);
   };
 
    // 전문가 인증교육 목록으로 이동
@@ -121,7 +103,6 @@ export const SideMenu: React.FC<SideMenuProps> = ({ visible, onClose }) => {
     handleClose();
     navigation.navigate('CertAudResult' as never);
   };
-
 
   // 일정관리 화면으로 이동
   const handleScheduleManager = () => {
@@ -157,12 +138,103 @@ export const SideMenu: React.FC<SideMenuProps> = ({ visible, onClose }) => {
     }
   };
 
+  // 헤더(아바타/유저 정보) 영역 클릭 시 동작
+  const handleHeaderPress = () => {
+    // 로그인되지 않은 경우 로그인 화면으로 이동
+    if (!userIsAuthenticated) {
+      handleClose();
+      navigation.navigate('Login' as never);
+      return;
+    }
+    // 로그인된 경우, 마이페이지로 이동 (원하시면 다른 화면으로 변경 가능)
+    handleClose();
+    navigation.navigate('MyPage' as never);
+  };
+
   // Q&A 목록 화면으로 이동
   const handleQnaList = () => {
     handleClose();
     safeNavigate('QnaList');
   };
 
+  // 인증종류 화면으로 이동
+  const handleCertificationTypes = () => {
+    handleClose();
+    navigation.navigate('CertificationTypes' as never);
+  };
+
+  // 성공사례 화면으로 이동
+  const handleSuccessCases = () => {
+    handleClose();
+    navigation.navigate('SuccessCases' as never);
+  };
+  
+  // 기업 장바구니 화면으로 이동
+  const handleShoppingCartCorp = () => {
+    handleClose();
+    navigation.navigate('ShoppingCartCorp' as never);
+  };
+
+  // 개인 장바구니 화면으로 이동
+  const handleShoppingCartPerson = () => {
+    handleClose();
+    navigation.navigate('ShoppingCartPerson' as never);
+  };
+
+  // 기업 결제관리 화면으로 이동
+  const handlePaymentCorporate = () => {
+    handleClose();
+    navigation.navigate('PaymentManagementCorporate' as never);
+  };
+
+  // 개인 결제관리 화면으로 이동
+  const handlePaymentPersonal = () => {
+    handleClose();
+    navigation.navigate('PaymentManagementPersonal' as never);
+  };
+
+  // 설정 화면으로 이동
+  const handleSettings = () => {
+    handleClose();
+    navigation.navigate('Settings' as never);
+  };
+
+  // 마이페이지 화면으로 이동
+  const handleMyPage = () => {
+    handleClose();
+    navigation.navigate('MyPage' as never);
+  };
+
+  // Q&A 답변 화면으로 이동
+  const handleQnaAnswers = () => {
+    handleClose();
+    navigation.navigate('QA_Answers' as never);
+  };
+
+  // 공고 관리 화면으로 이동
+  const handleAnnounceManagement = () => {
+    handleClose();
+    navigation.navigate('AnnounceManagement' as never);
+  };
+
+  // 공지사항 관리 화면으로 이동
+  const handleNoticeManagement = () => {
+    handleClose();
+    navigation.navigate('NoticeNewsList' as never);
+  };
+
+  // 베너 광고 관리 화면으로 이동
+  const handleBannerManagement = () => {
+    handleClose();
+    navigation.navigate('BannerManagement' as never);
+  };
+
+  // 관리자 페이지 화면으로 이동 (누락된 핸들러 추가)
+  const handleAdminPage = () => {
+    handleClose();
+    // 실제 관리자 메인 화면 라우트 이름에 맞게 수정하세요
+    safeNavigate('AdminManagement');
+  };
 
 
   // Function to get user type label
@@ -235,7 +307,7 @@ export const SideMenu: React.FC<SideMenuProps> = ({ visible, onClose }) => {
           style={[styles.menu, { transform: [{ translateX: slideAnim }] }]}
           onStartShouldSetResponder={() => true}
         >
-          <View style={styles.header}>
+          <TouchableOpacity style={styles.header} onPress={handleHeaderPress} activeOpacity={0.8}>
             <View style={styles.avatar}>
               <FontAwesome5 
                 name={userIsAuthenticated && user ? getUserTypeIcon(user.role) : "user"} 
@@ -269,32 +341,22 @@ export const SideMenu: React.FC<SideMenuProps> = ({ visible, onClose }) => {
                 </>
               )}
             </View>
-          </View>
+          </TouchableOpacity>
           <ScrollView
             style={styles.content}
             contentContainerStyle={styles.contentContainer}
             showsVerticalScrollIndicator={true}
           >
-            <MenuItem icon="home" label="홈" />
-            <MenuItem icon="id-badge" label="개인 자격 등록" onPress={handlePersonalRegistration} />
-            <MenuItem icon="building" label="기업 자격 등록" onPress={handleCompanyRegistration} />
+            <MenuItem icon="id-badge" label="개인 정보 등록" onPress={handlePersonalRegistration} />
+            <MenuItem icon="building" label="기업 정보 등록" onPress={handleCompanyRegistration} />
             
             <View style={styles.divider} />
 
-            <MenuItem icon="users" label="인증 인력모집 등록" onPress={handleExpertRecruitment} />
-            <MenuItem icon="user-tie" label="인증 전문가 등록" onPress={handleExpertProfessional} />
-            <MenuItem icon="graduation-cap" label="전문가 교육 등록" onPress={handleEducationRegistration} />
+            <MenuItem icon="list" label="컨설팅 및 구직 등록" onPress={handleExpertRecruitmentList} />
+            <MenuItem icon="users" label="전문가 등록" onPress={handleExpertProfessionalList} />
+            <MenuItem icon="book" label="인증 교육 등록" onPress={handleEducationList} />
             <View style={styles.divider} />
-
-            <MenuItem icon="list" label="인증 인력모집 목록" onPress={handleExpertRecruitmentList} />
-            <MenuItem icon="users" label="인증 전문가등록 목록" onPress={handleExpertProfessionalDetail} />
-            <MenuItem icon="book" label="전문가 교육 목록" onPress={handleEducationList} />
-            <View style={styles.divider} />
-
-            <MenuItem icon="list-alt" label="인증 인력모집 세부사항" onPress={handleExpertRecruitmentList} />
-            <MenuItem icon="book-open" label="전문가 교육 세부사항" onPress={handleEducationList} />
-            <View style={styles.divider} />
-
+            
             <MenuItem icon="user-plus" label="인증심사원 자격등록" onPress={handleCertAudRegistration} />
             <MenuItem icon="clipboard-list" label="인증심사 지원/결과" onPress={handleCertAudResult} />
             <View style={styles.divider} />
@@ -304,18 +366,22 @@ export const SideMenu: React.FC<SideMenuProps> = ({ visible, onClose }) => {
             <MenuItem icon="bookmark" label="북마크 페이지(기업)" onPress={handleBookmarkCorporates} />
             <View style={styles.divider} />
 
-            <MenuItem icon="credit-card" label="기업 결제관리" />
-            <MenuItem icon="wallet" label="개인 결제관리" />
+            <MenuItem icon="credit-card" label="기업 결제관리" onPress={handlePaymentCorporate} />
+            <MenuItem icon="wallet" label="개인 결제관리" onPress={handlePaymentPersonal} />
+            <View style={styles.divider} />
+            
+            <MenuItem icon="shopping-cart" label="기업 장바구니" onPress={handleShoppingCartCorp} />
+            <MenuItem icon="shopping-basket" label="개인 장바구니" onPress={handleShoppingCartPerson} />
             <View style={styles.divider} />
 
-            <MenuItem icon="tags" label="인증종류" />
+            <MenuItem icon="tags" label="인증종류" onPress={handleCertificationTypes} />
             <MenuItem icon="question-circle" label="Q&A"  onPress={handleQnaList} />
-            <MenuItem icon="trophy" label="성공사례" />
+            <MenuItem icon="trophy" label="성공사례" onPress={handleSuccessCases} />
             <View style={styles.divider} />
 
-            <MenuItem icon="cog" label="설정" />
+            <MenuItem icon="cog" label="설정" onPress={handleSettings} />
             <MenuItem icon="question-circle" label="도움말" />
-            <MenuItem icon="user-circle" label="내정보" />
+            <MenuItem icon="user-circle" label="내정보" onPress={handleMyPage} />
             <View style={styles.divider} />
 
             <TouchableOpacity style={styles.menuItem} onPress={handleAuthAction}>
@@ -331,14 +397,11 @@ export const SideMenu: React.FC<SideMenuProps> = ({ visible, onClose }) => {
             </TouchableOpacity>
             {/* //관리자 페이지 */}
             <View style={styles.divider} />
-            <MenuItem icon="user-shield" label="관리자 페이지" />
-            <MenuItem icon="id-badge" label="Q&A 답변" />
-            <MenuItem icon="id-badge" label="회사회원 관리" />
-            <MenuItem icon="id-badge" label="개인회원 관리" />
-            <MenuItem icon="id-badge" label="광고 관리" />
-
-
-
+            <MenuItem icon="user-shield" label="관리자 페이지" onPress={handleAdminPage} />
+            <MenuItem icon="comment-dots" label="Q&A 답변" onPress={handleQnaAnswers} />
+            <MenuItem icon="bullhorn" label="공고 관리" onPress={handleAnnounceManagement} />
+            <MenuItem icon="bullhorn" label="공지사항 관리" onPress={handleNoticeManagement} />
+            <MenuItem icon="image" label="베너 광고 관리" onPress={handleBannerManagement} />
           </ScrollView>
         </Animated.View>
       </TouchableOpacity>

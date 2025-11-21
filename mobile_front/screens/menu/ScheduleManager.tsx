@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
+// Ensure correct SubformHeader import; fix any prior mistaken '../components/.SubformHeader'
 import SubformHeader from '../components/SubformHeader';
 
 const { width } = Dimensions.get('window');
@@ -856,6 +857,7 @@ const ScheduleManager: React.FC<{ navigation: any }> = ({ navigation }) => {
         showBack={true}
         showHome={true}
         navigation={navigation}
+        onHome={() => navigation?.navigate?.('Home')}
       />
 
       {/* View Toggle */}

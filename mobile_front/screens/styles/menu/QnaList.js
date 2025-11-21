@@ -269,5 +269,3 @@ export const styles = StyleSheet.create({
     color: '#888',
   },
 });
-
-export default styles;

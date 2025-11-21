@@ -1,0 +1,80 @@
+7. CertMatch 모바일 앱 – API
+(React Native ↔ Backend API Alignment Checklist)
+
+🔍 목적
+React Native 프론트엔드 개발팀과 백엔드 팀 간 API 인터페이스 일치성을 보장하고,MVP 개발 중 발생할 수 있는 오해, 누락, 불일치를 사전에 방지하기 위함.
+
+📋 검토 범위
+* 프론트엔드: React Native (Expo) 기반 CertMatch 모바일 앱 (v1.0 MVP)
+* 백엔드: RESTful API (Node.js/NestJS 기반, 버전 v1)
+* 대상 기능: 사용자 인증, 매칭, 채팅, 프로필 관리
+
+✅ 크로스 체크 항목 목록
+1. 공통 사항
+항목	프론트엔드 기대값	백엔드 명세 확인	상태 ✅/❌	비고
+Base URL	https://api.certmatch.kr/v1	O	✅	
+인증 방식	Bearer Token (JWT)	O	✅	헤더: Authorization: Bearer <token>
+응답 형식	{ success: boolean, data?: T, message?: string }	O	✅	에러 시 message 포함
+시간 형식	ISO 8601 (2025-10-30T12:00:00Z)	O	✅	
+페이지네이션	page, limit 쿼리 파라미터	O	✅	응답: { items: [], total: number }
+2. *사용자 인증 *(Auth)
+엔드포인트	메서드	요청 (프론트)	응답 (백엔드)	일치 여부	비고
+/auth/login	POST	{ provider: 'kakao', accessToken: string }	{ token: string, user: { id, name, type } }	✅	소셜 로그인
+/auth/business-verify	POST	{ businessRegNo: string }	{ verified: true, companyName: string }	✅	사업자 인증
+/users/me	GET	—	{ id, name, email, userType, profile }	✅	프로필 포함
+토큰 만료	—	401 Unauthorized 수신 시 로그아웃	—	✅	프론트: 토큰 삭제 + 홈 이동
+✅ 검증 완료: 모든 인증 흐름 정상 동작 확인
+
+3. *인증 매칭 *(Matching)
+엔드포인트	메서드	요청 파라미터	응답 구조	일치 여부	비고
+/matching	GET	type=ISMS-P&budgetMin=3000000&budgetMax=5000000&region=서울	{ items: Partner[], total: number }	✅	Partner: { id, name, rating, certifications, priceRange }
+/requests	POST	{ partnerId: string, message: string }	{ requestId: string, status: 'pending' }	✅	견적 요청 생성
+/requests/{id}	GET	—	{ id, partner, status, createdAt, messages }	✅	요청 상세 조회
+⚠️ 주의사항:
+* budget은 원 단위 정수로 전달 (예: 5000000)
+* region은 시/도 이름 (예: "서울", "경기") — 백엔드에서 정규화 처리
+
+4. *채팅 *(Chat)
+엔드포인트	메서드	요청	응답	일치 여부	비고
+/chats	GET	—	{ items: Chat[], total: number }	✅	Chat: { id, partnerName, lastMessage, unreadCount }
+/chats/{chatId}/messages	GET	?page=1&limit=20	{ items: Message[], total: number }	✅	Message: { id, sender, text, timestamp, fileUrl? }
+/chats/{chatId}/messages	POST	{ text: string, fileUrl?: string }	{ id, sender, text, timestamp }	✅	파일은 S3 업로드 후 URL 전달
+폴링 주기	—	10초 간격	—	✅	프론트: setInterval 사용
+❗ MVP 제약: 실시간 WebSocket 미사용 → 폴링 기반→ 프론트: useFocusEffect로 화면 진입 시 최신 메시지 로드
+
+5. *프로필 및 리뷰 *(Profile & Review)
+엔드포인트	메서드	요청	응답	일치 여부
+/users/me/profile	PATCH	{ name, region, certifications: string[] }	{ success: true }	✅
+/partners/{id}/reviews	GET	?page=1&limit=10	{ items: Review[], avgRating: number }	✅
+/reviews	POST	{ partnerId, rating: 1~5, comment: string }	{ id, createdAt }	✅
+✅ 타입 정의 일치:
+* certifications: ["ISMS", "ISO27001"] (문자열 배열)
+* rating: 정수 (1~5)
+
+🧩 데이터 모델 일치성 검토
+객체	프론트 타입 (TypeScript)	백엔드 스키마	일치 여부
+User	{ id: string; name: string; userType: 'company' | 'consultant' }	user_type ENUM('company', 'consultant', 'education')	✅
+Partner	{ id: string; name: string; rating: number; certifications: string[] }	certifications JSON	✅
+Message	{ id: string; sender: 'me' | 'partner'; text: string; timestamp: string }	sender ENUM('client', 'partner')	⚠️ 불일치
+🔧 조치 사항:
+* 백엔드 sender 값: 'client' → 프론트에서 'me'로 매핑
+* 프론트 Message 타입 수정:type Message = {
+*   id: string;
+*   sender: 'me' | 'partner';
+*   text: string;
+*   timestamp: string;
+* };
+* 매핑 로직을 services/chat.ts에 추가
+
+🚨 발견된 이슈 및 조치 계획
+이슈	영향도	담당	조치 내용	완료일
+sender 값 불일치	중간	프론트	백엔드 값 → 프론트 값 매핑 로직 추가	2025-11-02
+예산 필터 단위 혼동 가능성	낮음	양팀	API 문서에 “원 단위 정수” 명시	2025-11-01
+채팅 폴링 성능 우려	중간	프론트	화면 비활성 시 폴링 일시 중지	2025-11-03
+✅ 최종 검토 결과
+* 일치율: 95% 이상
+* 블로킹 이슈: 없음 (모두 조치 가능)
+* 다음 단계:
+    *  API 문서 최종 확정 (Swagger URL: https://api.certmatch.kr/docs)
+    *  프론트 Mock API 연동 완료 (MSW 사용)
+    *  E2E 테스트 시나리오 작성 (로그인 → 매칭 → 채팅)

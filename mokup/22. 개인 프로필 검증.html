@@ -403,7 +403,35 @@
         .empty-text {
             font-size: 16px;
         }
-    </style>
+    
+/* Tabs style updated to match '회사 프로필 검증' pill-style */
+.filter-tabs {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    background-color: transparent;
+    border-radius: 0;
+    box-shadow: none;
+}
+.filter-tab {
+    flex: 0 0 auto;
+    padding: 8px 16px;
+    border-radius: 20px;
+    background-color: #f0f2f5;
+    color: #777;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.3s ease;
+    border: none;
+}
+.filter-tab.active {
+    background-color: #4a6cf7;
+    color: white;
+}
+
+</style>
 </head>
 <body>
     <!-- App Header -->

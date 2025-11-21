@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, Pressable, TextInput, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import SubformHeader from '../components/SubformHeader';
 import { styles } from '../styles/menu/QnaList';
@@ -76,7 +76,7 @@ export default function QnaList() {
     },
   ]);
 
-  const [privateItems] = useState<PrivateQnaItem[]>([
+  const [privateItems, setPrivateItems] = useState<PrivateQnaItem[]>([
     {
       id: 'p1',
       title: '1:1 인증 절차 문의드립니다',
@@ -94,6 +94,25 @@ export default function QnaList() {
       lastMessagePreview: '보완해야 할 항목을 확인 중입니다. 빠르게 답변드리겠습니다...',
     },
   ]);
+
+  // 등록 폼 상태
+  const [showCommunityForm, setShowCommunityForm] = useState(false);
+  const [communityCategory, setCommunityCategory] = useState<string>('인증');
+  const [communityTitle, setCommunityTitle] = useState('');
+  const [communityContent, setCommunityContent] = useState('');
+  const [communityAuthor, setCommunityAuthor] = useState('');
+
+  const [showPrivateForm, setShowPrivateForm] = useState(false);
+  const [privateTitle, setPrivateTitle] = useState('');
+  const [privateExpertName, setPrivateExpertName] = useState('담당 전문가 배정 예정');
+  const [privatePreview, setPrivatePreview] = useState('문의 등록되었습니다. 담당자가 확인 후 답변 드릴 예정입니다.');
+
+  const formatDate = (d: Date) => {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  };
 
   const sortedCommunityItems = useMemo(() => {
     const items = [...communityItems];
@@ -113,6 +132,58 @@ export default function QnaList() {
     setCommunityItems(prev => prev.map(item => (item.id === id ? { ...item, bookmarked: !item.bookmarked } : item)));
   };
 
+  const handleSubmitCommunity = () => {
+    if (!communityTitle.trim() || !communityContent.trim()) {
+      Alert.alert('알림', '제목과 내용을 입력해주세요.');
+      return;
+    }
+    const newItem: QnaItem = {
+      id: `q${Date.now()}`,
+      category: communityCategory || '인증',
+      title: communityTitle.trim(),
+      content: communityContent.trim(),
+      author: communityAuthor.trim() || '익명',
+      views: 0,
+      likes: 0,
+      bookmarked: false,
+      answered: false,
+      createdAt: formatDate(new Date()),
+    };
+    setCommunityItems(prev => [newItem, ...prev]);
+    // 폼 초기화
+    setCommunityTitle('');
+    setCommunityContent('');
+    setCommunityAuthor('');
+    setShowCommunityForm(false);
+    // 커뮤니티 탭으로 이동
+    setActiveType('community');
+    Alert.alert('알림', 'Q&A가 등록되었습니다.');
+  };
+
+  const handleSubmitPrivate = () => {
+    if (!privateTitle.trim()) {
+      Alert.alert('알림', '제목을 입력해주세요.');
+      return;
+    }
+    const newItem: PrivateQnaItem = {
+      id: `p${Date.now()}`,
+      title: privateTitle.trim(),
+      expertName: privateExpertName.trim() || '담당 전문가 배정 예정',
+      status: 'pending',
+      createdAt: formatDate(new Date()),
+      lastMessagePreview: privatePreview.trim() || '문의 등록되었습니다. 담당자가 확인 후 답변 드릴 예정입니다.',
+    };
+    setPrivateItems(prev => [newItem, ...prev]);
+    // 폼 초기화
+    setPrivateTitle('');
+    setPrivateExpertName('담당 전문가 배정 예정');
+    setPrivatePreview('문의 등록되었습니다. 담당자가 확인 후 답변 드릴 예정입니다.');
+    setShowPrivateForm(false);
+    // 1:1 탭으로 이동
+    setActiveType('private');
+    Alert.alert('알림', '1:1 Q&A가 등록되었습니다.');
+  };
+
   return (
     <View style={styles.container}>
       {/* Subform Header */}
@@ -123,6 +194,119 @@ export default function QnaList() {
       />
 
       <ScrollView contentContainerStyle={styles.content}>
+        {/* 등록 버튼 영역 */}
+        <View style={{ flexDirection: 'row', gap: 8, marginBottom: 12 }}>
+          <Pressable
+            onPress={() => setShowCommunityForm(s => !s)}
+            style={({ pressed }) => ({
+              backgroundColor: '#2ecc71',
+              paddingVertical: 10,
+              paddingHorizontal: 14,
+              borderRadius: 8,
+              opacity: pressed ? 0.8 : 1,
+              marginRight: 8,
+            })}
+          >
+            <Text style={{ color: '#fff', fontWeight: '600' }}>새 Q&A 등록</Text>
+          </Pressable>
+          <Pressable
+            onPress={() => setShowPrivateForm(s => !s)}
+            style={({ pressed }) => ({
+              backgroundColor: '#3498db',
+              paddingVertical: 10,
+              paddingHorizontal: 14,
+              borderRadius: 8,
+              opacity: pressed ? 0.8 : 1,
+            })}
+          >
+            <Text style={{ color: '#fff', fontWeight: '600' }}>1:1 Q&A 등록</Text>
+          </Pressable>
+        </View>
+
+        {/* 커뮤니티 Q&A 등록 폼 */}
+        {showCommunityForm && (
+          <View style={{ backgroundColor: '#f7f9fa', borderRadius: 12, padding: 12, marginBottom: 16 }}>
+            <Text style={{ fontSize: 16, fontWeight: '700', marginBottom: 8 }}>커뮤니티 Q&A 등록</Text>
+            <View style={{ flexDirection: 'row', marginBottom: 8 }}>
+              {['인증', '교육', '채용'].map(cat => (
+                <Pressable
+                  key={cat}
+                  onPress={() => setCommunityCategory(cat)}
+                  style={{
+                    backgroundColor: communityCategory === cat ? '#ffd166' : '#ecf0f1',
+                    paddingVertical: 6,
+                    paddingHorizontal: 10,
+                    borderRadius: 6,
+                    marginRight: 8,
+                  }}
+                >
+                  <Text style={{ color: '#2c3e50' }}>{cat}</Text>
+                </Pressable>
+              ))}
+            </View>
+            <TextInput
+              placeholder="제목"
+              value={communityTitle}
+              onChangeText={setCommunityTitle}
+              style={{ backgroundColor: '#fff', borderWidth: 1, borderColor: '#dfe6e9', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 8, marginBottom: 8 }}
+            />
+            <TextInput
+              placeholder="내용"
+              value={communityContent}
+              onChangeText={setCommunityContent}
+              multiline
+              style={{ backgroundColor: '#fff', borderWidth: 1, borderColor: '#dfe6e9', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 8, minHeight: 80, textAlignVertical: 'top', marginBottom: 8 }}
+            />
+            <TextInput
+              placeholder="작성자 (선택)"
+              value={communityAuthor}
+              onChangeText={setCommunityAuthor}
+              style={{ backgroundColor: '#fff', borderWidth: 1, borderColor: '#dfe6e9', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 8, marginBottom: 12 }}
+            />
+            <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+              <Pressable onPress={() => setShowCommunityForm(false)} style={{ paddingVertical: 10, paddingHorizontal: 14, marginRight: 8 }}>
+                <Text style={{ color: '#7f8c8d', fontWeight: '600' }}>취소</Text>
+              </Pressable>
+              <Pressable onPress={handleSubmitCommunity} style={{ backgroundColor: '#2ecc71', paddingVertical: 10, paddingHorizontal: 14, borderRadius: 8 }}>
+                <Text style={{ color: '#fff', fontWeight: '700' }}>등록</Text>
+              </Pressable>
+            </View>
+          </View>
+        )}
+
+        {/* 1:1 Q&A 등록 폼 */}
+        {showPrivateForm && (
+          <View style={{ backgroundColor: '#f7f9fa', borderRadius: 12, padding: 12, marginBottom: 16 }}>
+            <Text style={{ fontSize: 16, fontWeight: '700', marginBottom: 8 }}>1:1 Q&A 등록</Text>
+            <TextInput
+              placeholder="제목"
+              value={privateTitle}
+              onChangeText={setPrivateTitle}
+              style={{ backgroundColor: '#fff', borderWidth: 1, borderColor: '#dfe6e9', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 8, marginBottom: 8 }}
+            />
+            <TextInput
+              placeholder="전문가 이름 (선택)"
+              value={privateExpertName}
+              onChangeText={setPrivateExpertName}
+              style={{ backgroundColor: '#fff', borderWidth: 1, borderColor: '#dfe6e9', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 8, marginBottom: 8 }}
+            />
+            <TextInput
+              placeholder="문의 내용 또는 메시지 (선택)"
+              value={privatePreview}
+              onChangeText={setPrivatePreview}
+              multiline
+              style={{ backgroundColor: '#fff', borderWidth: 1, borderColor: '#dfe6e9', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 8, minHeight: 80, textAlignVertical: 'top', marginBottom: 12 }}
+            />
+            <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+              <Pressable onPress={() => setShowPrivateForm(false)} style={{ paddingVertical: 10, paddingHorizontal: 14, marginRight: 8 }}>
+                <Text style={{ color: '#7f8c8d', fontWeight: '600' }}>취소</Text>
+              </Pressable>
+              <Pressable onPress={handleSubmitPrivate} style={{ backgroundColor: '#3498db', paddingVertical: 10, paddingHorizontal: 14, borderRadius: 8 }}>
+                <Text style={{ color: '#fff', fontWeight: '700' }}>등록</Text>
+              </Pressable>
+            </View>
+          </View>
+        )}
         {/* QA Type Toggle */}
         <View style={styles.qaTypeToggle}>
           <Pressable

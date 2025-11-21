@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { View, Text, ScrollView, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, Image, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import SubformHeader from '../components/SubformHeader';
@@ -48,7 +48,8 @@ const ProfessionalistDetail: React.FC = () => {
     () => ({
       name: '김민수 컨설턴트',
       title: 'ISMS-P 전문가 · 15년 경력',
-      avatar: 'https://picsum.photos/seed/expert-kim/200/200.jpg',
+      // 로컬 아바타 이미지로 교체
+      avatar: require('../../assets/icon/expert-kim.jpg'),
       badges: ['매칭률 95%', 'ISMS-P 심사원', 'ISO 27001 Lead Auditor', '베테랑'],
       available: true,
       priceDisplay: '₩ 150,000 / 시간',
@@ -115,14 +116,15 @@ const ProfessionalistDetail: React.FC = () => {
     {
       title: '금융사 ISMS-P 인증 획득',
       client: 'K-Finance',
-      image: 'https://picsum.photos/seed/project-1/800/400.jpg',
+      // 로컬 프로젝트 이미지로 교체
+      image: require('../../assets/icon/project-1.jpg') as any,
       tags: ['ISMS-P', '금융', '리스크 관리'],
       result: '인증 취득 및 내부 보안 수준 향상',
     },
     {
       title: '의료기관 개인정보 보호 체계 개선',
       client: 'M-Medical',
-      image: 'https://picsum.photos/seed/project-2/800/400.jpg',
+      image: require('../../assets/icon/project-2.jpg') as any,
       tags: ['개인정보보호', '의료', '교육'],
       result: '민감정보 보호 강화 및 내부 교육 체계 정착',
     },
@@ -180,7 +182,11 @@ const ProfessionalistDetail: React.FC = () => {
         </View>
         <View style={styles.headerRow}>
         <View style={styles.headerLeft}>
-          <Image source={{ uri: profile.avatar }} style={styles.avatar} />
+          {/* 프로필 아바타 (로컬/URL 모두 지원) */}
+          <Image
+            source={typeof profile.avatar === 'string' ? { uri: profile.avatar } : (profile.avatar as any)}
+            style={styles.avatar}
+          />
           <View style={styles.titleInfo}>
             <Text style={styles.titleName}>{profile.name}</Text>
             <Text style={styles.titleRole}>{profile.title}</Text>
@@ -292,7 +298,11 @@ const ProfessionalistDetail: React.FC = () => {
           <Text style={styles.sectionTitle}>성공사례</Text>
           {projects.map((p, idx) => (
             <View key={`${p.title}-${idx}`} style={styles.projectCard}>
-              <Image source={{ uri: p.image }} style={styles.projectImage} />
+            {/* 프로젝트 이미지 (로컬/URL 모두 지원) */}
+            <Image
+              source={typeof p.image === 'string' ? { uri: p.image } : (p.image as any)}
+              style={styles.projectImage}
+            />
               <View style={styles.projectContent}>
                 <Text style={styles.projectTitle}>{p.title}</Text>
                 <Text style={styles.projectClient}>{p.client}</Text>

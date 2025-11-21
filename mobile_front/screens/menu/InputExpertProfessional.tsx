@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, ScrollView, TouchableOpacity, Image, Alert } from 'react-native';
+import type { ImageSourcePropType } from 'react-native';
+import { Images } from '../../assets/index';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { styles } from '../styles/menu/InputExpertRecruitment';
+import SubformHeader from '../components/SubformHeader';
 
 const dummyFileName = (ext = 'pdf') => `file_${Date.now()}.${ext}`;
 
@@ -22,8 +25,8 @@ const Tag: React.FC<{ label: string; onRemove?: () => void; selected?: boolean }
 export const ExpertRecruitmentFromMockup: React.FC = () => {
   const navigation = useNavigation();
 
-  const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
-  const [additionalPhotos, setAdditionalPhotos] = useState<string[]>([]);
+  const [profilePhoto, setProfilePhoto] = useState<ImageSourcePropType | null>(null);
+  const [additionalPhotos, setAdditionalPhotos] = useState<ImageSourcePropType[]>([]);
   const [name, setName] = useState('');
   const [introduction, setIntroduction] = useState('');
 
@@ -122,17 +125,30 @@ export const ExpertRecruitmentFromMockup: React.FC = () => {
   const removePortfolioFile = (idx: number) => setPortfolioFiles(portfolioFiles.filter((_, i) => i !== idx));
 
   const onPickPhoto = () => {
-    // Simulation: in a real app, open image picker
-    const uri = `https://picsum.photos/seed/${Date.now()}/200/200`;
-    setProfilePhoto(uri);
-    Alert.alert('사진 선택', '샘플 이미지를 설정했습니다 (시뮬레이션).');
+    // 로컬 실행을 위해 샘플 이미지를 로컬 에셋으로 설정합니다.
+    try {
+      const localImg = Images.photoPlaceholder;
+      setProfilePhoto(localImg);
+      Alert.alert('사진 선택', '로컬 샘플 이미지를 설정했습니다.');
+    } catch (e) {
+      // 폴백: 기본 이미지 사용
+      const fallback = Images.license200;
+      setProfilePhoto(fallback);
+      Alert.alert('사진 선택', '기본 로컬 이미지를 설정했습니다.');
+    }
   };
 
   const onPickAdditionalPhoto = () => {
-    // Simulation: in a real app, open image picker
-    const uri = `https://picsum.photos/seed/${Date.now() + Math.random()}/200/200`;
-    setAdditionalPhotos([...additionalPhotos, uri]);
-    Alert.alert('사진 추가', '샘플 이미지가 추가되었습니다 (시뮬레이션).');
+    // 로컬 실행을 위해 샘플 이미지를 로컬 에셋으로 추가합니다.
+    try {
+      const localImg = Images.photoPlaceholder;
+      setAdditionalPhotos([...additionalPhotos, localImg]);
+      Alert.alert('사진 추가', '로컬 샘플 이미지가 추가되었습니다.');
+    } catch (e) {
+      const fallback = Images.license200;
+      setAdditionalPhotos([...additionalPhotos, fallback]);
+      Alert.alert('사진 추가', '기본 로컬 이미지가 추가되었습니다.');
+    }
   };
 
   const removeAdditionalPhoto = (index: number) => {
@@ -183,13 +199,11 @@ export const ExpertRecruitmentFromMockup: React.FC = () => {
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 120 }}>
       {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <FontAwesome5 name="arrow-left" size={20} color="#0066CC" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>인증 전문가 등록</Text>
-        <View style={{ width: 20 }} />
-      </View>
+      <SubformHeader
+        title="인증 전문가 등록"
+        navigation={navigation as any}
+        onHome={() => (navigation as any)?.navigate?.('Home')}
+      />
 
       <View style={styles.formContainer}>
         {/* Profile */}
@@ -200,7 +214,7 @@ export const ExpertRecruitmentFromMockup: React.FC = () => {
           <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
             <TouchableOpacity onPress={onPickPhoto} style={styles.profilePhotoContainer as any}>
               {profilePhoto ? (
-                <Image source={{ uri: profilePhoto }} style={{ width: 80, height: 80, borderRadius: 40 }} />
+                <Image source={profilePhoto as ImageSourcePropType} style={{ width: 80, height: 80, borderRadius: 40 }} />
               ) : (
                 <View style={{ width: 80, height: 80, borderRadius: 40, backgroundColor: '#f0f0f0', alignItems: 'center', justifyContent: 'center' }}>
                   <FontAwesome5 name="camera" size={30} color="#aaa" />
@@ -231,7 +245,7 @@ export const ExpertRecruitmentFromMockup: React.FC = () => {
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
               {additionalPhotos.map((photo, index) => (
                 <View key={index} style={{ position: 'relative' }}>
-                  <Image source={{ uri: photo }} style={{ width: 80, height: 80, borderRadius: 8 }} />
+                  <Image source={photo as ImageSourcePropType} style={{ width: 80, height: 80, borderRadius: 8 }} />
                   <TouchableOpacity 
                     onPress={() => removeAdditionalPhoto(index)}
                     style={{ 

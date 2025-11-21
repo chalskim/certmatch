@@ -544,3 +544,6 @@ export const scheduleManagerStyles = StyleSheet.create({
     height: 120, // 在大屏幕上使用更大的高度
   },
 });
+
+// Provide a named export alias to align with other style modules
+export { scheduleManagerStyles as styles };

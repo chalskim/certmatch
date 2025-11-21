@@ -422,4 +422,51 @@ selectedInterestText: {
 removeInterestButton: {
   padding: 2,
 },
+
+// 인증 정보 항목 스타일
+certItemContainer: {
+  width: '100%',
+  borderWidth: 1,
+  borderColor: '#eee',
+  borderRadius: 8,
+  padding: 12,
+  marginBottom: 16,
+  backgroundColor: '#fff',
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.05,
+  shadowRadius: 4,
+  elevation: 2,
+},
+certItemHeader: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  marginBottom: 8,
+},
+removeCertButton: {
+  flexDirection: 'row',
+  alignItems: 'center',
+},
+fileList: {
+  marginTop: 8,
+},
+fileItem: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  backgroundColor: '#f5f7fa',
+  borderRadius: 6,
+  paddingVertical: 6,
+  paddingHorizontal: 10,
+  marginBottom: 6,
+},
+fileName: {
+  fontSize: 12,
+  color: '#333',
+},
+fileRemove: {
+  fontSize: 12,
+  color: 'red',
+},
 });

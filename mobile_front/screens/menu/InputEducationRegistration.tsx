@@ -3,6 +3,7 @@ import { View, Text, TextInput, ScrollView, TouchableOpacity, Alert } from 'reac
 import { FontAwesome5 } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { styles } from '../styles/menu/InputEducationRegistration';
+import SubformHeader from '../components/SubformHeader';
 
 type ScheduleItem = {
   id: string;
@@ -130,13 +131,11 @@ export const EducationRegistration: React.FC = () => {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 120 }}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <FontAwesome5 name="arrow-left" size={18} color="#0066CC" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>인증 교육 등록</Text>
-        <View style={{ width: 20 }} />
-      </View>
+      <SubformHeader
+        title="인증 교육 등록"
+        navigation={navigation as any}
+        onHome={() => (navigation as any)?.navigate('Home')}
+      />
 
       <View style={styles.formContainer}>
         {/* Institution Info */}

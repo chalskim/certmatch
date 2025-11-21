@@ -213,4 +213,3 @@ const styles = StyleSheet.create({
 
 // 기본 export와 함께 named export를 제공하여 TS/JS 양쪽 import 형태를 모두 지원
 export { styles };
-export default styles;

@@ -1,5 +1,5 @@
-
 import { StyleSheet } from 'react-native';
+
 export const styles = StyleSheet.create({
   root: { backgroundColor: '#f8f9fa' },
   header: {
@@ -146,4 +146,4 @@ export const styles = StyleSheet.create({
   btnText: { color: '#fff', fontWeight: '700' },
   btnPrimary: { backgroundColor: '#4a6fdc' },
   btnSecondary: { backgroundColor: '#6c757d' },
-});
+  });
