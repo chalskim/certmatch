@@ -116,16 +116,25 @@ npm run lint:web     # 웹 린트
 - [API 문서](http://localhost:3001/api)
 - [웹 애플리케이션](http://localhost:3000)
 
-## GitHub Update
-cd /Users/chalskim/src/certmatch/certmatch
-git status
-git add -A
-git commit -m "chore: 전체 업데이트 및 테스트 페이지 추가"
-git push origin main
-git remote -v
-git branch --show-current
-git push -u origin main or git push --force origin main
-git config --global credential.helper osxkeychain
+## GitHub Update (one-shot)
+아래 블록을 그대로 터미널에 붙여넣으면 한 번에 설정/커밋/푸시가 진행됩니다. GitHub 인증이 필요하면 비밀번호 대신 PAT를 입력하세요.
+```bash
+cd '/Users/cheolhomaegbug/src/certmatch' && \
+git init && \
+git config --global credential.helper osxkeychain && \
+git branch -M main && \
+(git remote get-url origin >/dev/null 2>&1 && \
+  git remote set-url origin https://github.com/chalskim/certmatch.git || \
+  git remote add origin https://github.com/chalskim/certmatch.git) && \
+git add . && \
+git commit -m "Initial commit: upload full project" || echo "Skipping commit (nothing to commit)" && \
+git remote -v && \
+git branch --show-current && \
+git push -u origin main || git push -u origin main --force
+```
+참고:
+- HTTPS 대신 SSH를 쓰려면 `https://github.com/chalskim/certmatch.git` 를 `git@github.com:chalskim/certmatch.git` 로 교체하세요.
+- `--force`는 브랜치 히스토리를 덮어쓰므로 필요한 경우에만 사용하세요.
 
 서버 실행 
 cd '/Users/cheolhomaegbug/src/certmatch/Server' && npm run start:dev
