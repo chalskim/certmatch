@@ -13,6 +13,7 @@ import type { ImageStyle } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import SubformHeader from '../components/SubformHeader';
 import { styles } from '../styles/menu/NoticeItemlistDetail';
+import { Images } from '../../assets/index';
 
 // 뉴스 및 정부 정책 상세 화면 (타입스크립트 변환)
 // 기존 mokup/뉴스및정부정책상세.html을 React Native/Expo 스타일로 변환한 화면입니다.
@@ -119,7 +120,7 @@ export default function NoticeItemlistDetail() {
 
       {/* 히어로 이미지 */}
       <Image
-            source={require('../../assets/icon/news-assembly.jpg')}
+        source={Images.newsAssembly}
         style={styles.heroImage as ImageStyle}
         resizeMode="cover"
         accessibilityLabel="국회 본회의 장면"

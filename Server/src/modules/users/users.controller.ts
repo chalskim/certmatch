@@ -1,7 +1,6 @@
 import {
   Controller,
   Get,
-  Post,
   Body,
   Patch,
   Param,
@@ -33,7 +32,7 @@ export class UsersController {
   @ApiOperation({ summary: 'Get current authenticated user' })
   @ApiResponse({ status: 200, description: 'Return current user' })
   findMe(@Request() req: any) {
-    const userId: string | undefined = req?.user?.id;
+    const userId: string | undefined = req?.user?.userId || req?.user?.id;
     return userId ? this.usersService.findOne(userId) : null;
   }
 
@@ -49,10 +48,7 @@ export class UsersController {
   @ApiOperation({ summary: 'Update user' })
   @ApiResponse({ status: 200, description: 'User updated successfully' })
   @ApiResponse({ status: 404, description: 'User not found' })
-  update(
-    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
-    @Body() updateUserDto: any,
-  ) {
+  update(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string, @Body() updateUserDto: any) {
     return this.usersService.update(id, updateUserDto);
   }
 

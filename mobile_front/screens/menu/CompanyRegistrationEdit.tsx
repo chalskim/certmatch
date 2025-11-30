@@ -1,0 +1,767 @@
+import React, { useEffect, useState } from 'react';
+import { View, Text, TextInput, ScrollView, TouchableOpacity, Alert, Modal, ActivityIndicator } from 'react-native';
+import { FontAwesome5 } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import { styles } from '../styles/menu/RegistrationCompany';
+import SubformHeader from '../components/SubformHeader';
+import mockupData from '../data/mokup.json';
+import { apiService, type User } from '../../services/apiService';
+import { CompanyRegistrationService } from '../../services/companyRegistrationService';
+import {
+  CompanyRegistrationPayload,
+  UserCompany,
+  UserCompanyContactPerson,
+  UserCompanyCertification
+} from '../../types/db/CompanyRegistration';
+
+type CertFile = { name: string; uri: string; size?: number; mimeType?: string };
+type CertInfo = {
+  id: string;
+  certType: string;
+  certLevel: string;
+  certScope: string;
+  desiredDate: string;
+  auditType: string;
+  files: CertFile[];
+};
+
+const newId = (prefix = '') => `${prefix}${Date.now()}${Math.floor(Math.random() * 1000)}`;
+
+const CompanyRegistrationEdit: React.FC = () => {
+  const navigation = useNavigation<any>();
+
+  const [companyName, setCompanyName] = useState('');
+  const [bizRegNo, setBizRegNo] = useState('');
+  const [ceoName, setCeoName] = useState('');
+  const [establishDate, setEstablishDate] = useState('');
+  const [industry, setIndustry] = useState('');
+  const [employees, setEmployees] = useState('');
+  const [postcode, setPostcode] = useState('');
+  const [address, setAddress] = useState('');
+  const [detailAddress, setDetailAddress] = useState('');
+  const [contactPerson, setContactPerson] = useState('');
+  const [contactEmail, setContactEmail] = useState('');
+  const [contactPhone, setContactPhone] = useState('');
+  const [certInfos, setCertInfos] = useState<CertInfo[]>([]);
+  const [terms1, setTerms1] = useState(false);
+  const [terms2, setTerms2] = useState(false);
+  const [terms3, setTerms3] = useState(false);
+  const [selectedIndustries, setSelectedIndustries] = useState<string[]>([]);
+  const [selectedCertTypes, setSelectedCertTypes] = useState<string[]>([]);
+  const [contactPersons, setContactPersons] = useState<{ name: string; email: string; phone: string; position: string }[]>([]);
+  const [editId, setEditId] = useState<string | null>(null);
+
+  const [showIndustryDropdown, setShowIndustryDropdown] = useState(false);
+  const [showEmployeesDropdown, setShowEmployeesDropdown] = useState(false);
+  const [openCertTypeDropdownIndex, setOpenCertTypeDropdownIndex] = useState<number | null>(null);
+  const [openCertLevelDropdownIndex, setOpenCertLevelDropdownIndex] = useState<number | null>(null);
+  const [openAuditTypeDropdownIndex, setOpenAuditTypeDropdownIndex] = useState<number | null>(null);
+
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [loadingUser, setLoadingUser] = useState(false);
+
+  useEffect(() => {
+    setLoadingUser(true);
+    apiService.getCurrentUser().then(setCurrentUser).finally(() => setLoadingUser(false));
+  }, []);
+
+  useEffect(() => {
+    const loadCompanyRegistration = async () => {
+      try {
+        const res = await CompanyRegistrationService.getMyCompanyRegistration();
+        if (!res.success || !res.data) return;
+        const d: any = res.data;
+        setEditId(d.id || d.cr_id || d.comp_id || d.companyId || null);
+        setCompanyName(d.companyName || d.company?.name || '');
+        setBizRegNo(d.bizRegNo || d.company?.bizRegNo || '');
+        setCeoName(d.ceoName || d.company?.ceoName || '');
+        setEstablishDate(d.establishDate || d.company?.establishDate || '');
+        setIndustry(d.industry || d.company?.industry || '');
+        setEmployees(d.employees || d.company?.employees || '');
+        setPostcode(d.postcode || d.company?.postcode || '');
+        setAddress(d.address || d.company?.address || '');
+        setDetailAddress(d.detailAddress || d.company?.detailAddress || '');
+        setContactPerson(d.contactPerson || '');
+        setContactEmail(d.contactEmail || '');
+        setContactPhone(d.contactPhone || '');
+        setSelectedIndustries(Array.isArray(d.industryFields) ? d.industryFields : []);
+        setSelectedCertTypes(Array.isArray(d.selectedCertTypes) ? d.selectedCertTypes : []);
+        setContactPersons(Array.isArray(d.contactPersons) ? d.contactPersons : []);
+        const mappedCerts: CertInfo[] = Array.isArray(d.certifications)
+          ? d.certifications.map((c: any) => ({
+            id: c.id || newId('cert_'),
+            certType: c.certType || '',
+            certLevel: c.certLevel || '',
+            certScope: c.certScope || '',
+            desiredDate: c.desiredDate || '',
+            auditType: c.auditType || '',
+            files: Array.isArray(c.files)
+              ? c.files.map((f: any) => ({ name: f.name, uri: f.uri, size: f.size, mimeType: f.mimeType }))
+              : []
+          }))
+          : [];
+        setCertInfos(mappedCerts);
+        setTerms1(!!d.terms1);
+        setTerms2(!!d.terms2);
+        setTerms3(!!d.terms3);
+      } catch { }
+    };
+    loadCompanyRegistration();
+  }, []);
+
+  const industryOptions = [
+    { label: '선택해주세요', value: '' },
+    ...mockupData.filters.industury.map((industry: string) => ({
+      label: industry,
+      value: industry.toLowerCase().replace(/\s+/g, '_')
+    }))
+  ];
+
+  const employeesOptions = [
+    { label: '선택해주세요', value: '' },
+    { label: '1-50명', value: '1-50' },
+    { label: '51-100명', value: '51-100' },
+    { label: '101-300명', value: '101-300' },
+    { label: '301-500명', value: '301-500' },
+    { label: '501명 이상', value: '501+' }
+  ];
+
+  const certTypeOptions = [
+    { label: '선택해주세요', value: '' },
+    ...mockupData.filters.categories.map((cat: string) => ({ label: cat, value: cat }))
+  ];
+
+  const certLevelOptions = [
+    { label: '선택해주세요', value: '' },
+    { label: '기본인증', value: 'basic' },
+    { label: '종합인증', value: 'comprehensive' },
+    { label: '고급인증', value: 'advanced' }
+  ];
+
+  const auditTypeOptions = [
+    { label: '선택해주세요', value: '' },
+    { label: '최초 인증', value: 'initial' },
+    { label: '갱신 인증', value: 'renewal' },
+    { label: '감시 심사', value: 'surveillance' },
+    { label: '인증 이전', value: 'transfer' }
+  ];
+
+  const toggleIndustry = (v: string) => {
+    setSelectedIndustries(prev => (prev.includes(v) ? prev.filter(i => i !== v) : [...prev, v]));
+  };
+
+  const addContactPerson = () => {
+    setContactPersons([...contactPersons, { position: '', name: '', email: '', phone: '' }]);
+  };
+
+  const updateContactPerson = (index: number, field: string, value: string) => {
+    const updated = [...contactPersons];
+    updated[index] = { ...updated[index], [field]: value };
+    setContactPersons(updated);
+  };
+
+  const removeContactPerson = (index: number) => {
+    setContactPersons(contactPersons.filter((_, i) => i !== index));
+  };
+
+  const addCurrentUserAsContact = () => {
+    if (!currentUser) {
+      Alert.alert('알림', '로그인된 사용자 정보를 찾을 수 없습니다.');
+      return;
+    }
+    const isAlreadyAdded = contactPersons.some(person => person.email === currentUser.email);
+    if (isAlreadyAdded) {
+      Alert.alert('알림', '이미 담당자 목록에 포함되어 있습니다.');
+      return;
+    }
+    const newContact = {
+      name: currentUser.name || '',
+      email: currentUser.email || '',
+      phone: currentUser.phone || '',
+      position: '담당자'
+    };
+    setContactPersons([...contactPersons, newContact]);
+    Alert.alert('성공', '로그인된 사용자 정보가 담당자로 추가되었습니다.');
+  };
+
+  const addCertInfo = () => {
+    setCertInfos(prev => [...prev, { id: newId('cert_'), certType: '', certLevel: '', certScope: '', desiredDate: '', auditType: '', files: [] }]);
+  };
+
+  const removeCertInfo = (id: string) => {
+    setCertInfos(prev => prev.filter(ci => ci.id !== id));
+    setSelectedCertTypes(prev => prev.filter(t => certInfos.find(ci => ci.id === id)?.certType !== t));
+  };
+
+  const updateCertInfo = (id: string, patch: Partial<CertInfo>) => {
+    setCertInfos(prev => prev.map(ci => (ci.id === id ? { ...ci, ...patch } : ci)));
+  };
+
+  const toggleSelectCertType = (type: string) => {
+    setSelectedCertTypes(prev => {
+      const exists = prev.includes(type);
+      const next = exists ? prev.filter(t => t !== type) : [...prev, type];
+      if (exists) {
+        setCertInfos(cis => cis.filter(ci => ci.certType !== type));
+      } else {
+        setCertInfos(cis => cis.some(ci => ci.certType === type) ? cis : [...cis, { id: newId('cert_'), certType: type, certLevel: '', certScope: '', desiredDate: '', auditType: '', files: [] }]);
+      }
+      return next;
+    });
+  };
+
+  const pickCertFile = async (id: string) => {
+    try {
+      const DocumentPicker = await import('expo-document-picker');
+      const res = await DocumentPicker.getDocumentAsync({ type: '*/*' });
+      if (!res.canceled && res.assets && res.assets.length > 0) {
+        const file = res.assets[0] as any;
+        setCertInfos(prev => prev.map(ci => (ci.id === id ? { ...ci, files: [...ci.files, { name: file.name, uri: file.uri, size: file.size, mimeType: file.mimeType }] } : ci)));
+      }
+    } catch (err) {
+      Alert.alert('파일 업로드 불가', '파일 선택 기능을 사용하려면 expo-document-picker를 설치하거나 네이티브 환경에서 실행하세요.');
+    }
+  };
+
+  const removeCertFile = (id: string, index: number) => {
+    setCertInfos(prev => prev.map(ci => (ci.id === id ? { ...ci, files: ci.files.filter((_, i) => i !== index) } : ci)));
+  };
+
+  const handleUpdate = async () => {
+    if (!companyName || !bizRegNo || !ceoName || !establishDate || !industry || !employees || !address || !contactPerson || !contactEmail || !contactPhone || !terms1 || !terms2 || !terms3) {
+      Alert.alert('필수 정보 누락', '모든 필수 정보를 입력해주세요.');
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(contactEmail)) {
+      Alert.alert('이메일 형식 오류', '올바른 이메일 주소를 입력해주세요.');
+      return;
+    }
+    if (certInfos.length === 0 || certInfos.find(ci => !ci.certType || !ci.desiredDate)) {
+      Alert.alert('보유 인증 누락', '각 보유 인증에 인증 명과 희망 심사일을 입력해주세요.');
+      return;
+    }
+    const data: CompanyRegistrationPayload = {
+      company: {
+        comp_name: companyName,
+        comp_biz_reg_no: bizRegNo,
+        comp_owner_name: ceoName,
+        comp_founded_date: establishDate,
+        comp_industry_gb: 'INDUSTRY',
+        comp_industry_key: industry,
+        comp_employee_count: parseInt(employees.replace(/[^0-9]/g, '')) || 0,
+        comp_address: `${postcode} ${address} ${detailAddress}`.trim(),
+        comp_profile_state: 'draft'
+      },
+      contactPersons: contactPersons.map((cp, index) => ({
+        cper_name: cp.name,
+        cper_email: cp.email,
+        cper_phone: cp.phone,
+        cper_position: cp.position,
+        cper_seq: index + 1,
+        cper_is_primary: index === 0
+      })),
+      certifications: certInfos.map((ci, index) => ({
+        ccert_type_gb: 'CERT_TYPE',
+        ccert_type_key: ci.certType,
+        ccert_level_gb: 'CERT_LEVEL',
+        ccert_level_key: ci.certLevel,
+        ccert_audit_type_gb: 'AUDIT_TYPE',
+        ccert_audit_type_key: ci.auditType,
+        ccert_scope: ci.certScope,
+        ccert_desired_date: ci.desiredDate,
+        ccert_seq: index + 1
+      }))
+    };
+    try {
+      if (editId) {
+        const res = await CompanyRegistrationService.updateCompanyRegistration(editId, data);
+        if (res.success) {
+          Alert.alert('수정 완료', res.message || '기업 자격 정보가 수정되었습니다.', [{ text: '확인', onPress: () => navigation.goBack() }]);
+        } else {
+          Alert.alert('수정 실패', res.message || '기업 자격 정보 수정에 실패했습니다.');
+        }
+      } else {
+        const res = await CompanyRegistrationService.createCompanyRegistration(data as any);
+        if (res.success) {
+          Alert.alert('등록 완료', res.message || '기업 자격 정보가 등록되었습니다.', [{ text: '확인', onPress: () => navigation.goBack() }]);
+        } else {
+          Alert.alert('등록 실패', res.message || '기업 자격 정보 등록에 실패했습니다.');
+        }
+      }
+    } catch (error: any) {
+      Alert.alert('오류 발생', error?.message || '서버 통신 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+    }
+  };
+
+  const saveDraft = async () => {
+    const data: CompanyRegistrationPayload = {
+      company: {
+        comp_name: companyName,
+        comp_biz_reg_no: bizRegNo,
+        comp_owner_name: ceoName,
+        comp_founded_date: establishDate,
+        comp_industry_gb: 'INDUSTRY',
+        comp_industry_key: industry,
+        comp_employee_count: parseInt(employees.replace(/[^0-9]/g, '')) || 0,
+        comp_address: `${postcode} ${address} ${detailAddress}`.trim(),
+        comp_profile_state: 'draft'
+      },
+      contactPersons: contactPersons.map((cp, index) => ({
+        cper_name: cp.name,
+        cper_email: cp.email,
+        cper_phone: cp.phone,
+        cper_position: cp.position,
+        cper_seq: index + 1,
+        cper_is_primary: index === 0
+      })),
+      certifications: certInfos.map((ci, index) => ({
+        ccert_type_gb: 'CERT_TYPE',
+        ccert_type_key: ci.certType,
+        ccert_level_gb: 'CERT_LEVEL',
+        ccert_level_key: ci.certLevel,
+        ccert_audit_type_gb: 'AUDIT_TYPE',
+        ccert_audit_type_key: ci.auditType,
+        ccert_scope: ci.certScope,
+        ccert_desired_date: ci.desiredDate,
+        ccert_seq: index + 1
+      }))
+    };
+    try {
+      if (editId) {
+        await CompanyRegistrationService.updateCompanyRegistration(editId, data);
+      } else {
+        await CompanyRegistrationService.createCompanyRegistration(data as any);
+      }
+      Alert.alert('임시 저장', '임시 저장이 완료되었습니다.');
+    } catch (error: any) {
+      Alert.alert('오류', error?.message || '임시 저장 중 오류가 발생했습니다.');
+    }
+  };
+
+  const renderDropdown = (
+    visible: boolean,
+    onClose: () => void,
+    options: Array<{ label: string; value: string }>,
+    selectedValue: string,
+    onSelect: (value: string) => void
+  ) => {
+    return (
+      <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+        <TouchableOpacity style={styles.dropdownOverlay} onPress={onClose}>
+          <View style={styles.dropdownContainer}>
+            <ScrollView>
+              {options.map((option, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={[styles.dropdownItem, selectedValue === option.value && styles.dropdownItemSelected]}
+                  onPress={() => {
+                    onSelect(option.value);
+                    onClose();
+                  }}
+                >
+                  <Text style={[styles.dropdownItemText, selectedValue === option.value && styles.dropdownItemTextSelected]}>
+                    {option.label}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        </TouchableOpacity>
+      </Modal>
+    );
+  };
+
+  return (
+    <ScrollView style={styles.container}>
+      <SubformHeader title="기업 자격 수정" navigation={navigation} onHome={() => (navigation as any)?.navigate?.('Home')} />
+
+      <View style={styles.formContainer}>
+        <View style={styles.formHeader}>
+          <Text style={styles.formSubtitle}>정확한 정보를 입력해 주시면 빠르고 정확하게 심사를 진행할 수 있습니다.</Text>
+        </View>
+
+        <View style={styles.profileCompletion}>
+          <View style={styles.completionText}>
+            <View style={styles.completionTitle}>
+              <FontAwesome5 name="chart-pie" size={16} color="#0066CC" />
+              <Text style={styles.completionTitleText}>프로필 완성도</Text>
+            </View>
+            <Text style={styles.helpText}>프로필이 완성될수록 더 많은 기업에게 노출됩니다</Text>
+            <View style={styles.completionBar}>
+              <View style={[styles.completionFill, { width: '0%' }]} />
+            </View>
+          </View>
+          <Text style={styles.completionPercentage}>0%</Text>
+        </View>
+
+        <View style={styles.formSection}>
+          <View style={styles.sectionHeader}>
+            <FontAwesome5 name="building" size={18} color="#0066CC" />
+            <Text style={styles.sectionTitle}>기본 정보</Text>
+          </View>
+
+          <View style={styles.formGrid}>
+            <View style={styles.formGroup}>
+              <Text style={styles.label}>회사명 <Text style={styles.required}>*</Text></Text>
+              <TextInput style={styles.input} value={companyName} onChangeText={setCompanyName} placeholder="회사명을 입력하세요" />
+              <Text style={styles.helpText}>사업자등록증 상의 정확한 상호를 입력해주세요.</Text>
+            </View>
+
+            <View style={styles.formGroup}>
+              <Text style={styles.label}>사업자등록번호 <Text style={styles.required}>*</Text></Text>
+              <TextInput style={styles.input} value={bizRegNo} onChangeText={setBizRegNo} placeholder="000-00-00000" keyboardType="numeric" />
+            </View>
+
+            <View style={styles.formGroup}>
+              <Text style={styles.label}>대표자명 <Text style={styles.required}>*</Text></Text>
+              <TextInput style={styles.input} value={ceoName} onChangeText={setCeoName} placeholder="대표자명을 입력하세요" />
+            </View>
+
+            <View style={styles.formGroup}>
+              <Text style={styles.label}>설립일 <Text style={styles.required}>*</Text></Text>
+              <TextInput style={styles.input} value={establishDate} onChangeText={setEstablishDate} placeholder="YYYY-MM-DD" />
+            </View>
+
+            <View style={styles.formGroup}>
+              <Text style={styles.label}>산업 분류 <Text style={styles.required}>*</Text></Text>
+              <TouchableOpacity style={styles.input} onPress={() => setShowIndustryDropdown(true)}>
+                <Text style={industry ? styles.dropdownText : styles.dropdownPlaceholder}>
+                  {industryOptions.find(opt => opt.value === industry)?.label || '선택해주세요'}
+                </Text>
+                <FontAwesome5 name="chevron-down" size={16} color="#666" />
+              </TouchableOpacity>
+              {renderDropdown(showIndustryDropdown, () => setShowIndustryDropdown(false), industryOptions, industry, setIndustry)}
+            </View>
+
+            <View style={styles.formGroup}>
+              <Text style={styles.label}>직원 수 <Text style={styles.required}>*</Text></Text>
+              <TouchableOpacity style={styles.input} onPress={() => setShowEmployeesDropdown(true)}>
+                <Text style={employees ? styles.dropdownText : styles.dropdownPlaceholder}>
+                  {employeesOptions.find(opt => opt.value === employees)?.label || '선택해주세요'}
+                </Text>
+                <FontAwesome5 name="chevron-down" size={16} color="#666" />
+              </TouchableOpacity>
+              {renderDropdown(showEmployeesDropdown, () => setShowEmployeesDropdown(false), employeesOptions, employees, setEmployees)}
+            </View>
+
+            <View style={[styles.formGroup, styles.fullWidth]}>
+              <Text style={styles.label}>주소 <Text style={styles.required}>*</Text></Text>
+              <View style={styles.inputGroup}>
+                <TextInput style={[styles.input, { flex: 1 }]} value={postcode} onChangeText={setPostcode} placeholder="우편번호" editable={false} />
+                <TouchableOpacity style={styles.secondaryButton}>
+                  <Text style={styles.secondaryButtonText}>주소 찾기</Text>
+                </TouchableOpacity>
+              </View>
+              <TextInput style={[styles.input, styles.marginTop]} value={address} onChangeText={setAddress} placeholder="기본 주소" />
+              <TextInput style={[styles.input, styles.marginTop]} value={detailAddress} onChangeText={setDetailAddress} placeholder="상세 주소" />
+            </View>
+
+            <View style={[styles.formGroup, styles.fullWidth]}>
+              <View style={{ flexDirection: 'row', gap: 10 }}>
+                <TouchableOpacity style={[styles.primaryButton, { flex: 1 }]} onPress={addContactPerson}>
+                  <FontAwesome5 name="plus" size={16} color="white" />
+                  <Text style={styles.primaryButtonText}>수동 담당자 추가</Text>
+                </TouchableOpacity>
+                {currentUser && !loadingUser ? (
+                  <TouchableOpacity style={[styles.primaryButton, { flex: 1, backgroundColor: '#28a745' }]} onPress={addCurrentUserAsContact}>
+                    <FontAwesome5 name="user" size={16} color="white" />
+                    <Text style={styles.primaryButtonText}>내 정보 추가</Text>
+                  </TouchableOpacity>
+                ) : loadingUser ? (
+                  <View style={[styles.primaryButton, { flex: 1, backgroundColor: '#6c757d' }]}>
+                    <ActivityIndicator size="small" color="white" />
+                    <Text style={styles.primaryButtonText}>로딩 중...</Text>
+                  </View>
+                ) : null}
+              </View>
+              {currentUser && !loadingUser && (
+                <View style={{ marginTop: 10, padding: 10, backgroundColor: '#f8f9fa', borderRadius: 6 }}>
+                  <Text style={{ fontSize: 12, color: '#666', marginBottom: 5 }}>현재 로그인된 사용자:</Text>
+                  <Text style={{ fontSize: 14, fontWeight: '600' }}>{currentUser.name} ({currentUser.email})</Text>
+                  {currentUser.phone && (<Text style={{ fontSize: 12, color: '#666' }}>{currentUser.phone}</Text>)}
+                </View>
+              )}
+            </View>
+
+            {contactPersons.map((person, index) => (
+              <View key={index} style={[styles.formGroup, styles.fullWidth, { marginTop: 10, padding: 10, borderWidth: 1, borderColor: '#eee', borderRadius: 6 }]}>
+                <Text style={styles.label}>담당자 {index + 1}</Text>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                  <TextInput style={[styles.input, { flex: 1, marginRight: 10 }]} value={person.name} onChangeText={(v) => updateContactPerson(index, 'name', v)} placeholder="성함" />
+                  <TextInput style={[styles.input, { flex: 1 }]} value={person.position} onChangeText={(v) => updateContactPerson(index, 'position', v)} placeholder="직책" />
+                </View>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
+                  <TextInput style={[styles.input, { flex: 1, marginRight: 10 }]} value={person.email} onChangeText={(v) => updateContactPerson(index, 'email', v)} placeholder="이메일" keyboardType="email-address" />
+                  <TextInput style={[styles.input, { flex: 1 }]} value={person.phone} onChangeText={(v) => updateContactPerson(index, 'phone', v)} placeholder="연락처" keyboardType="phone-pad" />
+                </View>
+                <View style={{ alignItems: 'flex-end', marginTop: 10 }}>
+                  <TouchableOpacity onPress={() => removeContactPerson(index)} style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <FontAwesome5 name="minus" size={16} color="red" />
+                    <Text style={{ marginLeft: 6, color: 'red' }}>제거</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            ))}
+
+            <View style={[styles.formGroup, styles.fullWidth]}>
+              <View style={styles.sectionHeader}>
+                <FontAwesome5 name="heart" size={16} color="#0066CC" />
+                <Text style={styles.label}>산업분야</Text>
+                <Text style={styles.helpText}>중복 선택 가능</Text>
+              </View>
+              <View style={styles.interestContainer}>
+                {mockupData.filters.industury.map((ind, index) => (
+                  <TouchableOpacity key={index} style={[styles.interestTag, selectedIndustries.includes(ind) && styles.interestTagSelected]} onPress={() => toggleIndustry(ind)}>
+                    <View style={styles.interestTagContent}>
+                      <FontAwesome5 name={(() => {
+                        switch (ind) {
+                          case '전체': return 'th-large';
+                          case '금융': return 'won-sign';
+                          case '의료': return 'briefcase-medical';
+                          case '제조': return 'industry';
+                          case 'IT': return 'laptop-code';
+                          case '공공': return 'university';
+                          case '유통': return 'store';
+                          case '교육': return 'graduation-cap';
+                          case '물류': return 'truck';
+                          case '환경': return 'leaf';
+                          case '식품': return 'apple-alt';
+                          default: return 'tags';
+                        }
+                      })()} size={12} color={selectedIndustries.includes(ind) ? '#fff' : '#0066CC'} />
+                      <Text style={[styles.interestTagText, selectedIndustries.includes(ind) && styles.interestTagTextSelected]}>{ind}</Text>
+                    </View>
+                    {selectedIndustries.includes(ind) && (<FontAwesome5 name="check-circle" size={12} color="#fff" />)}
+                  </TouchableOpacity>
+                ))}
+              </View>
+              {selectedIndustries.length > 0 && (
+                <View style={styles.selectedInterests}>
+                  <Text style={styles.selectedInterestsLabel}>선택된 산업분야:</Text>
+                  <View style={styles.selectedInterestsContainer}>
+                    {selectedIndustries.map((ind, index) => (
+                      <View key={index} style={styles.selectedInterestChip}>
+                        <Text style={styles.selectedInterestText}>{ind}</Text>
+                        <TouchableOpacity onPress={() => toggleIndustry(ind)} style={styles.removeInterestButton}>
+                          <FontAwesome5 name="times" size={12} color="#fff" />
+                        </TouchableOpacity>
+                      </View>
+                    ))}
+                  </View>
+                </View>
+              )}
+            </View>
+          </View>
+        </View>
+
+        <View style={styles.formSection}>
+          <View style={styles.sectionHeader}>
+            <FontAwesome5 name="tags" size={18} color="#0066CC" />
+            <Text style={styles.sectionTitle}>관심 분야</Text>
+          </View>
+          <View style={styles.formGroup}>
+            <Text style={styles.label}>관심 분야 선택</Text>
+            <Text style={styles.helpText}>중복 선택 가능. 선택된 항목은 아래 '보유 인증'에 자동으로 추가됩니다.</Text>
+          </View>
+          <View style={styles.interestContainer}>
+            {certTypeOptions.filter(opt => opt.value).map(opt => (
+              <TouchableOpacity key={opt.value} style={[styles.interestTag, selectedCertTypes.includes(opt.value) && styles.interestTagSelected]} onPress={() => toggleSelectCertType(opt.value)}>
+                <View style={styles.interestTagContent}>
+                  <FontAwesome5 name={selectedCertTypes.includes(opt.value) ? 'check-circle' : 'certificate'} size={14} color={selectedCertTypes.includes(opt.value) ? '#fff' : '#0066CC'} />
+                  <Text style={[styles.interestTagText, selectedCertTypes.includes(opt.value) && styles.interestTagTextSelected]}>{opt.label}</Text>
+                </View>
+                {selectedCertTypes.includes(opt.value) && (<FontAwesome5 name="check-circle" size={14} color="#fff" />)}
+              </TouchableOpacity>
+            ))}
+          </View>
+          {selectedCertTypes.length > 0 && (
+            <View style={styles.selectedInterests}>
+              <Text style={styles.selectedInterestsLabel}>선택된 관심 분야:</Text>
+              <View style={styles.selectedInterestsContainer}>
+                {selectedCertTypes.map(type => {
+                  const label = certTypeOptions.find(opt => opt.value === type)?.label || type;
+                  return (
+                    <View key={`type_${type}`} style={styles.selectedInterestChip}>
+                      <Text style={styles.selectedInterestText}>{label}</Text>
+                      <TouchableOpacity onPress={() => toggleSelectCertType(type)} style={styles.removeInterestButton}>
+                        <FontAwesome5 name="times" size={12} color="#fff" />
+                      </TouchableOpacity>
+                    </View>
+                  );
+                })}
+              </View>
+            </View>
+          )}
+        </View>
+
+        <View style={styles.formSection}>
+          <View style={styles.sectionHeader}>
+            <FontAwesome5 name="shield-alt" size={18} color="#0066CC" />
+            <Text style={styles.sectionTitle}>보유 인증</Text>
+          </View>
+          <View style={[styles.formGroup, styles.fullWidth]}>
+            <TouchableOpacity style={styles.primaryButton} onPress={addCertInfo}>
+              <FontAwesome5 name="plus" size={16} color="#fff" />
+              <Text style={styles.primaryButtonText}>보유 인증 추가</Text>
+            </TouchableOpacity>
+          </View>
+          {certInfos.map((ci, index) => (
+            <View key={ci.id} style={styles.certItemContainer}>
+              <View style={styles.certItemHeader}>
+                <Text style={{ fontWeight: '600', color: '#333' }}>인증 항목 {index + 1}</Text>
+                <TouchableOpacity style={styles.removeCertButton} onPress={() => removeCertInfo(ci.id)}>
+                  <FontAwesome5 name="minus" size={14} color="red" />
+                  <Text style={{ marginLeft: 6, color: 'red' }}>제거</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.formGrid}>
+                <View style={styles.formGroup}>
+                  <Text style={styles.label}>인증 명 <Text style={styles.required}>*</Text></Text>
+                  <TouchableOpacity style={styles.input} onPress={() => setOpenCertTypeDropdownIndex(index)}>
+                    <Text style={ci.certType ? styles.dropdownText : styles.dropdownPlaceholder}>
+                      {certTypeOptions.find(opt => opt.value === ci.certType)?.label || '선택해주세요'}
+                    </Text>
+                    <FontAwesome5 name="chevron-down" size={16} color="#666" />
+                  </TouchableOpacity>
+                  {renderDropdown(openCertTypeDropdownIndex === index, () => setOpenCertTypeDropdownIndex(null), certTypeOptions, ci.certType, (value: string) => updateCertInfo(ci.id, { certType: value }))}
+                </View>
+                <View style={styles.formGroup}>
+                  <Text style={styles.label}>심사 유형</Text>
+                  <TouchableOpacity style={styles.input} onPress={() => setOpenAuditTypeDropdownIndex(index)}>
+                    <Text style={ci.auditType ? styles.dropdownText : styles.dropdownPlaceholder}>
+                      {auditTypeOptions.find(opt => opt.value === ci.auditType)?.label || '선택해주세요'}
+                    </Text>
+                    <FontAwesome5 name="chevron-down" size={16} color="#666" />
+                  </TouchableOpacity>
+                  {renderDropdown(openAuditTypeDropdownIndex === index, () => setOpenAuditTypeDropdownIndex(null), auditTypeOptions, ci.auditType, (value: string) => updateCertInfo(ci.id, { auditType: value }))}
+                </View>
+                <View style={styles.formGroup}>
+                  <Text style={styles.label}>희망 심사일 <Text style={styles.required}>*</Text></Text>
+                  <TextInput style={styles.input} value={ci.desiredDate} onChangeText={(v) => updateCertInfo(ci.id, { desiredDate: v })} placeholder="YYYY-MM-DD" />
+                  <Text style={styles.helpText}>최소 3개월 이후의 날짜를 선택해주세요.</Text>
+                </View>
+                <View style={styles.formGroup}>
+                  <Text style={styles.label}>인증 등급</Text>
+                  <TouchableOpacity style={styles.input} onPress={() => setOpenCertLevelDropdownIndex(index)}>
+                    <Text style={ci.certLevel ? styles.dropdownText : styles.dropdownPlaceholder}>
+                      {certLevelOptions.find(opt => opt.value === ci.certLevel)?.label || '선택해주세요'}
+                    </Text>
+                    <FontAwesome5 name="chevron-down" size={16} color="#666" />
+                  </TouchableOpacity>
+                  {renderDropdown(openCertLevelDropdownIndex === index, () => setOpenCertLevelDropdownIndex(null), certLevelOptions, ci.certLevel, (value: string) => updateCertInfo(ci.id, { certLevel: value }))}
+                </View>
+                <View style={[styles.formGroup, styles.fullWidth]}>
+                  <Text style={styles.label}>인증 범위</Text>
+                  <TextInput style={[styles.input, styles.textArea]} value={ci.certScope} onChangeText={(v) => updateCertInfo(ci.id, { certScope: v })} multiline numberOfLines={3} placeholder="인증 적용 범위를 간단히 작성하세요" />
+                </View>
+                <View style={[styles.formGroup, styles.fullWidth]}>
+                  <Text style={styles.label}>증빙자료</Text>
+                  <TouchableOpacity style={styles.fileUpload} onPress={() => pickCertFile(ci.id)}>
+                    <FontAwesome5 name="cloud-upload-alt" size={32} color="#0066CC" />
+                    <Text style={styles.fileUploadText}>파일을 클릭하여 업로드하세요</Text>
+                    <View style={styles.fileUploadButton}><Text style={styles.fileUploadButtonText}>파일 선택</Text></View>
+                  </TouchableOpacity>
+                  {ci.files.length > 0 && (
+                    <View style={styles.fileList}>
+                      {ci.files.map((f, i) => (
+                        <View key={`${ci.id}_file_${i}`} style={styles.fileItem}>
+                          <Text style={styles.fileName}>{f.name}</Text>
+                          <TouchableOpacity onPress={() => removeCertFile(ci.id, i)}><Text style={styles.fileRemove}>삭제</Text></TouchableOpacity>
+                        </View>
+                      ))}
+                    </View>
+                  )}
+                </View>
+              </View>
+            </View>
+          ))}
+        </View>
+
+        <View style={styles.formSection}>
+          <View style={styles.sectionHeader}>
+            <FontAwesome5 name="file-upload" size={18} color="#0066CC" />
+            <Text style={styles.sectionTitle}>필수 서류 제출</Text>
+          </View>
+          <View style={styles.infoCard}>
+            <View style={styles.infoCardTitle}><FontAwesome5 name="exclamation-triangle" size={16} color="#0066CC" /><Text style={styles.infoCardTitleText}>서류 제출 주의사항</Text></View>
+            <Text style={styles.infoCardContent}>모든 서류는 최신 버전으로 제출해야 하며, PDF 형식을 권장합니다. 파일 크기는 개당 10MB를 초과할 수 없습니다.</Text>
+          </View>
+          <View style={styles.formGrid}>
+            <View style={[styles.formGroup, styles.fullWidth]}>
+              <Text style={styles.label}>사업자등록증 <Text style={styles.required}>*</Text></Text>
+              <TouchableOpacity style={styles.fileUpload}>
+                <FontAwesome5 name="cloud-upload-alt" size={32} color="#0066CC" />
+                <Text style={styles.fileUploadText}>파일을 드래그하거나 클릭하여 업로드하세요</Text>
+                <View style={styles.fileUploadButton}><Text style={styles.fileUploadButtonText}>파일 선택</Text></View>
+              </TouchableOpacity>
+            </View>
+            <View style={[styles.formGroup, styles.fullWidth]}>
+              <Text style={styles.label}>회사 소개</Text>
+              <TouchableOpacity style={styles.fileUpload}>
+                <FontAwesome5 name="cloud-upload-alt" size={32} color="#0066CC" />
+                <Text style={styles.fileUploadText}>파일을 드래그하거나 클릭하여 업로드하세요</Text>
+                <View style={styles.fileUploadButton}><Text style={styles.fileUploadButtonText}>파일 선택</Text></View>
+              </TouchableOpacity>
+            </View>
+          </View>
+          <View>
+            <View style={[styles.formGroup, styles.fullWidth]}>
+              <Text style={styles.label}>인증 서류</Text>
+              <TouchableOpacity style={styles.fileUpload}>
+                <FontAwesome5 name="cloud-upload-alt" size={32} color="#0066CC" />
+                <Text style={styles.fileUploadText}>파일을 드래그하거나 클릭하여 업로드하세요</Text>
+                <View style={styles.fileUploadButton}><Text style={styles.fileUploadButtonText}>파일 선택</Text></View>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+
+        <View style={styles.formSection}>
+          <View style={styles.sectionHeader}>
+            <FontAwesome5 name="check-square" size={18} color="#0066CC" />
+            <Text style={styles.sectionTitle}>약관 동의</Text>
+          </View>
+          <View style={styles.formGrid}>
+            <View style={[styles.formGroup, styles.fullWidth]}>
+              <TouchableOpacity style={styles.checkboxItem} onPress={() => setTerms1(!terms1)}>
+                <FontAwesome5 name={terms1 ? 'check-square' : 'square'} size={16} color="#0066CC" />
+                <Text style={styles.checkboxLabel}>개인정보 수집 및 이용에 동의 <Text style={styles.required}>*</Text></Text>
+              </TouchableOpacity>
+              <Text style={styles.helpText}>수집된 개인정보는 심사 진행 및 결과 통보 목적으로만 사용됩니다.</Text>
+            </View>
+            <View style={[styles.formGroup, styles.fullWidth]}>
+              <TouchableOpacity style={styles.checkboxItem} onPress={() => setTerms2(!terms2)}>
+                <FontAwesome5 name={terms2 ? 'check-square' : 'square'} size={16} color="#0066CC" />
+                <Text style={styles.checkboxLabel}>심사 규정 및 절차에 동의 <Text style={styles.required}>*</Text></Text>
+              </TouchableOpacity>
+            </View>
+            <View style={[styles.formGroup, styles.fullWidth]}>
+              <TouchableOpacity style={styles.checkboxItem} onPress={() => setTerms3(!terms3)}>
+                <FontAwesome5 name={terms3 ? 'check-square' : 'square'} size={16} color="#0066CC" />
+                <Text style={styles.checkboxLabel}>제출 서류의 진실성 확인 <Text style={styles.required}>*</Text></Text>
+              </TouchableOpacity>
+              <Text style={styles.helpText}>허위 서류 제출 시 인증이 취소될 수 있습니다.</Text>
+            </View>
+          </View>
+        </View>
+
+        <View style={styles.formActions}>
+          <View></View>
+          <View style={styles.buttonGroup}>
+            <TouchableOpacity style={styles.secondaryButton} onPress={saveDraft}>
+              <FontAwesome5 name="save" size={16} color="#333" />
+              <Text style={styles.secondaryButtonText}>임시저장</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.primaryButton} onPress={handleUpdate}>
+              <FontAwesome5 name="check" size={16} color="#fff" />
+              <Text style={styles.primaryButtonText}>수정 저장</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+    </ScrollView>
+  );
+};
+
+export default CompanyRegistrationEdit;

@@ -3,16 +3,18 @@ import { StyleSheet } from 'react-native';
 const styles = StyleSheet.create({
   headerBar: {
     flexDirection: 'row', alignItems: 'center', gap: 10,
-    paddingHorizontal: 16, paddingVertical: 12, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#eee',
+    paddingHorizontal: 16, paddingVertical: 8, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#eee',
   },
   headerTitle: { fontSize: 16, fontWeight: '700', color: '#333' },
-  searchBar: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#f1f3f5', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8 },
+  searchBar: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#f1f3f5', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 },
   searchInput: { minWidth: 160 },
 
   tabHeader: { backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#eee' },
-  tabItem: { paddingHorizontal: 12, paddingVertical: 12 },
+  // Compact, uniform tab height
+  tabItem: { height: 34, paddingHorizontal: 12, alignItems: 'center', justifyContent: 'center' },
   tabItemActive: { borderBottomWidth: 2, borderBottomColor: '#4a6bdf' },
-  tabText: { fontSize: 14, color: '#666' },
+  // Slightly smaller label for compact look
+  tabText: { fontSize: 13, color: '#666' },
   tabTextActive: { color: '#4a6bdf', fontWeight: '600' },
 
   sectionHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 },

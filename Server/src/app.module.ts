@@ -7,6 +7,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { ExpertsModule } from './modules/experts/experts.module';
 import { CompaniesModule } from './modules/companies/companies.module';
+import { FileUploadModule } from './common/file-upload.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { CompaniesModule } from './modules/companies/companies.module';
     UsersModule,
     ExpertsModule,
     CompaniesModule,
+    FileUploadModule,
   ],
   controllers: [AppController],
   providers: [AppService],

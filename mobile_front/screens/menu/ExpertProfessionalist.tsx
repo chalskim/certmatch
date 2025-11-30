@@ -6,9 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
   FlatList,
-  Modal,
-  TextInput,
-  StyleSheet,
+  Modal
 } from 'react-native';
 
 import { styles } from '../styles/menu/ExpertProfessionalist';

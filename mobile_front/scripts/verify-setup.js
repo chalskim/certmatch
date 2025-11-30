@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 // Simple verification script to check if main components can be imported
-console.log('Verifying CertLine Mobile setup...');
+console.log('Verifying SuperSlice Mobile setup...');
 
 try {
   // Try importing main components

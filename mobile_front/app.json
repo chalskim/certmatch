@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "mobile_front",
-    "slug": "mobile_front",
+    "name": "SuperSlice",
+    "slug": "superslice",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -14,7 +14,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "io.adcluster.CertLine",
+      "bundleIdentifier": "io.adcluster.SuperSlice",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -26,13 +26,15 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.anonymous.mobile_front"
+      "package": "com.adcluster.SuperSlice"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
       "expo-font",
+      "expo-image-picker",
+      "expo-document-picker",
       [
         "expo-build-properties",
         {

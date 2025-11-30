@@ -21,7 +21,7 @@ export class AppController {
     return {
       status: 'ok',
       timestamp: new Date().toISOString(),
-      service: 'CertMatch Backend API',
+      service: 'SuperSlice Backend API',
       version: '1.0.0',
     };
   }

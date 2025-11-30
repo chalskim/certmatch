@@ -3,6 +3,7 @@ import { View, Text, ScrollView, Image, TouchableOpacity, Modal, TextInput } fro
 import { useNavigation, useRoute } from '@react-navigation/native';
 import SubformHeader from '../components/SubformHeader';
 import { styles } from '../styles/menu/ExpertRecruitmentListDetail';
+import { Images } from '../../assets/index';
 
 type JobPosting = {
   id: number;
@@ -159,8 +160,8 @@ export default function ExpertRecruitmentListDetail() {
 
         {/* Office images */}
         <View style={styles.officeImages}>
-        <Image source={require('../../assets/icon/office1.jpg')} style={styles.officeImage} />
-        <Image source={require('../../assets/icon/office2.jpg')} style={styles.officeImage} />
+          <Image source={Images.office1} style={styles.officeImage} />
+          <Image source={Images.office2} style={styles.officeImage} />
         </View>
 
         {/* Tabs */}

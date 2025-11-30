@@ -3,6 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../../prisma/prisma.service';
+import { code_state_enum } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -13,43 +14,36 @@ export class AuthService {
   ) {}
 
   async validateUser(email: string, password: string): Promise<any> {
-    try {
-      // First check if user exists using raw SQL
-      const userResult: any = await this.prisma.$queryRaw`
-        SELECT user_id, email, password_hash, name, user_type as role, is_active
-        FROM public.users
-        WHERE email = ${email}
-        AND is_active = true
-        AND deleted_at IS NULL
-      `;
+    const user = await this.prisma.user.findFirst({
+      where: {
+        user_email: email,
+        user_state: 'active' as code_state_enum,
+        user_deleted_at: null,
+      },
+      select: {
+        id: true,
+        user_email: true,
+        user_password_hash: true,
+        user_display_name: true,
+      },
+    });
 
-      if (userResult.length === 0) {
-        // User doesn't exist
-        return null;
-      }
-
-      const user = userResult[0];
-      
-      // Verify password using bcrypt
-      const isPasswordValid = await bcrypt.compare(password, user.password_hash);
-      
-      if (isPasswordValid) {
-        // Return user object without password
-        const { password_hash, ...result } = user;
-        return {
-          id: user.user_id,
-          email: user.email,
-          name: user.name,
-          role: user.role,
-          isActive: user.is_active
-        };
-      }
-      
-      return null;
-    } catch (error) {
-      console.error('Error validating user:', error);
+    if (!user) {
       return null;
     }
+
+    const isPasswordValid = await bcrypt.compare(password, user.user_password_hash);
+    if (!isPasswordValid) {
+      return null;
+    }
+
+    return {
+      id: user.id,
+      email: user.user_email,
+      name: user.user_display_name,
+      role: 'USER',
+      isActive: true,
+    };
   }
 
   async login(user: any) {
@@ -66,18 +60,31 @@ export class AuthService {
   }
 
   async register(createUserDto: any) {
-    const existingUser = await this.usersService.findByEmail(createUserDto.email);
-    if (existingUser) {
+    const exists = await this.prisma.user.count({
+      where: { user_email: createUserDto.email, user_deleted_at: null },
+    });
+    if (exists > 0) {
       throw new UnauthorizedException('User already exists');
     }
 
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
-    const user = await this.usersService.create({
-      ...createUserDto,
-      password: hashedPassword,
+    const created = await this.prisma.user.create({
+      data: {
+        user_email: createUserDto.email,
+        user_password_hash: hashedPassword,
+        user_password_algo: 'bcrypt',
+        user_display_name: createUserDto.name ?? null,
+        user_email_verified: false,
+        user_state: 'active' as code_state_enum,
+      },
+      select: { id: true, user_email: true, user_display_name: true },
     });
 
-    const { password, ...result } = user;
-    return this.login(result);
+    return this.login({
+      id: created.id,
+      email: created.user_email,
+      name: created.user_display_name,
+      role: 'USER',
+    });
   }
 }

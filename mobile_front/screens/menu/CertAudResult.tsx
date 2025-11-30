@@ -6,13 +6,15 @@ import {
   TouchableOpacity,
   ScrollView,
   TextInput,
-  StyleSheet,
   Alert,
   FlatList,
-  Modal
+  Modal,
+  Platform
 } from 'react-native';
 import { Ionicons, FontAwesome5, MaterialIcons } from '@expo/vector-icons';
 import styles from '../styles/menu/CertAudResult';
+import SubformHeader from '../components/SubformHeader';
+import mockupData from '../data/mokup.json';
 
 // Map status values to corresponding style objects to satisfy TypeScript and avoid hyphenated keys
 type AnnouncementStatus = 'recruiting' | 'closed';
@@ -33,7 +35,7 @@ const statusStyleMap: Record<AuditStatus | AnnouncementStatus, any> = {
 type AuditStatus = 'requested' | 'scheduled' | 'in-progress' | 'reporting' | 'completed' | 
                   'applied' | 'accepted' | 'rejected' | 'recruiting';
 
-type CertificationType = 'isms-p' | 'iso27001' | 'iso27701' | 'iso20000' | 'iso22301' | 'pims';
+type CertificationType = string;
 
 type AuditApplication = {
   id: string;
@@ -70,7 +72,8 @@ interface AuditAnnouncement {
 
 interface FilterState {
   certificationType: CertificationType | null;
-  location: string;
+  dateFrom: string;
+  dateTo: string;
   status: AuditStatus | null;
   searchKeyword: string;
 }
@@ -82,10 +85,13 @@ const CertAudResult = ({ navigation }: any) => {
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [filters, setFilters] = useState<FilterState>({
     certificationType: null,
-    location: '',
+    dateFrom: '',
+    dateTo: '',
     status: null,
     searchKeyword: ''
   });
+  const [showFromPicker, setShowFromPicker] = useState(false);
+  const [showToPicker, setShowToPicker] = useState(false);
 
   // Mock data for audit announcements
   const [auditAnnouncements, setAuditAnnouncements] = useState<AuditAnnouncement[]>([
@@ -168,13 +174,14 @@ const CertAudResult = ({ navigation }: any) => {
   const filteredAnnouncements = auditAnnouncements.filter(announcement => {
     const matchesCertification = !filters.certificationType || 
       announcement.certificationType === filters.certificationType;
-    const matchesLocation = !filters.location || 
-      announcement.location.includes(filters.location);
+    const d = new Date(announcement.deadline);
+    const fromOk = !filters.dateFrom || d >= new Date(filters.dateFrom);
+    const toOk = !filters.dateTo || d <= new Date(filters.dateTo);
     const matchesKeyword = !filters.searchKeyword || 
       announcement.projectTitle.toLowerCase().includes(filters.searchKeyword.toLowerCase()) ||
       announcement.companyName.toLowerCase().includes(filters.searchKeyword.toLowerCase());
     
-    return matchesCertification && matchesLocation && matchesKeyword;
+    return matchesCertification && fromOk && toOk && matchesKeyword;
   });
 
   // Handle filter changes
@@ -343,45 +350,84 @@ const CertAudResult = ({ navigation }: any) => {
           
           <View style={styles.filterGroup}>
             <Text style={styles.filterLabel}>인증 종류</Text>
-            <View style={styles.filterTags}>
-              {[
-                { value: 'isms-p', label: 'ISMS-P' },
-                { value: 'iso27001', label: 'ISO 27001' },
-                { value: 'iso27701', label: 'ISO 27701' },
-                { value: 'iso20000', label: 'ISO 20000' },
-                { value: 'iso22301', label: 'ISO 22301' },
-                { value: 'pims', label: 'PIMS' }
-              ].map((item) => (
-                <TouchableOpacity
-                  key={item.value}
-                  style={[
-                    styles.filterTag,
-                    filters.certificationType === item.value && styles.filterTagSelected
-                  ]}
-                  onPress={() => handleFilterChange('certificationType', 
-                    filters.certificationType === item.value ? null : item.value
-                  )}
-                >
-                  <Text style={[
-                    styles.filterTagText,
-                    filters.certificationType === item.value && styles.filterTagTextSelected
-                  ]}>
-                    {item.label}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
+          <View style={styles.filterTags}>
+            {mockupData.filters.categories.map((cat) => (
+              <TouchableOpacity
+                key={cat}
+                style={[
+                  styles.filterTag,
+                  filters.certificationType === cat && styles.filterTagSelected
+                ]}
+                onPress={() => handleFilterChange('certificationType', 
+                  filters.certificationType === cat ? null : cat
+                )}
+              >
+                <Text style={[
+                  styles.filterTagText,
+                  filters.certificationType === cat && styles.filterTagTextSelected
+                ]}>
+                  {cat}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
           </View>
           
           <View style={styles.filterGroup}>
-            <Text style={styles.filterLabel}>지역</Text>
-            <TextInput
-              style={styles.filterInput}
-              placeholder="지역명 입력"
-              value={filters.location}
-              onChangeText={(text) => handleFilterChange('location', text)}
-            />
+            <Text style={styles.filterLabel}>기간</Text>
+            <View style={{ flexDirection: 'row', gap: 10 }}>
+              <TextInput
+                style={[styles.filterInput, { flex: 1 }]}
+                placeholder="From: YYYY-MM-DD"
+                value={filters.dateFrom}
+                onChangeText={(text) => handleFilterChange('dateFrom', text)}
+              />
+              {Platform.OS !== 'web' && (
+                <TouchableOpacity onPress={() => setShowFromPicker(true)} style={{ paddingHorizontal: 10, justifyContent: 'center' }}>
+                  <FontAwesome5 name="calendar-alt" size={16} color="#666" />
+                </TouchableOpacity>
+              )}
+              <TextInput
+                style={[styles.filterInput, { flex: 1 }]}
+                placeholder="To: YYYY-MM-DD"
+                value={filters.dateTo}
+                onChangeText={(text) => handleFilterChange('dateTo', text)}
+              />
+              {Platform.OS !== 'web' && (
+                <TouchableOpacity onPress={() => setShowToPicker(true)} style={{ paddingHorizontal: 10, justifyContent: 'center' }}>
+                  <FontAwesome5 name="calendar-alt" size={16} color="#666" />
+                </TouchableOpacity>
+              )}
+            </View>
           </View>
+          {Platform.OS !== 'web' && showFromPicker && (
+            <DateTimePicker
+              value={filters.dateFrom ? new Date(filters.dateFrom) : new Date()}
+              mode="date"
+              display="calendar"
+              onChange={(event: any, date?: Date) => {
+                setShowFromPicker(false);
+                if (event.type === 'set' && date) {
+                  const iso = date.toISOString().split('T')[0];
+                  handleFilterChange('dateFrom', iso);
+                }
+              }}
+            />
+          )}
+          {Platform.OS !== 'web' && showToPicker && (
+            <DateTimePicker
+              value={filters.dateTo ? new Date(filters.dateTo) : new Date()}
+              mode="date"
+              display="calendar"
+              onChange={(event: any, date?: Date) => {
+                setShowToPicker(false);
+                if (event.type === 'set' && date) {
+                  const iso = date.toISOString().split('T')[0];
+                  handleFilterChange('dateTo', iso);
+                }
+              }}
+            />
+          )}
         </View>
       </View>
 
@@ -521,21 +567,7 @@ const CertAudResult = ({ navigation }: any) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity 
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-          <Ionicons name="arrow-back" size={24} color="#333" />
-        </TouchableOpacity>
-        <Text style={styles.pageTitle}>심사 지원/결과</Text>
-        <View style={styles.headerIcons}>
-          <TouchableOpacity style={styles.headerIcon}>
-            <Ionicons name="notifications" size={24} color="#333" />
-          </TouchableOpacity>
-        </View>
-      </View>
+      <SubformHeader title="심사 지원/결과" navigation={navigation as any} onHome={() => navigation.navigate('Home')} />
 
       {/* Tab Navigation */}
       <View style={styles.tabNav}>
@@ -569,3 +601,4 @@ const CertAudResult = ({ navigation }: any) => {
 };
 
 export default CertAudResult;
+import DateTimePicker from '@react-native-community/datetimepicker';

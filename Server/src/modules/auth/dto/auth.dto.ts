@@ -1,6 +1,5 @@
 import { z } from 'zod';
 import { ApiProperty } from '@nestjs/swagger';
-import { user_type_enum } from '@prisma/client';
 
 // Zod 스키마 정의
 export const LoginSchema = z.object({
@@ -13,7 +12,6 @@ export const RegisterSchema = z.object({
   password: z.string().min(6, 'Password must be at least 6 characters'),
   name: z.string().min(2, 'Name must be at least 2 characters'),
   phone: z.string().regex(/^[0-9-+().\s]+$/, 'Invalid phone number format'),
-  role: z.nativeEnum(user_type_enum),
 });
 
 export const ChangePasswordSchema = z.object({
@@ -51,13 +49,6 @@ export class RegisterDto {
 
   @ApiProperty({ description: 'User phone number', example: '+82-10-1234-5678' })
   phone: string;
-
-  @ApiProperty({ 
-    description: 'User role', 
-    enum: user_type_enum,
-    example: user_type_enum.company 
-  })
-  role: user_type_enum;
 }
 
 export class ChangePasswordDto {
@@ -90,6 +81,5 @@ export class AuthResponseDto {
     id: string;
     email: string;
     name: string;
-    role: user_type_enum;
   };
 }

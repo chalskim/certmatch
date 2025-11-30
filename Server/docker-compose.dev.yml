@@ -4,10 +4,10 @@ services:
   # Development Database
   db:
     image: postgres:15-alpine
-    container_name: certmatch-db-dev
+    container_name: superslice-db-dev
     environment:
-      - POSTGRES_DB=certmatch_db
-      - POSTGRES_USER=certmatch_dev
+      - POSTGRES_DB=superslice_db
+      - POSTGRES_USER=superslice_dev
       - POSTGRES_PASSWORD=a770405z
     ports:
       - "5432:5432"
@@ -15,10 +15,10 @@ services:
       - postgres_dev_data:/var/lib/postgresql/data
       - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
     networks:
-      - certmatch-dev-network
+      - superslice-dev-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U certmatch_dev -d certmatch_db"]
+      test: ["CMD-SHELL", "pg_isready -U superslice_dev -d superslice_db"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -26,20 +26,20 @@ services:
   # Test Database
   db-test:
     image: postgres:15-alpine
-    container_name: certmatch-db-test
+    container_name: superslice-db-test
     environment:
-      - POSTGRES_DB=certmatch_test
-      - POSTGRES_USER=certmatch
+      - POSTGRES_DB=superslice_test
+      - POSTGRES_USER=superslice
       - POSTGRES_PASSWORD=password
     ports:
       - "5433:5432"
     volumes:
       - postgres_test_data:/var/lib/postgresql/data
     networks:
-      - certmatch-dev-network
+      - superslice-dev-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U certmatch -d certmatch_test"]
+      test: ["CMD-SHELL", "pg_isready -U superslice -d superslice_test"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -47,20 +47,20 @@ services:
   # Redis for Development
   redis:
     image: redis:7-alpine
-    container_name: certmatch-redis-dev
+    container_name: superslice-redis-dev
     ports:
       - "6379:6379"
     volumes:
       - redis_dev_data:/data
     networks:
-      - certmatch-dev-network
+      - superslice-dev-network
     restart: unless-stopped
     command: redis-server --appendonly yes
 
   # Adminer for Database Management
   adminer:
     image: adminer:latest
-    container_name: certmatch-adminer
+    container_name: superslice-adminer
     ports:
       - "8080:8080"
     environment:
@@ -68,18 +68,18 @@ services:
     depends_on:
       - db
     networks:
-      - certmatch-dev-network
+      - superslice-dev-network
     restart: unless-stopped
 
   # MailHog for Email Testing
   mailhog:
     image: mailhog/mailhog:latest
-    container_name: certmatch-mailhog
+    container_name: superslice-mailhog
     ports:
       - "1025:1025"  # SMTP server
       - "8025:8025"  # Web UI
     networks:
-      - certmatch-dev-network
+      - superslice-dev-network
     restart: unless-stopped
 
 volumes:
@@ -91,5 +91,5 @@ volumes:
     driver: local
 
 networks:
-  certmatch-dev-network:
+  superslice-dev-network:
     driver: bridge

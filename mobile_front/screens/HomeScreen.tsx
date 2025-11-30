@@ -52,7 +52,7 @@ export const HomeScreen: React.FC = () => {
     <ScrollView contentContainerStyle={styles.container}>
       {/* Search Section */}
       <View style={styles.searchSection}>
-        <Text style={styles.searchTitle}>인증도 스마트하게, CertLine와 함께</Text>
+        <Text style={styles.searchTitle}>인증도 스마트하게, SuperSlice와 함께</Text>
         <View style={styles.searchBar}>
           <TextInput placeholder="컨설턴트, 교육과정, 인증 검색..." style={styles.searchInput} />
           <TouchableOpacity style={styles.searchButton}>

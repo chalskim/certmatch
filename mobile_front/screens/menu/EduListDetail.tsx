@@ -13,7 +13,8 @@ import type { ImageStyle } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import SubformHeader from '../components/SubformHeader';
-import {styles, colors} from '../styles/menu/EduListDetail';
+import { styles, colors } from '../styles/menu/EduListDetail';
+import { Images } from '../../assets/index';
 
 type TabKey = 'overview' | 'instructor' | 'benefits' | 'reviews';
 
@@ -39,7 +40,7 @@ const EduListDetail: React.FC = () => {
       rating: 4.8,
       ratingCount: 156,
       // 로컬 이미지로 교체
-      hero: require('../../assets/icon/isms-course-hero.jpg'),
+      hero: Images.ismsCourseHero,
     }),
     []
   );
@@ -91,21 +92,21 @@ const EduListDetail: React.FC = () => {
       org: '한국인터넷진흥원 정보보호진흥팀',
       desc: 'ISMS-P 제도 기획 및 심사 기준 개발 총괄. 정보보호 분야 20년 경력. 저서 「정보보호관리체계 구축 가이드」。',
       // 로컬 아바타 이미지로 교체
-      avatar: require('../../assets/icon/instructor1.jpg'),
+      avatar: Images.instructor1,
       badges: ['ISMS-P 심사원', 'CISSP', '정보보호전문가'],
     },
     {
       name: '이영희 교수',
       org: '한국정보보호학회 부회장',
       desc: '한국대학교 정보보호학과 교수. 정보보호 정책 및 법규 전문가. 다수 정부 기관 자문위원 역임.',
-      avatar: require('../../assets/icon/instructor2.jpg'),
+      avatar: Images.instructor2,
       badges: ['법학박사', '개인정보보호전문가'],
     },
     {
       name: '김민준 수석컨설턴트',
       org: '㈜시큐리티파트너스',
       desc: '대기업 및 공공기관 ISMS-P 인증 컨설팅 100건 이상 수행. 실무 중심의 생생한 사례 중심 강의.',
-      avatar: require('../../assets/icon/instructor3.jpg'),
+      avatar: Images.instructor3,
       badges: ['ISO 27001 LA', 'PIMS 전문가'],
     },
   ];
@@ -198,8 +199,8 @@ const EduListDetail: React.FC = () => {
                         b.type === 'new'
                           ? styles.badgeNew
                           : b.type === 'popular'
-                          ? styles.badgePopular
-                          : styles.badgeDefault,
+                            ? styles.badgePopular
+                            : styles.badgeDefault,
                       ]}
                     >
                       <Text
@@ -222,7 +223,7 @@ const EduListDetail: React.FC = () => {
                     <FontAwesome5 name="bookmark" size={18} color={colors.primary} style={styles.btnIcon} />
                     <Text style={styles.btnOutlineText}>{bookmark ? '저장됨' : '저장'}</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={styles.btnSecondary} onPress={() => {}}>
+                  <TouchableOpacity style={styles.btnSecondary} onPress={() => { }}>
                     <FontAwesome5 name="share-alt" size={18} color={colors.lightGray} style={styles.btnIcon} />
                     <Text style={styles.btnSecondaryText}>공유</Text>
                   </TouchableOpacity>
@@ -414,22 +415,22 @@ const EduListDetail: React.FC = () => {
 
         {/* 하단 제공기관 + 이런 교육은 어떠세요? */}
         <View style={styles.bottomContainer}>
-            <View style={styles.sectionCard}>
-              <Text style={styles.sectionTitle}>제공 기관</Text>
-              <View style={styles.providerCard}>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.providerName}>한국인터넷진흥원</Text>
-                  <Text style={styles.providerDesc}>정보보호 산업 육성 및 ISMS-P 인증 제도 운영 기관입니다.</Text>
-                  <View style={styles.badgeRow}>
-                    <View style={styles.badgePrimary}><Text style={styles.badgePrimaryText}>공공기관</Text></View>
-                    <View style={styles.badgePrimary}><Text style={styles.badgePrimaryText}>신뢰도 높음</Text></View>
-                  </View>
-                  <View style={{ flexDirection: 'row', marginTop: 8 }}>
-                    <TouchableOpacity style={styles.btnOutlineSmall}><Text style={styles.btnOutlineSmallText}>기관 정보 더보기</Text></TouchableOpacity>
-                  </View>
+          <View style={styles.sectionCard}>
+            <Text style={styles.sectionTitle}>제공 기관</Text>
+            <View style={styles.providerCard}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.providerName}>한국인터넷진흥원</Text>
+                <Text style={styles.providerDesc}>정보보호 산업 육성 및 ISMS-P 인증 제도 운영 기관입니다.</Text>
+                <View style={styles.badgeRow}>
+                  <View style={styles.badgePrimary}><Text style={styles.badgePrimaryText}>공공기관</Text></View>
+                  <View style={styles.badgePrimary}><Text style={styles.badgePrimaryText}>신뢰도 높음</Text></View>
+                </View>
+                <View style={{ flexDirection: 'row', marginTop: 8 }}>
+                  <TouchableOpacity style={styles.btnOutlineSmall}><Text style={styles.btnOutlineSmallText}>기관 정보 더보기</Text></TouchableOpacity>
                 </View>
               </View>
             </View>
+          </View>
 
           <View style={styles.sectionCard}>
             <Text style={styles.sectionTitle}>이런 교육은 어떠세요?</Text>

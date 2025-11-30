@@ -244,7 +244,7 @@ export default function ExpertRecruitmentList({ navigation }: any) {
 
         <View style={styles.actionsTop}>
             <Text style={styles.pageTitle}>내 공고 목록</Text>
-            <TouchableOpacity style={styles.primaryBtn} onPress={() => (navigation?.navigate ? navigation.navigate('InputExpertProfessional') : showToast('새 공고 등록 (데모)'))}>
+            <TouchableOpacity style={styles.primaryBtn} onPress={() => (navigation?.navigate ? navigation.navigate('InputExpertRecruitment') : showToast('새 공고 등록 (데모)'))}>
             <Text style={styles.primaryBtnText}>+ 새 공고 등록</Text>
             </TouchableOpacity>
         </View>

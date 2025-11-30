@@ -12,6 +12,7 @@ import {
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
 import SubformHeader from '../components/SubformHeader';
 import { styles } from '../styles/menu/CertAudRegistration';
+import mockupData from '../data/mokup.json';
 
 // TypeScript Interfaces
 type Certification = {
@@ -36,17 +37,13 @@ type FileInfo = {
 };
 
 type Expertise = 'isms-p' | 'iso27001' | 'iso27701' | 'iso20000' | 'iso22301' | 'pims';
-type Region = 'seoul' | 'gyeonggi' | 'incheon' | 'busan' | 'daegu' | 'daejeon' | 'all';
-type FeeType = 'daily' | 'project';
+type Region = string;
 
 interface FormData {
   certifications: Certification[];
   expertise: Expertise[];
   experiences: Experience[];
   regions: Region[];
-  feeType: FeeType | null;
-  minFee: string;
-  maxFee: string;
   certFiles: FileInfo[];
   careerFiles: FileInfo[];
 }
@@ -58,16 +55,12 @@ const CertAudRegistration = ({ navigation }: any) => {
     expertise: [],
     experiences: [],
     regions: [],
-    feeType: null,
-    minFee: '',
-    maxFee: '',
     certFiles: [],
     careerFiles: []
   });
 
   const [selectedExpertise, setSelectedExpertise] = useState<Expertise[]>([]);
   const [selectedRegions, setSelectedRegions] = useState<Region[]>([]);
-  const [selectedFeeType, setSelectedFeeType] = useState<FeeType | null>(null);
 
   // Add Certification Item
   const addCertification = () => {
@@ -151,10 +144,6 @@ const CertAudRegistration = ({ navigation }: any) => {
   };
 
   // Select Fee Type
-  const selectFeeType = (type: FeeType) => {
-    setSelectedFeeType(type);
-    setFormData(prev => ({ ...prev, feeType: type }));
-  };
 
   // Handle File Upload (Mock implementation)
   const handleFileUpload = (type: 'cert' | 'career') => {
@@ -184,10 +173,6 @@ const CertAudRegistration = ({ navigation }: any) => {
       return;
     }
 
-    if (!selectedFeeType) {
-      Alert.alert('오류', '비용 타입을 선택해주세요.');
-      return;
-    }
 
     Alert.alert('성공', '심사 인증원 정보가 성공적으로 등록되었습니다.');
     navigation.goBack();
@@ -406,97 +391,26 @@ const CertAudRegistration = ({ navigation }: any) => {
           </View>
           
           <View style={styles.multiSelectContainer}>
-            {[
-              { value: 'seoul', label: '서울' },
-              { value: 'gyeonggi', label: '경기' },
-              { value: 'incheon', label: '인천' },
-              { value: 'busan', label: '부산' },
-              { value: 'daegu', label: '대구' },
-              { value: 'daejeon', label: '대전' },
-              { value: 'all', label: '전국' }
-            ].map((item) => (
+            {mockupData.filters.regions.map((r) => (
               <TouchableOpacity
-                key={item.value}
+                key={r}
                 style={[
                   styles.selectTag,
-                  selectedRegions.includes(item.value as Region) && styles.selectTagSelected
+                  selectedRegions.includes(r as Region) && styles.selectTagSelected
                 ]}
-                onPress={() => toggleRegion(item.value as Region)}
+                onPress={() => toggleRegion(r as Region)}
               >
                 <Text style={[
                   styles.selectTagText,
-                  selectedRegions.includes(item.value as Region) && styles.selectTagTextSelected
+                  selectedRegions.includes(r as Region) && styles.selectTagTextSelected
                 ]}>
-                  {item.label}
+                  {r}
                 </Text>
               </TouchableOpacity>
             ))}
           </View>
         </View>
 
-        {/* Fee Section */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <FontAwesome5 name="won-sign" size={18} color="#4a6fdc" />
-            <Text style={styles.sectionTitle}>심사 비용</Text>
-          </View>
-          
-          <View style={styles.feeTypes}>
-            <TouchableOpacity
-              style={[
-                styles.feeType,
-                selectedFeeType === 'daily' && styles.feeTypeSelected
-              ]}
-              onPress={() => selectFeeType('daily')}
-            >
-              <Text style={[
-                styles.feeTypeText,
-                selectedFeeType === 'daily' && styles.feeTypeTextSelected
-              ]}>
-                일당
-              </Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity
-              style={[
-                styles.feeType,
-                selectedFeeType === 'project' && styles.feeTypeSelected
-              ]}
-              onPress={() => selectFeeType('project')}
-            >
-              <Text style={[
-                styles.feeTypeText,
-                selectedFeeType === 'project' && styles.feeTypeTextSelected
-              ]}>
-                프로젝트당
-              </Text>
-            </TouchableOpacity>
-          </View>
-          
-          <View style={styles.feeInputs}>
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>최소 비용</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="예: 50만원"
-                value={formData.minFee}
-                onChangeText={(text) => setFormData(prev => ({ ...prev, minFee: text }))}
-                keyboardType="numeric"
-              />
-            </View>
-            
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>최대 비용</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="예: 80만원"
-                value={formData.maxFee}
-                onChangeText={(text) => setFormData(prev => ({ ...prev, maxFee: text }))}
-                keyboardType="numeric"
-              />
-            </View>
-          </View>
-        </View>
 
         {/* Form Actions */}
         <View style={styles.formActions}>

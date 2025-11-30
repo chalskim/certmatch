@@ -1,0 +1,2 @@
+-- UUID 확장 생성
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";

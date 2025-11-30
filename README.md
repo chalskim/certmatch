@@ -1,4 +1,4 @@
-# CertMatch - 인증 구인구직 플랫폼
+# SuperSlice - 인증 구인구직 플랫폼
 
 기업과 인증 전문가를 연결하는 스마트한 매칭 플랫폼입니다.
 
@@ -132,12 +132,17 @@ git remote -v && \
 git branch --show-current && \
 git push -u origin main || git push -u origin main --force
 ```
+
 참고:
-- HTTPS 대신 SSH를 쓰려면 `https://github.com/chalskim/certmatch.git` 를 `git@github.com:chalskim/certmatch.git` 로 교체하세요.
+- HTTPS 대신 SSH를 쓰려면 `https://github.com/chalskim/certmatch.git` 를 
+`git@github.com:chalskim/certmatch.git` 로 교체하세요.
 - `--force`는 브랜치 히스토리를 덮어쓰므로 필요한 경우에만 사용하세요.
 
 서버 실행 
 cd '/Users/cheolhomaegbug/src/certmatch/Server' && npm run start:dev
+
+prisma studio
+cd '/Users/cheolhomaegbug/src/certmatch/Server' && npm run db:studio
 
 클라이언트 실행 
 cd '/Users/cheolhomaegbug/src/certmatch/mobile_front' && npm start

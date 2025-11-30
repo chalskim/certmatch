@@ -1,16 +1,13 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
-import { User, Prisma } from '@prisma/client';
+import { User, Prisma, code_state_enum } from '@prisma/client';
 import { isUUID } from 'class-validator';
 
-// Define the UserWithoutPassword type to match what we're selecting
 type UserWithoutPassword = {
   id: string;
-  email: string;
-  name: string | null;
-  phone: string | null;
-  role: any;
-  isActive: boolean | null;
+  user_email: string;
+  user_display_name: string | null;
+  user_state: code_state_enum;
   createdAt: Date | null;
   updatedAt: Date | null;
 };
@@ -29,11 +26,9 @@ export class UsersService {
     return this.prisma.user.findMany({
       select: {
         id: true,
-        email: true,
-        name: true,
-        phone: true,
-        role: true,
-        isActive: true,
+        user_email: true,
+        user_display_name: true,
+        user_state: true,
         createdAt: true,
         updatedAt: true,
       },
@@ -41,7 +36,6 @@ export class UsersService {
   }
 
   async findOne(id: string): Promise<UserWithoutPassword | null> {
-    // Validate UUID to avoid Prisma errors when invalid IDs are passed
     if (!isUUID(id)) {
       throw new BadRequestException('유효하지 않은 사용자 ID 형식입니다. UUID 형식이어야 합니다.');
     }
@@ -51,28 +45,27 @@ export class UsersService {
         where: { id },
         select: {
           id: true,
-          email: true,
-          name: true,
-          phone: true,
-          role: true,
-          isActive: true,
+          user_email: true,
+          user_display_name: true,
+          user_state: true,
           createdAt: true,
           updatedAt: true,
         },
       });
     } catch (error: any) {
-      // Provide a clearer message if the underlying DB driver throws UUID parsing errors
       const msg = typeof error?.message === 'string' ? error.message : '';
       if (msg.includes('UUID') || msg.includes('invalid character')) {
-        throw new BadRequestException('사용자 조회 중 UUID 파싱 오류가 발생했습니다. ID 값을 확인해주세요.');
+        throw new BadRequestException(
+          '사용자 조회 중 UUID 파싱 오류가 발생했습니다. ID 값을 확인해주세요.',
+        );
       }
       throw error;
     }
   }
 
   async findByEmail(email: string): Promise<User | null> {
-    return this.prisma.user.findUnique({
-      where: { email },
+    return this.prisma.user.findFirst({
+      where: { user_email: email },
     });
   }
 
@@ -87,11 +80,9 @@ export class UsersService {
         data,
         select: {
           id: true,
-          email: true,
-          name: true,
-          phone: true,
-          role: true,
-          isActive: true,
+          user_email: true,
+          user_display_name: true,
+          user_state: true,
           createdAt: true,
           updatedAt: true,
         },
@@ -99,7 +90,9 @@ export class UsersService {
     } catch (error: any) {
       const msg = typeof error?.message === 'string' ? error.message : '';
       if (msg.includes('UUID') || msg.includes('invalid character')) {
-        throw new BadRequestException('사용자 수정 중 UUID 파싱 오류가 발생했습니다. ID 값을 확인해주세요.');
+        throw new BadRequestException(
+          '사용자 수정 중 UUID 파싱 오류가 발생했습니다. ID 값을 확인해주세요.',
+        );
       }
       throw error;
     }
@@ -117,7 +110,9 @@ export class UsersService {
     } catch (error: any) {
       const msg = typeof error?.message === 'string' ? error.message : '';
       if (msg.includes('UUID') || msg.includes('invalid character')) {
-        throw new BadRequestException('사용자 삭제 중 UUID 파싱 오류가 발생했습니다. ID 값을 확인해주세요.');
+        throw new BadRequestException(
+          '사용자 삭제 중 UUID 파싱 오류가 발생했습니다. ID 값을 확인해주세요.',
+        );
       }
       throw error;
     }

@@ -1,52 +1,49 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
-import { Company, Prisma } from '@prisma/client';
+import { Prisma, user_company } from '@prisma/client';
 
 @Injectable()
 export class CompaniesService {
   constructor(private prisma: PrismaService) {}
 
-  async create(data: Prisma.CompanyCreateInput): Promise<Company> {
-    return this.prisma.company.create({
+  async create(data: Prisma.user_companyCreateInput): Promise<user_company> {
+    return this.prisma.user_company.create({
       data,
       include: {
-        user: {
+        users: {
           select: {
             id: true,
-            email: true,
-            name: true,
-            phone: true,
+            user_email: true,
+            user_display_name: true,
           },
         },
       },
     });
   }
 
-  async findAll(): Promise<Company[]> {
-    return this.prisma.company.findMany({
+  async findAll(): Promise<user_company[]> {
+    return this.prisma.user_company.findMany({
       include: {
-        user: {
+        users: {
           select: {
             id: true,
-            email: true,
-            name: true,
-            phone: true,
+            user_email: true,
+            user_display_name: true,
           },
         },
       },
     });
   }
 
-  async findOne(id: string): Promise<Company | null> {
-    return this.prisma.company.findUnique({
-      where: { id },
+  async findOne(comp_id: string): Promise<user_company | null> {
+    return this.prisma.user_company.findUnique({
+      where: { comp_id },
       include: {
-        user: {
+        users: {
           select: {
             id: true,
-            email: true,
-            name: true,
-            phone: true,
+            user_email: true,
+            user_display_name: true,
           },
         },
         // Remove invalid includes that don't exist in the schema
@@ -54,43 +51,41 @@ export class CompaniesService {
     });
   }
 
-  async findByUserId(userId: string): Promise<Company | null> {
+  async findByUserId(userId: string): Promise<user_company | null> {
     // Use findFirst instead of findUnique since userId is not a unique field
-    return this.prisma.company.findFirst({
-      where: { userId },
+    return this.prisma.user_company.findFirst({
+      where: { user_id: userId },
       include: {
-        user: {
+        users: {
           select: {
             id: true,
-            email: true,
-            name: true,
-            phone: true,
+            user_email: true,
+            user_display_name: true,
           },
         },
       },
     });
   }
 
-  async update(id: string, data: Prisma.CompanyUpdateInput): Promise<Company> {
-    return this.prisma.company.update({
-      where: { id },
+  async update(comp_id: string, data: Prisma.user_companyUpdateInput): Promise<user_company> {
+    return this.prisma.user_company.update({
+      where: { comp_id },
       data,
       include: {
-        user: {
+        users: {
           select: {
             id: true,
-            email: true,
-            name: true,
-            phone: true,
+            user_email: true,
+            user_display_name: true,
           },
         },
       },
     });
   }
 
-  async remove(id: string): Promise<Company> {
-    return this.prisma.company.delete({
-      where: { id },
+  async remove(comp_id: string): Promise<user_company> {
+    return this.prisma.user_company.delete({
+      where: { comp_id },
     });
   }
 
@@ -98,11 +93,11 @@ export class CompaniesService {
     industry?: string;
     size?: string;
     location?: string;
-  }): Promise<Company[]> {
-    const where: Prisma.CompanyWhereInput = {};
+  }): Promise<user_company[]> {
+    const where: Prisma.user_companyWhereInput = {} as any;
 
     if (query.industry) {
-      where.industry = {
+      (where as any).comp_industry_key = {
         contains: query.industry,
         mode: 'insensitive',
       };
@@ -110,30 +105,29 @@ export class CompaniesService {
 
     // Fix the size field to match the enum type
     if (query.size) {
-      where.size = query.size as any; // Cast to any to avoid type issues
+      (where as any).comp_employees_key = query.size as any;
     }
 
     if (query.location) {
-      where.address = {
+      (where as any).comp_address = {
         contains: query.location,
         mode: 'insensitive',
       };
     }
 
-    return this.prisma.company.findMany({
+    return this.prisma.user_company.findMany({
       where,
       include: {
-        user: {
+        users: {
           select: {
             id: true,
-            email: true,
-            name: true,
-            phone: true,
+            user_email: true,
+            user_display_name: true,
           },
         },
       },
       orderBy: {
-        companyName: 'asc',
+        comp_name: 'asc',
       },
     });
   }

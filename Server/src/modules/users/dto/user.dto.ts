@@ -1,6 +1,5 @@
 import { z } from 'zod';
 import { ApiProperty } from '@nestjs/swagger';
-import { user_type_enum } from '@prisma/client';
 
 // Zod 스키마 정의
 export const CreateUserSchema = z.object({
@@ -8,17 +7,18 @@ export const CreateUserSchema = z.object({
   password: z.string().min(6, 'Password must be at least 6 characters'),
   name: z.string().min(2, 'Name must be at least 2 characters'),
   phone: z.string().regex(/^[0-9-+().\s]+$/, 'Invalid phone number format'),
-  role: z.nativeEnum(user_type_enum),
 });
 
 export const UpdateUserSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters').optional(),
-  phone: z.string().regex(/^[0-9-+().\s]+$/, 'Invalid phone number format').optional(),
+  phone: z
+    .string()
+    .regex(/^[0-9-+().\s]+$/, 'Invalid phone number format')
+    .optional(),
   isActive: z.boolean().optional(),
 });
 
 export const UserQuerySchema = z.object({
-  role: z.nativeEnum(user_type_enum).optional(),
   isActive: z.boolean().optional(),
   search: z.string().optional(),
 });
@@ -36,13 +36,6 @@ export class CreateUserDto {
 
   @ApiProperty({ description: 'User phone number', example: '+82-10-1234-5678' })
   phone: string;
-
-  @ApiProperty({ 
-    description: 'User role', 
-    enum: user_type_enum,
-    example: user_type_enum.company 
-  })
-  role: user_type_enum;
 }
 
 export class UpdateUserDto {
@@ -57,13 +50,6 @@ export class UpdateUserDto {
 }
 
 export class UserQueryDto {
-  @ApiProperty({ 
-    description: 'Filter by user role', 
-    enum: user_type_enum,
-    required: false 
-  })
-  role?: user_type_enum;
-
   @ApiProperty({ description: 'Filter by active status', example: true, required: false })
   isActive?: boolean;
 
@@ -83,13 +69,6 @@ export class UserResponseDto {
 
   @ApiProperty({ description: 'User phone number', example: '+82-10-1234-5678' })
   phone: string;
-
-  @ApiProperty({ 
-    description: 'User role', 
-    enum: user_type_enum,
-    example: user_type_enum.company 
-  })
-  role: user_type_enum;
 
   @ApiProperty({ description: 'User active status', example: true })
   isActive: boolean;

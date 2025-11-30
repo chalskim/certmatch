@@ -1,0 +1,82 @@
+테이블 생성 규칙
+1. 테이블명은 고유하게 한다
+2. 관리가 편하게 하기위해 사용자 구분을 위해 테이블명에 포함하고 _ 구분한다.
+    예) 개인 -> personal(pers), 회사 -> company(comp) 를 추가한다.
+3. 테이블명은 소문자로 한다
+4. 테이블의 필드명은 소문자로 한다
+5. 테이블의 필드명은 테이블마다 고유의 코드를 붙인다
+    예) user_company table의 필드명은 "comp_"와 같이 붙인다.
+    예) user_personal table의 필드명은 "pers_"와 같이 붙인다.
+6. 필드명의 고유코드는 6자를 넘지 않는다.
+6. 테이블의 필드명은 필드의 역할을 명확하게 한다
+7. 외부키는 외부키 필드명을 그대로 사용한다.
+
+8. 기본 키 및 공통 컬럼 규칙
+    - 모든 테이블의 PK는 <prefix>_id(예: pers_id, comp_id)로 하고 UUID를 사용한다.
+    - PK 기본값은 uuid_generate_v4()를 사용한다.
+    - 공통 감사 컬럼은 <prefix>_created_at, <prefix>_updated_at, <prefix>_deleted_at를 사용한다.
+    - updated_at은 UPDATE 트리거로 자동 갱신한다.
+      예) 함수명: set_updated_at_<table>, 트리거명: trg_<table>_updated
+
+9. 자료형 기본 가이드
+    - 시간 컬럼은 timestamptz 또는 timestamp(6) 중 하나로 일관되게 사용한다(권장: timestamptz).
+    - 금액/수치 컬럼은 integer 또는 numeric(12,2) 등 명확한 스케일로 지정한다.
+    - 통화 코드는 CHAR(3)로 하고 ISO-4217 대문자 코드를 사용하며 CHECK('^[A-Z]{3}$')로 검증한다.
+    - 이메일/전화는 공통 정규식으로 CHECK 제약을 둔다.
+      예) email: ^[^@\s]+@[^@\s]+\.[^@\s]+$, phone: ^\+?[0-9\-]{7,}$
+    - 문자열 길이 상한을 명시한다(예: 이름 100, 이메일 255, 전화 20, 위치 100 등).
+
+10. 제약/인덱스/열거형 네이밍 규칙
+    - FK: fk_<table>_<target>
+    - UQ: uq_<table>_<column>
+    - CHK: chk_<table>_<purpose>
+    - IDX: idx_<table>_<columns>
+    - GIN 인덱스: gin_<table>_<jsonb_column>
+    - ENUM 타입명: <prefix>_<purpose> (예: pers_profile_state, comp_profile_state)
+
+11. 외래키 동작 규칙
+    - user와의 1:1 관계는 ON DELETE CASCADE를 사용한다.
+    - 코드 사전(cert_code) 참조는 (code_gb, code_key) 복합 FK로 연결한다.
+      ON UPDATE CASCADE, ON DELETE RESTRICT를 기본으로 한다.
+
+12. JSONB 사용 규칙
+    - 반복/다중 선택/자유 서술형 데이터는 JSONB 사용을 허용한다.
+    - JSONB는 반드시 배열형으로 저장하고 CHECK(jsonb_typeof(...)='array')로 검증한다.
+    - 자주 조회하는 JSONB 컬럼에는 GIN 인덱스를 생성한다.
+    - 코드/파일의 정규화된 정보는 user_meta_code/user_file에 저장하고, JSONB에는 동기화 메타만 저장한다.
+
+13. 코드 테이블(cert_code) 사용 규칙
+    - code_gb는 대문자 그룹명을 사용한다.
+      예) INDUSTRY, CERT_TYPE, ACTIVITY, COUNTRY, EMP_SIZE, AUDIT_TYPE, CERT_LEVEL
+    - 화면 라벨은 user_meta_code.mcode_mdata_text에, 정규화 키는 user_meta_code.mcode_mdata_code(cert_code.code_key)에 저장한다.
+
+14. 파일(user_file) 사용 규칙
+    - owner_type는 명확한 문자열을 사용한다(예: 'user_personal', 'user_company').
+    - 여러 파일은 ufile_seq로 순서를 관리한다.
+    - 필수 문서는 ufile_code를 표준화한다.
+      예) 'profile_image', 'resume_file', 'biz_reg_cert', 'company_profile', 'cert_evidence'
+
+15. 소프트 삭제 정책
+    - <prefix>_deleted_at가 NULL이 아니면 삭제로 간주한다.
+    - 애플리케이션 조회 시 기본적으로 deleted_at IS NULL 조건을 사용한다.
+
+16. 컬럼 접두어 길이
+    - 접두어는 6자 이내로 한다(pers_, comp_ 등 4~5자 권장).
+    - 모든 컬럼은 해당 테이블 접두어로 시작하며, 외부키는 외부키 필드명을 그대로 사용한다(user_id 등).
+
+17. 스키마 변경 이행 규칙
+    - 스키마 변경 시 기존 데이터 마이그레이션 스크립트를 함께 제공한다.
+    - 트리거/인덱스/제약 이름 변경 시 일관되게 갱신한다.
+
+18. 표준 패턴 예시
+    - updated_at 트리거/함수 표준 템플릿을 사용한다.
+    - CHECK 예시: bio 최소 글자수, 수치 범위 검증, 범위 일관성(min <= max) 등.
+    - FK 예시: cert_code 복합키 참조 패턴을 준수한다.
+
+19. snake_case 원칙
+    - 모든 테이블/필드/제약/인덱스/트리거/함수/열거형은 snake_case로 작성한다.
+
+20. 개발/운영 가이드
+    - uuid_generate_v4() 사용 전 uuid-ossp 확장을 설치한다.
+    - ENUM 추가/변경은 별도 마이그레이션 스크립트로 관리한다.
+

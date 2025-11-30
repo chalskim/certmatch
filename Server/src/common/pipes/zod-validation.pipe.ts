@@ -5,7 +5,7 @@ import { ZodSchema, ZodError } from 'zod';
 export class ZodValidationPipe implements PipeTransform {
   constructor(private schema: ZodSchema) {}
 
-  transform(value: any, metadata: ArgumentMetadata) {
+  transform(value: any, _metadata: ArgumentMetadata) {
     try {
       const parsedValue = this.schema.parse(value);
       return parsedValue;
@@ -15,7 +15,7 @@ export class ZodValidationPipe implements PipeTransform {
           field: err.path.join('.'),
           message: err.message,
         }));
-        
+
         throw new BadRequestException({
           message: 'Validation failed',
           errors: errorMessages,
@@ -27,8 +27,8 @@ export class ZodValidationPipe implements PipeTransform {
 }
 
 // 데코레이터 함수
-export function UsePipes(schema: ZodSchema) {
-  return function (target: any, propertyName: string, descriptor: PropertyDescriptor) {
+export function UsePipes(_schema: ZodSchema) {
+  return function (_target: any, _propertyName: string, _descriptor: PropertyDescriptor) {
     // 이 데코레이터는 컨트롤러 메서드에서 사용할 수 있습니다
     // 실제 구현은 NestJS의 @UsePipes 데코레이터와 함께 사용됩니다
   };

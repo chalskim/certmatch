@@ -290,7 +290,7 @@ export const SignupScreen = () => {
         }}>
           <FontAwesome5 name="shield-alt" size={30} color="#fff" />
         </View>
-        <Text style={{ fontSize: 24, fontWeight: 'bold', color: '#333', marginBottom: 8 }}>CertLine</Text>
+        <Text style={{ fontSize: 24, fontWeight: 'bold', color: '#333', marginBottom: 8 }}>SuperSlice</Text>
         <Text style={{ fontSize: 14, color: '#666', textAlign: 'center' }}>
           인증 프로젝트 매칭 플랫폼에 오신 것을 환영합니다
         </Text>

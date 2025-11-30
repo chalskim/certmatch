@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { ExpertsService } from './experts.service';
-import { CreateExpertDto, UpdateExpertDto, ExpertQueryDto } from './dto/expert.dto';
+import { CreateExpertDto, UpdateExpertDto } from './dto/expert.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @ApiTags('Experts')
@@ -39,17 +39,16 @@ export class ExpertsController {
   @ApiOperation({ summary: 'Search experts by criteria' })
   @ApiResponse({ status: 200, description: 'Return filtered experts' })
   @ApiQuery({ name: 'location', required: false, type: String })
-  @ApiQuery({ name: 'languages', required: false, type: [String], description: 'Comma-separated or array of languages' })
-  @ApiQuery({ name: 'minRating', required: false, type: Number })
-  searchExperts(
-    @Query('location') location?: string,
-    @Query('languages') languages?: string[],
-    @Query('minRating') minRating?: number,
-  ) {
+  @ApiQuery({
+    name: 'languages',
+    required: false,
+    type: [String],
+    description: 'Comma-separated or array of languages',
+  })
+  searchExperts(@Query('location') location?: string, @Query('languages') languages?: string[]) {
     return this.expertsService.searchExperts({
       location,
       languages,
-      minRating,
     });
   }
 

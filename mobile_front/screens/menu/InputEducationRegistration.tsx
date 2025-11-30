@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { View, Text, TextInput, ScrollView, TouchableOpacity, Alert, Platform } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { styles } from '../styles/menu/InputEducationRegistration';
@@ -17,6 +17,14 @@ type InstructorItem = {
   id: string;
   name: string;
   career: string;
+};
+
+type MaterialItem = {
+  id: string;
+  name: string;
+  publisher: string;
+  price: string;
+  file?: { name: string; size?: number };
 };
 
 const newId = (prefix = '') => `${prefix}${Date.now()}${Math.floor(Math.random() * 1000)}`;
@@ -51,6 +59,8 @@ export const EducationRegistration: React.FC = () => {
   // Dynamic lists
   const [schedules, setSchedules] = useState<ScheduleItem[]>([]);
   const [instructors, setInstructors] = useState<InstructorItem[]>([]);
+  const [materials, setMaterials] = useState<MaterialItem[]>([]);
+  const materialFileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
   // Uploaded files for course materials
   const [files, setFiles] = useState<Array<{ name: string; uri: string; size?: number; mimeType?: string }>>([]);
@@ -70,12 +80,33 @@ export const EducationRegistration: React.FC = () => {
   const removeInstructor = (id: string) => setInstructors(instructors.filter(i => i.id !== id));
   const updateInstructor = (id: string, patch: Partial<InstructorItem>) => setInstructors(instructors.map(i => i.id === id ? { ...i, ...patch } : i));
 
-  // Initial add when component mounts: add one schedule and one instructor for convenience
-  React.useEffect(() => {
-    if (schedules.length === 0) addSchedule();
-    if (instructors.length === 0) addInstructor();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const addMaterial = () => {
+    const id = newId('mat_');
+    setMaterials([...materials, { id, name: '', publisher: '', price: '' }]);
+  };
+  const removeMaterial = (id: string) => setMaterials(materials.filter(m => m.id !== id));
+  const updateMaterial = (id: string, patch: Partial<MaterialItem>) => setMaterials(materials.map(m => m.id === id ? { ...m, ...patch } : m));
+  const onMaterialFileChangeWeb = (id: string, e: React.ChangeEvent<HTMLInputElement>) => {
+    try {
+      const files: File[] = Array.from(e.target?.files || []);
+      if (!files.length) return;
+      const f = files[0];
+      setMaterials(prev => prev.map(m => (m.id === id ? { ...m, file: { name: f.name, size: f.size } } : m)));
+    } finally {
+      if (e?.target) (e.target as HTMLInputElement).value = '';
+    }
+  };
+  const triggerMaterialFileSelect = (id: string) => {
+    if (Platform.OS === 'web') {
+      materialFileInputRefs.current[id]?.click();
+    } else {
+      Alert.alert('안내', '모바일 앱에서는 교재 파일 업로드가 추후 지원될 예정입니다.');
+    }
+  };
+  const removeMaterialFile = (id: string) => {
+    setMaterials(prev => prev.map(m => (m.id === id ? { ...m, file: undefined } : m)));
+  };
+
 
   const validateAndSubmit = () => {
     const required = [institutionName, contactNumber, courseName, curriculum, totalHours, tuitionFee, capacity];
@@ -102,6 +133,7 @@ export const EducationRegistration: React.FC = () => {
       course: { courseName, courseOverview, curriculum, location },
       details: { totalHours, duration, method, level },
       fee: { tuitionFee, governmentSupport, capacity },
+      materials,
       schedules,
       instructors,
       certificate: false,
@@ -118,8 +150,9 @@ export const EducationRegistration: React.FC = () => {
       // @ts-ignore - optional dependency, may not be installed in all environments
       const DocumentPicker = await import('expo-document-picker');
       const res = await DocumentPicker.getDocumentAsync({ type: '*/*' });
-      if (res.type === 'success') {
-        setFiles(prev => [...prev, { name: res.name, uri: res.uri, size: (res as any).size, mimeType: (res as any).mimeType }]);
+      if (!res.canceled && res.assets && res.assets.length > 0) {
+        const file = res.assets[0] as any;
+        setFiles(prev => [...prev, { name: file.name, uri: file.uri, size: file.size, mimeType: file.mimeType }]);
       }
     } catch (err) {
       console.warn('DocumentPicker not available or failed:', err);
@@ -269,6 +302,65 @@ export const EducationRegistration: React.FC = () => {
           </View>
         </View>
 
+        <View style={styles.formSection}>
+          <Text style={styles.sectionTitle}>교육 교재</Text>
+          <View style={styles.dynamicList}>
+            {materials.map((m, idx) => (
+              <View key={m.id} style={styles.listItem}>
+                <View style={styles.listItemHeader}>
+                  <Text style={styles.listItemTitle}>교육 교재 {idx + 1}</Text>
+                  <TouchableOpacity onPress={() => removeMaterial(m.id)}>
+                    <FontAwesome5 name="times" size={18} color="#e74c3c" />
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.formGroup}>
+                  <Text style={styles.label}>교재명</Text>
+                  <TextInput style={styles.input} value={m.name} onChangeText={(v) => updateMaterial(m.id, { name: v })} placeholder="교재명을 입력하세요" />
+                </View>
+                <View style={styles.formGroup}>
+                  <Text style={styles.label}>출판사</Text>
+                  <TextInput style={styles.input} value={m.publisher} onChangeText={(v) => updateMaterial(m.id, { publisher: v })} placeholder="출판사를 입력하세요" />
+                </View>
+                <View style={styles.formGroup}>
+                  <Text style={styles.label}>가격</Text>
+                  <TextInput style={styles.input} value={m.price} onChangeText={(v) => updateMaterial(m.id, { price: v })} placeholder="예: 25,000원" />
+                </View>
+                <View style={styles.formGroup}>
+                  {Platform.OS === 'web' ? (
+                    <View>
+                      <input
+                        ref={(el) => { materialFileInputRefs.current[m.id] = el as any; }}
+                        type="file"
+                        accept=".pdf,.doc,.docx"
+                        style={{ display: 'none' }}
+                        onChange={(e) => onMaterialFileChangeWeb(m.id, e)}
+                      />
+                      <TouchableOpacity style={[styles.addItemBtn, { backgroundColor: '#0066CC', marginTop: 8 }]} onPress={() => triggerMaterialFileSelect(m.id)}>
+                        <FontAwesome5 name="cloud-upload-alt" size={14} color="#fff" />
+                        <Text style={{ color: '#fff', marginLeft: 8 }}>파일 선택</Text>
+                      </TouchableOpacity>
+                      {m.file && (
+                        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8 }}>
+                          <Text style={{ color: '#666' }}>{m.file.name}</Text>
+                          <TouchableOpacity onPress={() => removeMaterialFile(m.id)} style={{ marginLeft: 8 }}>
+                            <FontAwesome5 name="times" size={16} color="#e74c3c" />
+                          </TouchableOpacity>
+                        </View>
+                      )}
+                    </View>
+                  ) : (
+                    <Text style={{ color: '#666' }}>모바일 앱에서는 파일 업로드는 추후 지원 예정입니다.</Text>
+                  )}
+                </View>
+              </View>
+            ))}
+          </View>
+          <TouchableOpacity style={styles.addItemBtn} onPress={addMaterial}>
+            <FontAwesome5 name="plus" size={14} color="#fff" />
+            <Text style={{ color: '#fff', marginLeft: 8 }}>교육 교재 추가</Text>
+          </TouchableOpacity>
+        </View>
+
         {/* Schedule dynamic list */}
         <View style={styles.formSection}>
           <Text style={styles.sectionTitle}>교육 과정 등록</Text>
@@ -360,7 +452,8 @@ export const EducationRegistration: React.FC = () => {
           <Text style={styles.sectionTitle}>교육 자료 업로드</Text>
 
           <View style={styles.formGroup}>
-            <Text style={styles.label}>강의자료, 슬라이드, 예제 파일 등을 업로드하세요</Text>
+            <Text style={styles.label}>강의자료, 슬라이드, 예제 파일 등을 업로드하세요.{'\n'}
+              (유료 교재는 교육 교재에 등록해 주세요.)</Text>
             <TouchableOpacity style={[styles.addItemBtn, { backgroundColor: '#0066CC', marginTop: 8 }]} onPress={pickFile}>
               <FontAwesome5 name="cloud-upload-alt" size={14} color="#fff" />
               <Text style={{ color: '#fff', marginLeft: 8 }}>파일 선택</Text>

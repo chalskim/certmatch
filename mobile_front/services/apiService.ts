@@ -43,6 +43,19 @@ export interface LoginData {
 
 class ApiService {
   private token: string | null = null;
+  
+  private async ensureTokenLoaded() {
+    if (!this.token) {
+      try {
+        const token = await AsyncStorage.getItem('authToken');
+        if (token) {
+          this.token = token;
+        }
+      } catch (error) {
+        console.log('Error ensuring token:', error);
+      }
+    }
+  }
 
   constructor() {
     this.loadToken();
@@ -103,6 +116,10 @@ class ApiService {
     const url = `${API_BASE_URL}${endpoint}`;
     console.log(`Making API request to: ${url}`, { method, data });
     
+    if (includeAuth) {
+      await this.ensureTokenLoaded();
+    }
+
     const options: RequestInit = {
       method,
       headers: this.getHeaders(includeAuth),
@@ -252,6 +269,31 @@ class ApiService {
   // Check if user is authenticated
   isAuthenticated(): boolean {
     return !!this.token;
+  }
+
+  async get<T>(endpoint: string, includeAuth: boolean = true): Promise<{ data: T }> {
+    const data = await this.apiRequest<T>(endpoint, 'GET', undefined, includeAuth);
+    return { data };
+  }
+
+  async post<T>(endpoint: string, payload: any, includeAuth: boolean = true): Promise<{ data: T }> {
+    const data = await this.apiRequest<T>(endpoint, 'POST', payload, includeAuth);
+    return { data };
+  }
+
+  async patch<T>(endpoint: string, payload: any, includeAuth: boolean = true): Promise<{ data: T }> {
+    const data = await this.apiRequest<T>(endpoint, 'PATCH', payload, includeAuth);
+    return { data };
+  }
+
+  async put<T>(endpoint: string, payload: any, includeAuth: boolean = true): Promise<{ data: T }> {
+    const data = await this.apiRequest<T>(endpoint, 'PUT', payload, includeAuth);
+    return { data };
+  }
+
+  async delete<T>(endpoint: string, includeAuth: boolean = true): Promise<{ data: T }> {
+    const data = await this.apiRequest<T>(endpoint, 'DELETE', undefined, includeAuth);
+    return { data };
   }
 }
 

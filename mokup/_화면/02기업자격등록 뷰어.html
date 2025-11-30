@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SuperSlice - 기업 자격 정보</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-blue: #0066CC;
+            --success-green: #2EBD59;
+            --neutral-gray: #333333;
+            --light-gray: #F5F5F5;
+            --warm-orange: #FF8C42;
+            --alert-red: #E74C3C;
+            --calm-purple: #7B68EE;
+            --border-color: #E0E0E0;
+            --text-light: #666666;
+            --shadow: 0 2px 8px rgba(0,0,0,0.08);
+            --shadow-hover: 0 8px 24px rgba(0,0,0,0.12);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Noto Sans KR', sans-serif;
+            background-color: #f8f9fa;
+            color: var(--neutral-gray);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            background-color: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-blue);
+        }
+
+        .logo i {
+            margin-right: 10px;
+            font-size: 28px;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        /* Status Bar */
+        .status-header {
+            background: linear-gradient(135deg, var(--primary-blue), #0052A3);
+            color: white;
+            padding: 30px 0;
+        }
+
+        .status-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .status-title {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-weight: 500;
+        }
+
+        .status-badge i {
+            font-size: 18px;
+        }
+
+        .status-badge.review {
+            background-color: rgba(255, 193, 7, 0.2);
+        }
+
+        .status-badge.approved {
+            background-color: rgba(46, 189, 89, 0.2);
+        }
+
+        .status-badge.rejected {
+            background-color: rgba(231, 76, 60, 0.2);
+        }
+
+        /* View Container */
+        .view-container {
+            background-color: white;
+            border-radius: 12px;
+            padding: 40px;
+            margin: 30px 0;
+            box-shadow: var(--shadow);
+        }
+
+        .view-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .view-title {
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .view-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-blue);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #0052A3;
+        }
+
+        .btn-danger {
+            background-color: var(--alert-red);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #C0392B;
+        }
+
+        .btn-secondary {
+            background-color: var(--light-gray);
+            color: var(--neutral-gray);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: #EEEEEE;
+        }
+
+        /* View Sections */
+        .view-section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title i {
+            color: var(--primary-blue);
+        }
+
+        .view-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .view-item {
+            margin-bottom: 20px;
+        }
+
+        .view-item.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .view-label {
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        .view-value {
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            background-color: var(--light-gray);
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+        }
+
+        .view-value.empty {
+            color: var(--text-light);
+            font-style: italic;
+        }
+
+        /* Tag List */
+        .tag-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            background-color: rgba(0, 102, 204, 0.1);
+            color: var(--primary-blue);
+            border: 1px solid rgba(0, 102, 204, 0.3);
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .tag i {
+            font-size: 12px;
+        }
+
+        /* Contact Persons List */
+        .contact-persons-list {
+            margin-top: 10px;
+        }
+
+        .contact-person-item {
+            background-color: var(--light-gray);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .contact-person-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .contact-person-title {
+            font-weight: 600;
+            color: var(--primary-blue);
+        }
+
+        .contact-person-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .contact-detail {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .contact-detail i {
+            color: var(--text-light);
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Certification List */
+        .certification-list {
+            margin-top: 10px;
+        }
+
+        .certification-item {
+            background-color: var(--light-gray);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .certification-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .certification-title {
+            font-weight: 600;
+            color: var(--primary-blue);
+        }
+
+        .certification-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .certification-detail {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .certification-detail i {
+            color: var(--text-light);
+            width: 20px;
+            text-align: center;
+        }
+
+        .certification-detail.full-width {
+            grid-column: 1 / -1;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .certification-detail-label {
+            font-weight: 500;
+            margin-bottom: 5px;
+            color: var(--text-light);
+            font-size: 13px;
+        }
+
+        .certification-detail-value {
+            background-color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            width: 100%;
+        }
+
+        /* File List */
+        .file-list {
+            margin-top: 10px;
+        }
+
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            background-color: white;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .file-icon {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .file-icon.pdf {
+            color: #E74C3C;
+        }
+
+        .file-icon.doc {
+            color: #2980B9;
+        }
+
+        .file-icon.excel {
+            color: #27AE60;
+        }
+
+        .file-icon.image {
+            color: #8E44AD;
+        }
+
+        .file-name {
+            font-weight: 500;
+        }
+
+        .file-size {
+            color: var(--text-light);
+            font-size: 13px;
+        }
+
+        .file-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .file-action {
+            color: var(--primary-blue);
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .file-action:hover {
+            color: #0052A3;
+        }
+
+        /* Info Cards */
+        .info-card {
+            background-color: rgba(0, 102, 204, 0.05);
+            border-left: 4px solid var(--primary-blue);
+            padding: 15px;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 20px;
+        }
+
+        .info-card-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-card-content {
+            font-size: 14px;
+            color: var(--text-light);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .view-container {
+                padding: 20px;
+            }
+            
+            .view-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .view-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .view-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-container">
+                <div class="logo">
+                    <i class="fas fa-check-circle"></i>
+                    SuperSlice
+                </div>
+                <div class="user-menu">
+                    <div class="user-profile">
+                        <img src="https://picsum.photos/seed/companyuser/40/40.jpg" alt="User Avatar" class="user-avatar">
+                        <span>김보안 님</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Status Header -->
+    <div class="status-header">
+        <div class="container">
+            <div class="status-container">
+                <h1 class="status-title">기업 자격 정보</h1>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Container -->
+    <div class="container">
+        <div class="view-container">
+            <div class="view-header">
+                <h2 class="view-title">기업 자격 정보</h2>
+                <div class="view-actions">
+                    <button class="btn btn-primary" onclick="editInfo()">
+                        <i class="fas fa-edit"></i>
+                        수정
+                    </button>
+                    <button class="btn btn-danger" onclick="deleteInfo()">
+                        <i class="fas fa-trash"></i>
+                        삭제
+                    </button>
+                </div>
+            </div>
+
+            <!-- 기본 정보 섹션 -->
+            <div class="view-section">
+                <h3 class="section-title">
+                    <i class="fas fa-building"></i>
+                    기본 정보
+                </h3>
+                
+                <div class="view-grid">
+                    <div class="view-item">
+                        <div class="view-label">회사명</div>
+                        <div class="view-value">테크솔루션 주식회사</div>
+                    </div>
+                    
+                    <div class="view-item">
+                        <div class="view-label">사업자등록번호</div>
+                        <div class="view-value">123-45-67890</div>
+                    </div>
+                    
+                    <div class="view-item">
+                        <div class="view-label">대표자명</div>
+                        <div class="view-value">김대표</div>
+                    </div>
+                    
+                    <div class="view-item">
+                        <div class="view-label">설립일</div>
+                        <div class="view-value">2015년 3월 15일</div>
+                    </div>
+                    
+                    <div class="view-item">
+                        <div class="view-label">산업 분류</div>
+                        <div class="view-value">IT 서비스</div>
+                    </div>
+                    
+                    <div class="view-item">
+                        <div class="view-label">직원 수</div>
+                        <div class="view-value">101-300명</div>
+                    </div>
+                    
+                    <div class="view-item full-width">
+                        <div class="view-label">주소</div>
+                        <div class="view-value">서울특별시 강남구 테헤란로 123, ABC타워 15층 (우편번호: 06234)</div>
+                    </div>
+                    
+                    <div class="view-item full-width">
+                        <div class="view-label">담당자 정보</div>
+                        <div class="contact-persons-list">
+                            <div class="contact-person-item">
+                                <div class="contact-person-header">
+                                    <div class="contact-person-title">주 담당자</div>
+                                </div>
+                                <div class="contact-person-details">
+                                    <div class="contact-detail">
+                                        <i class="fas fa-user"></i>
+                                        <span>이보안 / 보안팀장</span>
+                                    </div>
+                                    <div class="contact-detail">
+                                        <i class="fas fa-envelope"></i>
+                                        <span>security@techsolution.co.kr</span>
+                                    </div>
+                                    <div class="contact-detail">
+                                        <i class="fas fa-phone"></i>
+                                        <span>010-1234-5678</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="contact-person-item">
+                                <div class="contact-person-header">
+                                    <div class="contact-person-title">부 담당자</div>
+                                </div>
+                                <div class="contact-person-details">
+                                    <div class="contact-detail">
+                                        <i class="fas fa-user"></i>
+                                        <span>박기술 / 개발팀장</span>
+                                    </div>
+                                    <div class="contact-detail">
+                                        <i class="fas fa-envelope"></i>
+                                        <span>dev@techsolution.co.kr</span>
+                                    </div>
+                                    <div class="contact-detail">
+                                        <i class="fas fa-phone"></i>
+                                        <span>010-9876-5432</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 산업분야 섹션 -->
+            <div class="view-section">
+                <h3 class="section-title">
+                    <i class="fas fa-list-ul"></i>
+                    산업분야
+                </h3>
+                <div class="tag-list">
+                    <div class="tag"><i class="fas fa-check"></i>IT</div>
+                    <div class="tag"><i class="fas fa-check"></i>금융</div>
+                    <div class="tag"><i class="fas fa-check"></i>의료</div>
+                    <div class="tag"><i class="fas fa-check"></i>제조</div>
+                    <div class="tag"><i class="fas fa-check"></i>유통</div>
+                    <div class="tag"><i class="fas fa-check"></i>교육</div>
+                </div>
+            </div>
+
+            <!-- 관심분야 섹션 -->
+            <div class="view-section">
+                <h3 class="section-title">
+                    <i class="fas fa-star"></i>
+                    관심분야
+                </h3>
+                <div class="tag-list">
+                    <div class="tag"><i class="fas fa-check"></i>ISMS</div>
+                    <div class="tag"><i class="fas fa-check"></i>ISO 27001</div>
+                    <div class="tag"><i class="fas fa-check"></i>GDPR</div>
+                    <div class="tag"><i class="fas fa-check"></i>ESPM</div>
+                </div>
+            </div>
+
+            <!-- 인증 정보 섹션 -->
+            <div class="view-section">
+                <h3 class="section-title">
+                    <i class="fas fa-shield-alt"></i>
+                    인증 정보
+                </h3>
+                
+                <div class="certification-list">
+                    <div class="certification-item">
+                        <div class="certification-header">
+                            <div class="certification-title">ISMS-P</div>
+                        </div>
+                        <div class="certification-details">
+                            <div class="certification-detail">
+                                <i class="fas fa-layer-group"></i>
+                                <span>종합인증</span>
+                            </div>
+                            <div class="certification-detail">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span>2023년 10월 15일</span>
+                            </div>
+                            <div class="certification-detail">
+                                <i class="fas fa-clipboard-check"></i>
+                                <span>최초 인증</span>
+                            </div>
+                            <div class="certification-detail full-width">
+                                <div class="certification-detail-label">인증 범위</div>
+                                <div class="certification-detail-value">클라우드 기반 SaaS 서비스 개발 및 운영, 고객 데이터 관리, 인사 및 재무 관리</div>
+                            </div>
+                        </div>
+                        <div class="view-label" style="margin-top: 15px; margin-bottom: 8px;">관련 서류</div>
+                        <div class="file-list">
+                            <div class="file-item">
+                                <div class="file-info">
+                                    <div class="file-icon pdf">
+                                        <i class="fas fa-file-pdf"></i>
+                                    </div>
+                                    <div>
+                                        <div class="file-name">ISMS-P 인증 범위 상세.pdf</div>
+                                        <div class="file-size">1.5 MB</div>
+                                    </div>
+                                </div>
+                                <div class="file-actions">
+                                    <div class="file-action">
+                                        <i class="fas fa-download"></i>
+                                    </div>
+                                    <div class="file-action">
+                                        <i class="fas fa-eye"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="file-item">
+                                <div class="file-info">
+                                    <div class="file-icon doc">
+                                        <i class="fas fa-file-word"></i>
+                                    </div>
+                                    <div>
+                                        <div class="file-name">ISMS-P 심사 체크리스트.docx</div>
+                                        <div class="file-size">800 KB</div>
+                                    </div>
+                                </div>
+                                <div class="file-actions">
+                                    <div class="file-action">
+                                        <i class="fas fa-download"></i>
+                                    </div>
+                                    <div class="file-action">
+                                        <i class="fas fa-eye"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="certification-item">
+                        <div class="certification-header">
+                            <div class="certification-title">ISO 27001</div>
+                        </div>
+                        <div class="certification-details">
+                            <div class="certification-detail">
+                                <i class="fas fa-layer-group"></i>
+                                <span>기본인증</span>
+                            </div>
+                            <div class="certification-detail">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span>2023년 12월 5일</span>
+                            </div>
+                            <div class="certification-detail">
+                                <i class="fas fa-clipboard-check"></i>
+                                <span>갱신 인증</span>
+                            </div>
+                            <div class="certification-detail full-width">
+                                <div class="certification-detail-label">인증 범위</div>
+                                <div class="certification-detail-value">전사적인 정보보호 관리체계 운영</div>
+                            </div>
+                        </div>
+                        <div class="view-label" style="margin-top: 15px; margin-bottom: 8px;">관련 서류</div>
+                        <div class="file-list">
+                            <div class="file-item">
+                                <div class="file-info">
+                                    <div class="file-icon pdf">
+                                        <i class="fas fa-file-pdf"></i>
+                                    </div>
+                                    <div>
+                                        <div class="file-name">ISO 27001:2022 대응 계획서.pdf</div>
+                                        <div class="file-size">2.1 MB</div>
+                                    </div>
+                                </div>
+                                <div class="file-actions">
+                                    <div class="file-action">
+                                        <i class="fas fa-download"></i>
+                                    </div>
+                                    <div class="file-action">
+                                        <i class="fas fa-eye"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="file-item">
+                                <div class="file-info">
+                                    <div class="file-icon excel">
+                                        <i class="fas fa-file-excel"></i>
+                                    </div>
+                                    <div>
+                                        <div class="file-name">위험 평가 결과.xlsx</div>
+                                        <div class="file-size">950 KB</div>
+                                    </div>
+                                </div>
+                                <div class="file-actions">
+                                    <div class="file-action">
+                                        <i class="fas fa-download"></i>
+                                    </div>
+                                    <div class="file-action">
+                                        <i class="fas fa-eye"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 인증 관련 서류 -->
+            <div class="view-section">
+                <h3 class="section-title">
+                    <i class="fas fa-file-upload"></i>
+                    인증 관련 서류
+                </h3>
+                
+                <div class="view-grid">
+                    <div class="view-item full-width">
+                        <div class="view-label">사업자등록증</div>
+                        <div class="file-list">
+                            <div class="file-item">
+                                <div class="file-info">
+                                    <div class="file-icon pdf">
+                                        <i class="fas fa-file-pdf"></i>
+                                    </div>
+                                    <div>
+                                        <div class="file-name">사업자등록증.pdf</div>
+                                        <div class="file-size">1.2 MB</div>
+                                    </div>
+                                </div>
+                                <div class="file-actions">
+                                    <div class="file-action">
+                                        <i class="fas fa-download"></i>
+                                    </div>
+                                    <div class="file-action">
+                                        <i class="fas fa-eye"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="view-item full-width">
+                        <div class="view-label">인증 범위 관련 조직도</div>
+                        <div class="file-list">
+                            <div class="file-item">
+                                <div class="file-info">
+                                    <div class="file-icon image">
+                                        <i class="fas fa-file-image"></i>
+                                    </div>
+                                    <div>
+                                        <div class="file-name">조직도.png</div>
+                                        <div class="file-size">2.5 MB</div>
+                                    </div>
+                                </div>
+                                <div class="file-actions">
+                                    <div class="file-action">
+                                        <i class="fas fa-download"></i>
+                                    </div>
+                                    <div class="file-action">
+                                        <i class="fas fa-eye"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="view-item full-width">
+                        <div class="view-label">정보보호 정책 및 절차서</div>
+                        <div class="file-list">
+                            <div class="file-item">
+                                <div class="file-info">
+                                    <div class="file-icon doc">
+                                        <i class="fas fa-file-word"></i>
+                                    </div>
+                                    <div>
+                                        <div class="file-name">정보보호 정책.docx</div>
+                                        <div class="file-size">3.8 MB</div>
+                                    </div>
+                                </div>
+                                <div class="file-actions">
+                                    <div class="file-action">
+                                        <i class="fas fa-download"></i>
+                                    </div>
+                                    <div class="file-action">
+                                        <i class="fas fa-eye"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="file-item">
+                                <div class="file-info">
+                                    <div class="file-icon doc">
+                                        <i class="fas fa-file-word"></i>
+                                    </div>
+                                    <div>
+                                        <div class="file-name">정보보호 절차서.docx</div>
+                                        <div class="file-size">5.2 MB</div>
+                                    </div>
+                                </div>
+                                <div class="file-actions">
+                                    <div class="file-action">
+                                        <i class="fas fa-download"></i>
+                                    </div>
+                                    <div class="file-action">
+                                        <i class="fas fa-eye"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="view-item full-width">
+                        <div class="view-label">자체 평가 보고서</div>
+                        <div class="file-list">
+                            <div class="file-item">
+                                <div class="file-info">
+                                    <div class="file-icon excel">
+                                        <i class="fas fa-file-excel"></i>
+                                    </div>
+                                    <div>
+                                        <div class="file-name">자체 평가 보고서.xlsx</div>
+                                        <div class="file-size">2.1 MB</div>
+                                    </div>
+                                </div>
+                                <div class="file-actions">
+                                    <div class="file-action">
+                                        <i class="fas fa-download"></i>
+                                    </div>
+                                    <div class="file-action">
+                                        <i class="fas fa-eye"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="view-item full-width">
+                        <div class="view-label">기타 참고 자료</div>
+                        <div class="file-list">
+                            <div class="file-item">
+                                <div class="file-info">
+                                    <div class="file-icon pdf">
+                                        <i class="fas fa-file-pdf"></i>
+                                    </div>
+                                    <div>
+                                        <div class="file-name">서버 구성도.pdf</div>
+                                        <div class="file-size">1.8 MB</div>
+                                    </div>
+                                </div>
+                                <div class="file-actions">
+                                    <div class="file-action">
+                                        <i class="fas fa-download"></i>
+                                    </div>
+                                    <div class="file-action">
+                                        <i class="fas fa-eye"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="file-item">
+                                <div class="file-info">
+                                    <div class="file-icon pdf">
+                                        <i class="fas fa-file-pdf"></i>
+                                    </div>
+                                    <div>
+                                        <div class="file-name">네트워크 구성도.pdf</div>
+                                        <div class="file-size">2.3 MB</div>
+                                    </div>
+                                </div>
+                                <div class="file-actions">
+                                    <div class="file-action">
+                                        <i class="fas fa-download"></i>
+                                    </div>
+                                    <div class="file-action">
+                                        <i class="fas fa-eye"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 회사 홍보 자료 -->
+            <div class="view-section">
+                <h3 class="section-title">
+                    <i class="fas fa-info-circle"></i>
+                    회사 홍보 자료
+                </h3>
+                <div class="file-list">
+                    <div class="file-item">
+                        <div class="file-info">
+                            <div class="file-icon pdf">
+                                <i class="fas fa-file-pdf"></i>
+                            </div>
+                            <div>
+                                <div class="file-name">테크솔루션 회사 소개서.pdf</div>
+                                <div class="file-size">4.5 MB</div>
+                            </div>
+                        </div>
+                        <div class="file-actions">
+                            <div class="file-action">
+                                <i class="fas fa-download"></i>
+                            </div>
+                            <div class="file-action">
+                                <i class="fas fa-eye"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="file-item">
+                        <div class="file-info">
+                            <div class="file-icon image">
+                                <i class="fas fa-file-image"></i>
+                            </div>
+                            <div>
+                                <div class="file-name">사옥 전경.jpg</div>
+                                <div class="file-size">3.2 MB</div>
+                            </div>
+                        </div>
+                        <div class="file-actions">
+                            <div class="file-action">
+                                <i class="fas fa-download"></i>
+                            </div>
+                            <div class="file-action">
+                                <i class="fas fa-eye"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Edit function
+        function editInfo() {
+            // In a real application, this would navigate to the edit form
+            alert('수정 페이지로 이동합니다.');
+            // window.location.href = 'edit-page.html';
+        }
+        
+        // Delete function
+        function deleteInfo() {
+            if (confirm('정말로 이 정보를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
+                // In a real application, this would make an API call to delete the record
+                alert('삭제되었습니다.');
+                // window.location.href = 'list-page.html';
+            }
+        }
+        
+        // File download function
+        document.querySelectorAll('.file-action').forEach(action => {
+            action.addEventListener('click', function() {
+                const fileName = this.closest('.file-item').querySelector('.file-name').textContent;
+                
+                if (this.querySelector('.fa-download')) {
+                    // Download file
+                    alert(fileName + ' 파일을 다운로드합니다.');
+                    // In a real application, this would trigger a file download
+                } else if (this.querySelector('.fa-eye')) {
+                    // View file
+                    alert(fileName + ' 파일을 봅니다.');
+                    // In a real application, this would open the file in a new tab or modal
+                }
+            });
+        });
+    </script>
+</body>
+</html>

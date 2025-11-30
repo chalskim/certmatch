@@ -41,24 +41,24 @@ export class CreateCompanyDto {
   @ApiProperty({ description: 'Company size', example: '50-100' })
   size: string;
 
-  @ApiProperty({ 
-    description: 'Company description', 
+  @ApiProperty({
+    description: 'Company description',
     example: 'Leading technology solutions provider',
-    required: false 
+    required: false,
   })
   description?: string;
 
-  @ApiProperty({ 
-    description: 'Company website', 
+  @ApiProperty({
+    description: 'Company website',
     example: 'https://techsolutions.com',
-    required: false 
+    required: false,
   })
   website?: string;
 
-  @ApiProperty({ 
-    description: 'Company address', 
+  @ApiProperty({
+    description: 'Company address',
     example: '123 Tech Street, Seoul, South Korea',
-    required: false 
+    required: false,
   })
   address?: string;
 }
@@ -73,24 +73,24 @@ export class UpdateCompanyDto {
   @ApiProperty({ description: 'Company size', example: '50-100', required: false })
   size?: string;
 
-  @ApiProperty({ 
-    description: 'Company description', 
+  @ApiProperty({
+    description: 'Company description',
     example: 'Leading technology solutions provider',
-    required: false 
+    required: false,
   })
   description?: string;
 
-  @ApiProperty({ 
-    description: 'Company website', 
+  @ApiProperty({
+    description: 'Company website',
     example: 'https://techsolutions.com',
-    required: false 
+    required: false,
   })
   website?: string;
 
-  @ApiProperty({ 
-    description: 'Company address', 
+  @ApiProperty({
+    description: 'Company address',
     example: '123 Tech Street, Seoul, South Korea',
-    required: false 
+    required: false,
   })
   address?: string;
 }
@@ -122,7 +122,10 @@ export class CompanyResponseDto {
   @ApiProperty({ description: 'Company size', example: '50-100' })
   size: string;
 
-  @ApiProperty({ description: 'Company description', example: 'Leading technology solutions provider' })
+  @ApiProperty({
+    description: 'Company description',
+    example: 'Leading technology solutions provider',
+  })
   description: string;
 
   @ApiProperty({ description: 'Company website', example: 'https://techsolutions.com' })

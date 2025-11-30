@@ -1,0 +1,1549 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SuperSlice - 개인 자격 등록</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-blue: #0066CC;
+            --success-green: #2EBD59;
+            --neutral-gray: #333333;
+            --light-gray: #F5F5F5;
+            --warm-orange: #FF8C42;
+            --alert-red: #E74C3C;
+            --calm-purple: #7B68EE;
+            --border-color: #E0E0E0;
+            --text-light: #666666;
+            --shadow: 0 2px 8px rgba(0,0,0,0.08);
+            --shadow-hover: 0 8px 24px rgba(0,0,0,0.12);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Noto Sans KR', sans-serif;
+            background-color: #f8f9fa;
+            color: var(--neutral-gray);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            background-color: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-blue);
+        }
+
+        .logo i {
+            margin-right: 10px;
+            font-size: 28px;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        /* Form Container */
+        .form-container {
+            background-color: white;
+            border-radius: 12px;
+            padding: 40px;
+            margin: 30px 0;
+            box-shadow: var(--shadow);
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .form-title {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .form-subtitle {
+            color: var(--text-light);
+            font-size: 16px;
+        }
+
+        /* Profile Completion */
+        .profile-completion {
+            background: linear-gradient(135deg, rgba(0, 102, 204, 0.05), rgba(46, 189, 89, 0.05));
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .completion-text {
+            flex: 1;
+        }
+
+        .completion-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .completion-bar {
+            width: 100%;
+            height: 8px;
+            background-color: var(--light-gray);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .completion-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-blue), var(--success-green));
+            width: 65%;
+            transition: width 0.3s ease;
+        }
+
+        .completion-percentage {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-left: 20px;
+        }
+
+        /* Form Sections */
+        .form-section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title i {
+            color: var(--primary-blue);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--neutral-gray);
+        }
+
+        .required {
+            color: var(--alert-red);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        /* Rate Input Group */
+        .rate-input-group {
+            display: flex;
+            gap: 10px;
+            align-items: stretch;
+        }
+
+        .rate-input {
+            flex: 1;
+        }
+
+        .rate-negotiable-btn {
+            padding: 12px 20px;
+            background-color: var(--light-gray);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--neutral-gray);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .rate-negotiable-btn:hover {
+            background-color: #EEEEEE;
+        }
+
+        .rate-negotiable-btn.selected {
+            background-color: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+        }
+
+        .rate-negotiable-btn i {
+            font-size: 14px;
+        }
+
+        /* Avatar Upload */
+        .avatar-section {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .avatar-upload {
+            position: relative;
+        }
+
+        .avatar-preview {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .avatar-upload-btn {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--primary-blue);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: 3px solid white;
+            transition: all 0.3s ease;
+        }
+
+        .avatar-upload-btn:hover {
+            background-color: #0052A3;
+        }
+
+        .avatar-info {
+            flex: 1;
+        }
+
+        .avatar-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .avatar-description {
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        /* Specialty Tags */
+        .specialty-group {
+            margin-bottom: 25px;
+        }
+
+        .specialty-label {
+            font-weight: 500;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .specialty-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .specialty-tag {
+            background-color: var(--light-gray);
+            border: 1px solid var(--border-color);
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .specialty-tag:hover {
+            border-color: var(--primary-blue);
+            background-color: rgba(0, 102, 204, 0.05);
+        }
+
+        .specialty-tag.selected {
+            background-color: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+        }
+
+        /* Country/Region Tags */
+        .country-group {
+            margin-bottom: 25px;
+        }
+
+        .country-label {
+            font-weight: 500;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .country-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .country-tag {
+            background-color: var(--light-gray);
+            border: 1px solid var(--border-color);
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .country-tag:hover {
+            border-color: var(--calm-purple);
+            background-color: rgba(123, 104, 238, 0.05);
+        }
+
+        .country-tag.selected {
+            background-color: var(--calm-purple);
+            color: white;
+            border-color: var(--calm-purple);
+        }
+
+        .country-tag i {
+            font-size: 12px;
+        }
+
+        /* Experience Cards */
+        .experience-cards {
+            display: grid;
+            gap: 20px;
+        }
+
+        .experience-card {
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .experience-card:hover {
+            box-shadow: var(--shadow);
+        }
+
+        .experience-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .experience-title-input {
+            font-weight: 600;
+            font-size: 16px;
+            border: none;
+            background: transparent;
+            padding: 0;
+            margin-bottom: 5px;
+        }
+
+        .experience-period-input {
+            color: var(--text-light);
+            font-size: 14px;
+            border: none;
+            background: transparent;
+            padding: 0;
+        }
+
+        .experience-company-input {
+            color: var(--text-light);
+            font-size: 14px;
+            border: none;
+            background: transparent;
+            padding: 0;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .experience-description-input {
+            width: 100%;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 10px;
+            font-size: 14px;
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .remove-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: var(--alert-red);
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        /* Certification Cards */
+        .certification-cards {
+            display: grid;
+            gap: 20px;
+        }
+
+        .certification-card {
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            background: linear-gradient(135deg, rgba(0, 102, 204, 0.02), rgba(46, 189, 89, 0.02));
+        }
+
+        .certification-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .certification-name-input {
+            font-weight: 600;
+            font-size: 16px;
+            border: none;
+            background: transparent;
+            padding: 0;
+            flex: 1;
+        }
+
+        .certification-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            border: 1px solid var(--border-color);
+            background: white;
+        }
+
+        .certification-status.valid {
+            background-color: var(--success-green);
+            color: white;
+            border-color: var(--success-green);
+        }
+
+        .certification-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .cert-detail-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .cert-detail-item i {
+            color: var(--text-light);
+        }
+
+        .cert-detail-input {
+            border: none;
+            background: transparent;
+            padding: 0;
+            font-size: 14px;
+            color: var(--text-light);
+        }
+
+        /* Certification File Upload */
+        .cert-file-upload {
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .cert-file-upload:hover {
+            border-color: var(--primary-blue);
+            background-color: rgba(0, 102, 204, 0.02);
+        }
+
+        .cert-file-upload-icon {
+            font-size: 24px;
+            color: var(--primary-blue);
+            margin-bottom: 8px;
+        }
+
+        .cert-file-upload-text {
+            color: var(--text-light);
+            font-size: 13px;
+        }
+
+        .cert-file-list {
+            margin-top: 10px;
+        }
+
+        .cert-file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            background-color: var(--light-gray);
+            border-radius: 6px;
+            margin-bottom: 6px;
+            font-size: 13px;
+        }
+
+        .cert-file-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .cert-file-icon {
+            font-size: 16px;
+            color: var(--primary-blue);
+        }
+
+        .cert-file-remove {
+            color: var(--alert-red);
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        /* File Upload */
+        .file-upload-section {
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        .file-upload-section:hover {
+            border-color: var(--primary-blue);
+            background-color: rgba(0, 102, 204, 0.02);
+        }
+
+        .file-upload-icon {
+            font-size: 48px;
+            color: var(--primary-blue);
+            margin-bottom: 15px;
+        }
+
+        .file-upload-text {
+            color: var(--text-light);
+            margin-bottom: 10px;
+        }
+
+        .file-upload-button {
+            background-color: var(--primary-blue);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .file-list {
+            margin-top: 15px;
+        }
+
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background-color: var(--light-gray);
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .file-icon {
+            font-size: 20px;
+            color: var(--primary-blue);
+        }
+
+        .file-name {
+            font-weight: 500;
+        }
+
+        .file-size {
+            color: var(--text-light);
+            font-size: 13px;
+        }
+
+        .file-remove {
+            color: var(--alert-red);
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        /* Add Button */
+        .add-button {
+            width: 100%;
+            padding: 15px;
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            background: transparent;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-weight: 500;
+        }
+
+        .add-button:hover {
+            border-color: var(--primary-blue);
+            color: var(--primary-blue);
+            background-color: rgba(0, 102, 204, 0.02);
+        }
+
+        /* Help Text */
+        .help-text {
+            font-size: 13px;
+            color: var(--text-light);
+            margin-top: 5px;
+        }
+
+        .error-text {
+            font-size: 13px;
+            color: var(--alert-red);
+            margin-top: 5px;
+        }
+
+        /* Info Box */
+        .info-box {
+            background-color: rgba(0, 102, 204, 0.05);
+            border-left: 4px solid var(--primary-blue);
+            padding: 15px;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 20px;
+        }
+
+        .info-box-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-box-content {
+            font-size: 14px;
+            color: var(--text-light);
+        }
+
+        /* Form Actions */
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-blue);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #0052A3;
+        }
+
+        .btn-secondary {
+            background-color: var(--light-gray);
+            color: var(--neutral-gray);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: #EEEEEE;
+        }
+
+        .btn-success {
+            background-color: var(--success-green);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #249A46;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+        }
+
+        /* Compact checkbox styling */
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .checkbox-wrapper input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            margin-right: 10px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .checkbox-wrapper label {
+            margin-bottom: 0;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .terms-section {
+            padding: 0;
+            margin-bottom: 10px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .form-container {
+                padding: 20px;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .avatar-section {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .btn-group {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .rate-input-group {
+                flex-direction: column;
+            }
+
+            .rate-negotiable-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-container">
+                <div class="logo">
+                    <i class="fas fa-check-circle"></i>
+                    SuperSlice
+                </div>
+                <div class="user-menu">
+                    <div class="user-profile">
+                        <img src="https://picsum.photos/seed/consultant/40/40.jpg" alt="User Avatar" class="user-avatar">
+                        <span>컨설턴트</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Form Container -->
+    <div class="container">
+        <div class="form-container">
+            <div class="form-header">
+                <h2 class="form-title">개인 자격 등록</h2>
+                <p class="form-subtitle">전문가와 기업을 연결하는 최적의 매칭 플랫폼입니다.</p>
+            </div>
+
+            <!-- Profile Completion -->
+            <div class="profile-completion">
+                <div class="completion-text">
+                    <div class="completion-title">
+                        <i class="fas fa-chart-pie"></i>
+                        프로필 완성도
+                    </div>
+                    <div class="help-text">프로필이 완성될수록 더 많은 기업에게 노출됩니다</div>
+                    <div class="completion-bar">
+                        <div class="completion-fill" id="completionBar"></div>
+                    </div>
+                </div>
+                <div class="completion-percentage" id="completionPercentage">65%</div>
+            </div>
+
+            <form id="consultantProfileForm">
+                <!-- 기본 정보 섹션 -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-user"></i>
+                        기본 정보
+                    </h3>
+                    
+                    <div class="avatar-section">
+                        <div class="avatar-upload">
+                            <img src="https://picsum.photos/seed/defaultavatar/120/120.jpg" alt="Profile" class="avatar-preview" id="avatarPreview">
+                            <div class="avatar-upload-btn" onclick="document.getElementById('avatarInput').click()">
+                                <i class="fas fa-camera"></i>
+                            </div>
+                            <input type="file" id="avatarInput" accept="image/*" style="display: none;" onchange="updateAvatar(event)">
+                        </div>
+                        <div class="avatar-info">
+                            <div class="avatar-title">프로필 사진</div>
+                            <div class="avatar-description">전문적인 모습의 사진을 업로드해주세요. (JPG, PNG, 최대 5MB)</div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="name">이름 <span class="required">*</span></label>
+                            <input type="text" id="name" name="name" required placeholder="홍길동">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email">이메일 <span class="required">*</span></label>
+                            <input type="email" id="email" name="email" required placeholder="example@email.com">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="phone">연락처 <span class="required">*</span></label>
+                            <input type="tel" id="phone" name="phone" required placeholder="010-0000-0000">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="experienceYears">경력년수 <span class="required">*</span></label>
+                            <input type="number" id="experienceYears" name="experienceYears" required min="0" max="50" placeholder="10">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="hourlyRate">시간당 요금대 (만원) <span class="required">*</span></label>
+                            <div class="rate-input-group">
+                                <input type="text" id="hourlyRate" name="hourlyRate" class="rate-input" required placeholder="예: 50-100">
+                                <button type="button" class="rate-negotiable-btn" id="negotiableBtn" onclick="toggleNegotiable()">
+                                    <i class="fas fa-handshake"></i>
+                                    협의
+                                </button>
+                            </div>
+                            <div class="help-text">요금 범위를 입력하거나 '협의'를 선택해주세요.</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="location">활동 지역 <span class="required">*</span></label>
+                            <select id="location" name="location" required>
+                                <option value="">선택해주세요</option>
+                                <option value="seoul">서울</option>
+                                <option value="gyeonggi">경기</option>
+                                <option value="incheon">인천</option>
+                                <option value="busan">부산</option>
+                                <option value="daegu">대구</option>
+                                <option value="gwangju">광주</option>
+                                <option value="daejeon">대전</option>
+                                <option value="ulsan">울산</option>
+                                <option value="sejong">세종</option>
+                                <option value="gangwon">강원</option>
+                                <option value="chungbuk">충북</option>
+                                <option value="chungnam">충남</option>
+                                <option value="jeonbuk">전북</option>
+                                <option value="jeonnam">전남</option>
+                                <option value="gyeongbuk">경북</option>
+                                <option value="gyeongnam">경남</option>
+                                <option value="jeju">제주</option>
+                                <option value="online">온라인</option>
+                                <option value="all">전국</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group full-width">
+                            <label for="bio">자기소개 <span class="required">*</span></label>
+                            <textarea id="bio" name="bio" required placeholder="전문 분야와 경험을 중심으로 자신을 소개해주세요."></textarea>
+                            <div class="help-text">최소 100자 이상 작성해주세요.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 전문 분야 섹션 -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-briefcase"></i>
+                        전문 분야
+                    </h3>
+                    
+                    <div class="info-box">
+                        <div class="info-box-title">
+                            <i class="fas fa-info-circle"></i>
+                            전문 분야 선택 가이드
+                        </div>
+                        <div class="info-box-content">
+                            실제 경험이 있는 분야를 선택해주세요. 다중 선택이 가능합니다.
+                        </div>
+                    </div>
+
+                    <div class="specialty-group">
+                        <div class="specialty-label">
+                            <i class="fas fa-industry"></i>
+                            산업 분야 <span class="required">*</span>
+                        </div>
+                        <div class="specialty-container">
+                            <div class="specialty-tag" onclick="toggleSpecialty(this)">금융</div>
+                            <div class="specialty-tag" onclick="toggleSpecialty(this)">의료</div>
+                            <div class="specialty-tag" onclick="toggleSpecialty(this)">제조</div>
+                            <div class="specialty-tag" onclick="toggleSpecialty(this)">IT</div>
+                            <div class="specialty-tag" onclick="toggleSpecialty(this)">공공</div>
+                            <div class="specialty-tag" onclick="toggleSpecialty(this)">유통</div>
+                            <div class="specialty-tag" onclick="toggleSpecialty(this)">교육</div>
+                            <div class="specialty-tag" onclick="toggleSpecialty(this)">물류</div>
+                            <div class="specialty-tag" onclick="toggleSpecialty(this)">환경</div>
+                            <div class="specialty-tag" onclick="toggleSpecialty(this)">식품</div>
+                        </div>
+                    </div>
+
+                    <div class="specialty-group">
+                        <div class="specialty-label">
+                            <i class="fas fa-shield-alt"></i>
+                            인증 분야
+                        </div>
+                        <div class="specialty-container">
+                            <div class="specialty-tag" onclick="toggleSpecialty(this)">ISMS-P</div>
+                            <div class="specialty-tag" onclick="toggleSpecialty(this)">ISMS</div>
+                            <div class="specialty-tag" onclick="toggleSpecialty(this)">ISO 27001</div>
+                            <div class="specialty-tag" onclick="toggleSpecialty(this)">ISO 27701</div>
+                            <div class="specialty-tag" onclick="toggleSpecialty(this)">GS 인증</div>
+                            <div class="specialty-tag" onclick="toggleSpecialty(this)">CPPG</div>
+                            <div class="specialty-tag" onclick="toggleSpecialty(this)">CSAP</div>
+                            <div class="specialty-tag" onclick="toggleSpecialty(this)">ESPM</div>
+                        </div>
+                    </div>
+
+                    <!-- 국가/지역 섹션 추가 -->
+                    <div class="country-group">
+                        <div class="country-label">
+                            <i class="fas fa-globe"></i>
+                            해외 컨설팅 및 인증 경험
+                        </div>
+                        <div class="country-container">
+                            <div class="country-tag" onclick="toggleCountry(this)">
+                                <i class="fas fa-flag-usa"></i>
+                                <span>미국</span>
+                            </div>
+                            <div class="country-tag" onclick="toggleCountry(this)">
+                                <i class="fas fa-flag"></i>
+                                <span>일본</span>
+                            </div>
+                            <div class="country-tag" onclick="toggleCountry(this)">
+                                <i class="fas fa-flag"></i>
+                                <span>중국</span>
+                            </div>
+                            <div class="country-tag" onclick="toggleCountry(this)">
+                                <i class="fas fa-flag"></i>
+                                <span>싱가포르</span>
+                            </div>
+                            <div class="country-tag" onclick="toggleCountry(this)">
+                                <i class="fas fa-flag"></i>
+                                <span>홍콩</span>
+                            </div>
+                            <div class="country-tag" onclick="toggleCountry(this)">
+                                <i class="fas fa-flag"></i>
+                                <span>영국</span>
+                            </div>
+                            <div class="country-tag" onclick="toggleCountry(this)">
+                                <i class="fas fa-flag"></i>
+                                <span>독일</span>
+                            </div>
+                            <div class="country-tag" onclick="toggleCountry(this)">
+                                <i class="fas fa-flag"></i>
+                                <span>캐나다</span>
+                            </div>
+                            <div class="country-tag" onclick="toggleCountry(this)">
+                                <i class="fas fa-flag"></i>
+                                <span>호주</span>
+                            </div>
+                            <div class="country-tag" onclick="toggleCountry(this)">
+                                <i class="fas fa-flag"></i>
+                                <span>호주</span>
+                            </div>
+                            <div class="country-tag" onclick="toggleCountry(this)">
+                                <i class="fas fa-flag"></i>
+                                <span>인도네시아</span>
+                            </div>
+                            <div class="country-tag" onclick="toggleCountry(this)">
+                                <i class="fas fa-flag"></i>
+                                <span>태국</span>
+                            </div>
+                            <div class="country-tag" onclick="toggleCountry(this)">
+                                <i class="fas fa-flag"></i>
+                                <span>베트남</span>
+                            </div>
+                            <div class="country-tag" onclick="toggleCountry(this)">
+                                <i class="fas fa-flag"></i>
+                                <span>말레이시아</span>
+                            </div>
+                            <div class="country-tag" onclick="toggleCountry(this)">
+                                <i class="fas fa-flag"></i>
+                                <span>호주</span>
+                            </div>
+                            <div class="country-tag" onclick="toggleCountry(this)">
+                                <i class="fas fa-flag"></i>
+                                <span>오스트레일리아</span>
+                            </div>
+                            <div class="country-tag" onclick="toggleCountry(this)">
+                                <i class="fas fa-flag"></i>
+                                <span>뉴질랜드</span>
+                            </div>
+                        </div>
+                        <div class="help-text">해외 프로젝트 경험이 있는 국가를 선택해주세요. 다중 선택이 가능합니다.</div>
+                    </div>
+                </div>
+
+                <!-- 경력 섹션 -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-history"></i>
+                        경력 사항
+                    </h3>
+                    
+                    <div class="experience-cards" id="experienceCards">
+                        <div class="experience-card">
+                            <button type="button" class="remove-btn" onclick="removeExperience(this)">
+                                <i class="fas fa-times"></i>
+                            </button>
+                            <div class="experience-header">
+                                <div>
+                                    <input type="text" class="experience-title-input" placeholder="직책" value="정보보호 컨설턴트">
+                                    <input type="text" class="experience-period-input" placeholder="근무기간" value="2020.01 - 현재">
+                                </div>
+                            </div>
+                            <input type="text" class="experience-company-input" placeholder="회사명" value="(주)보안솔루션">
+                            <textarea class="experience-description-input" placeholder="주요 업무 및 성과">ISMS-P, ISO 27001 컨설팅 수행</textarea>
+                        </div>
+                    </div>
+                    
+                    <button type="button" class="add-button" onclick="addExperience()">
+                        <i class="fas fa-plus"></i>
+                        경력 추가
+                    </button>
+                </div>
+
+                <!-- 자격증 섹션 -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-certificate"></i>
+                        자격증
+                    </h3>
+                    
+                    <div class="info-box">
+                        <div class="info-box-title">
+                            <i class="fas fa-check-circle"></i>
+                            검증 안내
+                        </div>
+                        <div class="info-box-content">
+                            제출된 자격증은 3개월 내 수동 검증되며, 검증 완료 시 'Verified Consultant' 배지가 표시됩니다.
+                        </div>
+                    </div>
+                    
+                    <div class="certification-cards" id="certificationCards">
+                        <div class="certification-card">
+                            <button type="button" class="remove-btn" onclick="removeCertification(this)">
+                                <i class="fas fa-times"></i>
+                            </button>
+                            <div class="certification-header">
+                                <input type="text" class="certification-name-input" placeholder="자격증명" value="정보보호전문가">
+                                <select class="certification-status valid">
+                                    <option value="valid">유효</option>
+                                    <option value="expired">만료</option>
+                                    <option value="pending">갱신 중</option>
+                                </select>
+                            </div>
+                            <div class="certification-details">
+                                <div class="cert-detail-item">
+                                    <i class="fas fa-certificate"></i>
+                                    <input type="text" class="cert-detail-input" placeholder="인증번호" value="18-01-12345">
+                                </div>
+                                <div class="cert-detail-item">
+                                    <i class="fas fa-building"></i>
+                                    <input type="text" class="cert-detail-input" placeholder="발급기관" value="한국인터넷진흥원">
+                                </div>
+                                <div class="cert-detail-item">
+                                    <i class="fas fa-calendar"></i>
+                                    <input type="text" class="cert-detail-input" placeholder="발급일" value="2018.05">
+                                </div>
+                                <div class="cert-detail-item">
+                                    <i class="fas fa-calendar-check"></i>
+                                    <input type="text" class="cert-detail-input" placeholder="만료일" value="2025.05">
+                                </div>
+                            </div>
+                            <div class="cert-file-upload" onclick="this.querySelector('input').click()">
+                                <i class="fas fa-cloud-upload-alt cert-file-upload-icon"></i>
+                                <div class="cert-file-upload-text">자격증 사본 업로드</div>
+                                <input type="file" accept=".pdf,.jpg,.png" multiple style="display: none;" onchange="handleCertFileUpload(this, this.parentElement.parentElement)">
+                            </div>
+                            <div class="cert-file-list"></div>
+                        </div>
+                    </div>
+                    
+                    <button type="button" class="add-button" onclick="addCertification()">
+                        <i class="fas fa-plus"></i>
+                        자격증 추가
+                    </button>
+                </div>
+
+                <!-- 서류 제출 섹션 -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-file-upload"></i>
+                        서류 제출
+                    </h3>
+                    
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label>이력서 <span class="required">*</span></label>
+                            <div class="file-upload-section" onclick="document.getElementById('resumeFile').click()">
+                                <i class="fas fa-cloud-upload-alt file-upload-icon"></i>
+                                <div class="file-upload-text">파일을 드래그하거나 클릭하여 업로드하세요</div>
+                                <button type="button" class="file-upload-button">파일 선택</button>
+                                <input type="file" id="resumeFile" name="resumeFile" accept=".pdf,.doc,.docx" style="display: none;" onchange="handleFileUpload(this, '이력서')">
+                            </div>
+                            <div id="resumeFileList" class="file-list"></div>
+                        </div>
+                        
+                        <div class="form-group full-width">
+                            <label>자격증 이미지 <span class="required">*</span></label>
+                            <div class="file-upload-section" onclick="document.getElementById('certFiles').click()">
+                                <i class="fas fa-cloud-upload-alt file-upload-icon"></i>
+                                <div class="file-upload-text">자격증 스캔본을 업로드하세요 (최대 3개)</div>
+                                <button type="button" class="file-upload-button">파일 선택</button>
+                                <input type="file" id="certFiles" name="certFiles" accept=".pdf,.jpg,.png" multiple style="display: none;" onchange="handleFileUpload(this, '자격증')">
+                            </div>
+                            <div id="certFilesList" class="file-list"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 약관 동의 섹션 -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-check-square"></i>
+                        약관 동의
+                    </h3>
+                    
+                    <div class="terms-section">
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" id="terms1" name="terms1" required>
+                            <label for="terms1">개인정보 수집 및 이용에 동의 <span class="required">*</span></label>
+                        </div>
+                        <div class="help-text">수집된 개인정보는 심사 진행 및 결과 통보 목적으로만 사용됩니다.</div>
+                        
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" id="terms2" name="terms2" required>
+                            <label for="terms2">심사 규정 및 절차에 동의 <span class="required">*</span></label>
+                        </div>
+                        
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" id="terms3" name="terms3" required>
+                            <label for="terms3">제출 서류의 진실성 확인 <span class="required">*</span></label>
+                        </div>
+                        <div class="help-text">허위 서류 제출 시 인증이 취소될 수 있습니다.</div>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="saveDraft()">
+                        <i class="fas fa-save"></i>
+                        임시 저장
+                    </button>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-secondary" onclick="window.history.back()">
+                            <i class="fas fa-arrow-left"></i>
+                            이전
+                        </button>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-check"></i>
+                            프로필 등록 완료
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Profile completion tracking
+        function updateCompletion() {
+            const requiredFields = document.querySelectorAll('[required]');
+            const filledFields = Array.from(requiredFields).filter(field => field.value.trim() !== '');
+            const selectedSpecialties = document.querySelectorAll('.specialty-tag.selected');
+            const selectedCountries = document.querySelectorAll('.country-tag.selected');
+            
+            let completion = (filledFields.length / requiredFields.length) * 50;
+            completion += (selectedSpecialties.length > 0) ? 15 : 0;
+            completion += (selectedCountries.length > 0) ? 15 : 0;
+            completion += (document.querySelectorAll('.experience-card').length > 0) ? 10 : 0;
+            completion += (document.querySelectorAll('.certification-card').length > 0) ? 10 : 0;
+            
+            completion = Math.min(100, Math.round(completion));
+            
+            document.getElementById('completionBar').style.width = completion + '%';
+            document.getElementById('completionPercentage').textContent = completion + '%';
+        }
+
+        // Avatar upload
+        function updateAvatar(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('avatarPreview').src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Toggle negotiable button
+        function toggleNegotiable() {
+            const btn = document.getElementById('negotiableBtn');
+            const rateInput = document.getElementById('hourlyRate');
+            
+            btn.classList.toggle('selected');
+            
+            if (btn.classList.contains('selected')) {
+                rateInput.value = '협의';
+                rateInput.disabled = true;
+                rateInput.style.backgroundColor = '#f5f5f5';
+            } else {
+                rateInput.value = '';
+                rateInput.disabled = false;
+                rateInput.style.backgroundColor = 'white';
+            }
+            
+            updateCompletion();
+        }
+
+        // Toggle specialty
+        function toggleSpecialty(element) {
+            element.classList.toggle('selected');
+            updateCompletion();
+        }
+
+        // Toggle country
+        function toggleCountry(element) {
+            element.classList.toggle('selected');
+            updateCompletion();
+        }
+
+        // Add experience
+        function addExperience() {
+            const container = document.getElementById('experienceCards');
+            const experienceCard = document.createElement('div');
+            experienceCard.className = 'experience-card';
+            experienceCard.innerHTML = `
+                <button type="button" class="remove-btn" onclick="removeExperience(this)">
+                    <i class="fas fa-times"></i>
+                </button>
+                <div class="experience-header">
+                    <div>
+                        <input type="text" class="experience-title-input" placeholder="직책">
+                        <input type="text" class="experience-period-input" placeholder="근무기간 (예: 2020.01 - 2022.12)">
+                    </div>
+                </div>
+                <input type="text" class="experience-company-input" placeholder="회사명">
+                <textarea class="experience-description-input" placeholder="주요 업무 및 성과"></textarea>
+            `;
+            container.appendChild(experienceCard);
+            updateCompletion();
+        }
+
+        // Remove experience
+        function removeExperience(button) {
+            button.parentElement.remove();
+            updateCompletion();
+        }
+
+        // Add certification
+        function addCertification() {
+            const container = document.getElementById('certificationCards');
+            const certificationCard = document.createElement('div');
+            certificationCard.className = 'certification-card';
+            certificationCard.innerHTML = `
+                <button type="button" class="remove-btn" onclick="removeCertification(this)">
+                    <i class="fas fa-times"></i>
+                </button>
+                <div class="certification-header">
+                    <input type="text" class="certification-name-input" placeholder="자격증명">
+                    <select class="certification-status">
+                        <option value="valid">유효</option>
+                        <option value="expired">만료</option>
+                        <option value="pending">갱신 중</option>
+                    </select>
+                </div>
+                <div class="certification-details">
+                    <div class="cert-detail-item">
+                        <i class="fas fa-certificate"></i>
+                        <input type="text" class="cert-detail-input" placeholder="인증번호">
+                    </div>
+                    <div class="cert-detail-item">
+                        <i class="fas fa-building"></i>
+                        <input type="text" class="cert-detail-input" placeholder="발급기관">
+                    </div>
+                    <div class="cert-detail-item">
+                        <i class="fas fa-calendar"></i>
+                        <input type="text" class="cert-detail-input" placeholder="발급일">
+                    </div>
+                    <div class="cert-detail-item">
+                        <i class="fas fa-calendar-check"></i>
+                        <input type="text" class="cert-detail-input" placeholder="만료일">
+                    </div>
+                </div>
+                <div class="cert-file-upload" onclick="this.querySelector('input').click()">
+                    <i class="fas fa-cloud-upload-alt cert-file-upload-icon"></i>
+                    <div class="cert-file-upload-text">자격증 사본 업로드</div>
+                    <input type="file" accept=".pdf,.jpg,.png" multiple style="display: none;" onchange="handleCertFileUpload(this, this.parentElement.parentElement)">
+                </div>
+                <div class="cert-file-list"></div>
+            `;
+            container.appendChild(certificationCard);
+            updateCompletion();
+        }
+
+        // Remove certification
+        function removeCertification(button) {
+            button.parentElement.remove();
+            updateCompletion();
+        }
+
+        // Handle certificate file upload
+        function handleCertFileUpload(input, cardElement) {
+            const files = input.files;
+            const fileList = cardElement.querySelector('.cert-file-list');
+            
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const fileItem = document.createElement('div');
+                fileItem.className = 'cert-file-item';
+                
+                const fileSize = (file.size / 1024).toFixed(2) + ' KB';
+                
+                fileItem.innerHTML = `
+                    <div class="cert-file-info">
+                        <i class="fas fa-file cert-file-icon"></i>
+                        <span>${file.name} (${fileSize})</span>
+                    </div>
+                    <i class="fas fa-times cert-file-remove" onclick="this.parentElement.remove()"></i>
+                `;
+                
+                fileList.appendChild(fileItem);
+            }
+            
+            updateCompletion();
+        }
+
+        // Handle file upload
+        function handleFileUpload(input, fileType) {
+            const files = input.files;
+            const fileListId = fileType === '이력서' ? 'resumeFileList' : 'certFilesList';
+            const fileList = document.getElementById(fileListId);
+            
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                
+                const fileSize = (file.size / 1024).toFixed(2) + ' KB';
+                
+                fileItem.innerHTML = `
+                    <div class="file-info">
+                        <i class="fas fa-file file-icon"></i>
+                        <div>
+                            <div class="file-name">${file.name}</div>
+                            <div class="file-size">${fileSize}</div>
+                        </div>
+                    </div>
+                    <i class="fas fa-times file-remove" onclick="this.parentElement.remove()"></i>
+                `;
+                
+                fileList.appendChild(fileItem);
+            }
+            
+            updateCompletion();
+        }
+
+        // Save draft
+        function saveDraft() {
+            // Implementation for saving draft
+            alert('임시 저장되었습니다.');
+        }
+
+        // Form submission
+        document.getElementById('consultantProfileForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Check if all required fields are filled
+            const requiredFields = document.querySelectorAll('[required]');
+            let isValid = true;
+            
+            requiredFields.forEach(field => {
+                if (field.type === 'checkbox') {
+                    if (!field.checked) {
+                        isValid = false;
+                        field.style.borderColor = 'var(--alert-red)';
+                    } else {
+                        field.style.borderColor = 'var(--border-color)';
+                    }
+                } else if (!field.value.trim()) {
+                    isValid = false;
+                    field.style.borderColor = 'var(--alert-red)';
+                } else {
+                    field.style.borderColor = 'var(--border-color)';
+                }
+            });
+            
+            if (isValid) {
+                // Submit form
+                alert('프로필이 성공적으로 등록되었습니다.');
+                // In a real application, you would submit form data to server here
+            } else {
+                alert('필수 항목을 모두 입력해주세요.');
+            }
+        });
+        // Initialize completion on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCompletion();
+        });
+    </script>
+</body>
+</html>

@@ -1,4 +1,4 @@
--- CertMatch Database Schema - RESET VERSION
+-- SuperSlice Database Schema - RESET VERSION
 -- PostgreSQL 14+
 -- 작성일: 2025-01-15
 -- 주의: 이 스크립트는 기존 데이터를 모두 삭제합니다!
@@ -808,7 +808,7 @@ EXECUTE FUNCTION update_post_comment_count();
 
 -- 관리자 계정
 INSERT INTO users (email, password_hash, user_type, name, email_verified)
-VALUES ('admin@certmatch.io', crypt('admin123!', gen_salt('bf')), 'admin', 'Admin User', true);
+VALUES ('admin@superslice.io', crypt('admin123!', gen_salt('bf')), 'admin', 'Admin User', true);
 
 -- 샘플 기업 사용자
 INSERT INTO users (email, password_hash, user_type, name, email_verified)
@@ -827,7 +827,7 @@ VALUES ('educator@example.com', crypt('password123!', gen_salt('bf')), 'educator
 -- ============================================
 
 DO $$ BEGIN
-    RAISE NOTICE '✅ CertMatch 데이터베이스 스키마 생성 완료!';
+    RAISE NOTICE '✅ SuperSlice 데이터베이스 스키마 생성 완료!';
     RAISE NOTICE '📊 총 16개 테이블 생성됨';
     RAISE NOTICE '🔐 샘플 계정 4개 생성됨 (비밀번호: password123! 또는 admin123!)';
     RAISE NOTICE '⚡ 자동화 트리거 3개 활성화됨';

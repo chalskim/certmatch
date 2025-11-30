@@ -401,7 +401,64 @@ export const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: '500',
   },
-  // 프로필 사진 업로드 섹션
+
+  // 파일 관련 스타일
+  fileCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    borderRadius: 8,
+    padding: 16,
+    marginBottom: 12,
+  },
+  fileInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    gap: 12,
+  },
+  fileDetails: {
+    flex: 1,
+  },
+  fileName: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#333',
+    marginBottom: 4,
+  },
+  fileSize: {
+    fontSize: 12,
+    color: '#666',
+  },
+  removeFileButton: {
+    padding: 8,
+    borderRadius: 16,
+    backgroundColor: '#FEE',
+  },
+  fileList: {
+    gap: 12,
+  },
+  addFileButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#F8F9FA',
+    borderWidth: 1,
+    borderColor: '#0066CC',
+    borderStyle: 'dashed',
+    borderRadius: 8,
+    padding: 12,
+    gap: 8,
+  },
+  addFileButtonText: {
+    color: '#0066CC',
+    fontWeight: '500',
+    fontSize: 14,
+  },
+  // 프로필 사진 업로드 섹션 (기존 스타일 유지)
   avatarSection: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -465,6 +522,199 @@ export const styles = StyleSheet.create({
     fontWeight: '500',
     marginLeft: 6,
   },
+
+  // 새로운 이미지 업로드 스타일 (요청하신 CSS 클래스에 맞춤)
+  avatarPreviewContainer: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: '#F8F9FA',
+    borderWidth: 2,
+    borderColor: '#E9ECEF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  avatarCircularImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+  },
+  avatarCircularPlaceholder: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+    height: '100%',
+    gap: 8,
+  },
+  avatarPlaceholderText: {
+    fontSize: 12,
+    color: '#999',
+    fontWeight: '500',
+    marginTop: 4,
+  },
+  imageSelectButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#0066CC',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    gap: 8,
+    minWidth: 120,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  imageSelectButtonText: {
+    color: '#fff',
+    fontWeight: '500',
+    fontSize: 14,
+  },
+  imageRemoveButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#e74c3c',
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 6,
+    gap: 6,
+    minWidth: 80,
+  },
+  imageRemoveButtonText: {
+    color: '#e74c3c',
+    fontWeight: '500',
+    fontSize: 13,
+  },
+
+  // 시간당 요금대 협의 버튼 스타일
+  hourlyRateContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  hourlyRateInput: {
+    flex: 1,
+    marginRight: 8,
+  },
+  disabledInput: {
+    backgroundColor: '#F5F5F5',
+    color: '#999',
+  },
+  negotiableButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFFFFF',
+    borderWidth: 2,
+    borderColor: '#0066CC',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    gap: 8,
+    minWidth: 80,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  negotiableButtonActive: {
+    backgroundColor: '#0066CC',
+    borderColor: '#0066CC',
+  },
+  negotiableButtonText: {
+    color: '#0066CC',
+    fontWeight: '600',
+    fontSize: 14,
+  },
+  negotiableButtonTextActive: {
+    color: '#fff',
+  },
+
+  // 셀렉트 박스 스타일
+  selectButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    borderRadius: 8,
+    padding: 12,
+    backgroundColor: '#fff',
+    minHeight: 48,
+  },
+  selectButtonText: {
+    fontSize: 14,
+    color: '#333',
+    flex: 1,
+  },
+  placeholderText: {
+    color: '#999',
+  },
+
+  // 모달 스타일
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    maxHeight: '70%',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E0E0E0',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#333',
+  },
+  modalCloseButton: {
+    padding: 8,
+    borderRadius: 16,
+    backgroundColor: '#F5F5F5',
+  },
+
+  // 지역 선택 아이템 스타일
+  locationItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F0F0F0',
+  },
+  locationItemSelected: {
+    backgroundColor: 'rgba(0, 102, 204, 0.05)',
+  },
+  locationItemText: {
+    fontSize: 16,
+    color: '#333',
+  },
+  locationItemTextSelected: {
+    color: '#0066CC',
+    fontWeight: '600',
+  },
   addButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -524,5 +774,12 @@ export const styles = StyleSheet.create({
     fontWeight: '500',
     color: '#fff',
     marginLeft: 8,
+  },
+  progressPercentageText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '500',
+    textAlign: 'center',
+    marginTop: 10,
   },
 });

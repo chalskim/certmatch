@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, ScrollView, TouchableOpacity, Image, Alert } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { View, Text, TextInput, ScrollView, TouchableOpacity, Image, Alert, Platform } from 'react-native';
 import type { ImageSourcePropType } from 'react-native';
 import { Images } from '../../assets/index';
 import { FontAwesome5 } from '@expo/vector-icons';
@@ -44,8 +44,22 @@ export const ExpertRecruitmentFromMockup: React.FC = () => {
   const [otherExpertise, setOtherExpertise] = useState('');
 
   const [experienceYears, setExperienceYears] = useState('');
-  const [workplaceInput, setWorkplaceInput] = useState('');
-  const [workplaces, setWorkplaces] = useState<string[]>([]);
+  // 이전 직장 입력/추가 UI는 제거되었습니다.
+
+  // 상세 경력 정보 관리
+  type ExperienceEntry = {
+    title: string;
+    company: string;
+    startDate?: string; // YYYY-MM 권장
+    endDate?: string;   // YYYY-MM 권장
+    description?: string;
+  };
+  const [expTitle, setExpTitle] = useState('');
+  const [expCompany, setExpCompany] = useState('');
+  const [expStartDate, setExpStartDate] = useState('');
+  const [expEndDate, setExpEndDate] = useState('');
+  const [expDescription, setExpDescription] = useState('');
+  const [experiences, setExperiences] = useState<ExperienceEntry[]>([]);
 
   const [certFiles, setCertFiles] = useState<string[]>([]);
   const [portfolioFiles, setPortfolioFiles] = useState<string[]>([]);
@@ -67,6 +81,20 @@ export const ExpertRecruitmentFromMockup: React.FC = () => {
   const [customLanguageInput, setCustomLanguageInput] = useState('');
   const [customLanguages, setCustomLanguages] = useState<string[]>([]);
 
+  // 언어별 자격증 및 사본 파일 관리 (여러 개의 자격증 지원)
+  type LangCertFile = { name: string; size?: number; uri?: string };
+  type LangCertificate = { 
+    certificateName: string; 
+    files: LangCertFile[];
+    certificateNumber?: string;
+    issuingBody?: string;
+    issueDate?: string;
+    expiryDate?: string;
+  };
+  type LangCertInfo = { certificates: LangCertificate[] };
+  const [languageCerts, setLanguageCerts] = useState<Record<string, LangCertInfo>>({});
+  const langCertFileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
+
   // 제공 가능 서비스 선택 (인증/컨설팅/교육)
   const serviceOptions = [
     { key: 'certification', label: '인증' },
@@ -85,7 +113,22 @@ export const ExpertRecruitmentFromMockup: React.FC = () => {
   const toggleRegion = (value: string) => toggleArray(regions, setRegions, value);
   const toggleAvailabilityDay = (value: string) => toggleArray(availabilityDays, setAvailabilityDays, value);
   const toggleTimeSlot = (value: string) => toggleArray(timeSlots, setTimeSlots, value);
-  const toggleLanguage = (value: string) => toggleArray(selectedLanguages, setSelectedLanguages, value);
+  const toggleLanguage = (value: string) => {
+    // 선택/해제 시 언어별 자격증 맵도 동기화
+    if (selectedLanguages.includes(value)) {
+      setSelectedLanguages(selectedLanguages.filter((a) => a !== value));
+      setLanguageCerts((prev) => {
+        const { [value]: _omit, ...rest } = prev;
+        return rest;
+      });
+    } else {
+      setSelectedLanguages([...selectedLanguages, value]);
+      setLanguageCerts((prev) => {
+        if (prev[value]) return prev;
+        return { ...prev, [value]: { certificates: [] } };
+      });
+    }
+  };
   const addCustomLanguage = () => {
     const v = customLanguageInput.trim();
     if (!v) return Alert.alert('입력 오류', '언어를 입력하세요.');
@@ -95,18 +138,54 @@ export const ExpertRecruitmentFromMockup: React.FC = () => {
       return;
     }
     setCustomLanguages([...customLanguages, v]);
+    setLanguageCerts((prev) => ({ ...prev, [v]: { certificates: [] } }));
     setCustomLanguageInput('');
   };
-  const removeCustomLanguage = (idx: number) => setCustomLanguages(customLanguages.filter((_, i) => i !== idx));
+  const removeCustomLanguage = (idx: number) => {
+    const lang = customLanguages[idx];
+    setCustomLanguages(customLanguages.filter((_, i) => i !== idx));
+    setLanguageCerts((prev) => {
+      const { [lang]: _omit, ...rest } = prev;
+      return rest;
+    });
+  };
   const toggleService = (value: string) => toggleArray(services, setServices, value);
 
-  const handleAddWorkplace = () => {
-    const v = workplaceInput.trim();
-    if (!v) return Alert.alert('입력 오류', '회사명을 입력하세요.');
-    setWorkplaces([...workplaces, v]);
-    setWorkplaceInput('');
+  // 이전 직장 기능 삭제로 관련 핸들러 제거
+
+  const addExperience = () => {
+    const title = expTitle.trim();
+    const company = expCompany.trim();
+    const startDate = expStartDate.trim();
+    const endDate = expEndDate.trim();
+    const description = expDescription.trim();
+
+    if (!title || !company) {
+      Alert.alert('입력 오류', '직함/역할과 회사명을 입력하세요.');
+      return;
+    }
+    // 간단한 날짜 형식 유효성 (선택 입력)
+    const ymRegex = /^\d{4}-(0[1-9]|1[0-2])$/;
+    if (startDate && !ymRegex.test(startDate)) {
+      Alert.alert('날짜 형식', '시작일은 YYYY-MM 형식으로 입력하세요.');
+      return;
+    }
+    if (endDate && !ymRegex.test(endDate)) {
+      Alert.alert('날짜 형식', '종료일은 YYYY-MM 형식으로 입력하세요.');
+      return;
+    }
+    setExperiences([
+      ...experiences,
+      { title, company, startDate: startDate || undefined, endDate: endDate || undefined, description: description || undefined },
+    ]);
+    // 입력 초기화
+    setExpTitle('');
+    setExpCompany('');
+    setExpStartDate('');
+    setExpEndDate('');
+    setExpDescription('');
   };
-  const removeWorkplace = (idx: number) => setWorkplaces(workplaces.filter((_, i) => i !== idx));
+  const removeExperience = (idx: number) => setExperiences(experiences.filter((_, i) => i !== idx));
 
   // File upload stubs — replace with real pickers if you add packages
   const handleCertUpload = () => {
@@ -155,6 +234,128 @@ export const ExpertRecruitmentFromMockup: React.FC = () => {
     setAdditionalPhotos(additionalPhotos.filter((_, i) => i !== index));
   };
 
+  // 언어별 자격증 이름 변경
+  const setLanguageCertificateName = (lang: string, name: string) => {
+    setLanguageCerts((prev) => {
+      const current = prev[lang] || { certificates: [] };
+      const certificates = [...current.certificates];
+
+      // 자격증 항목이 없으면 새로 생성하고 이름 설정
+      if (certificates.length === 0) {
+        certificates.push({ certificateName: name, files: [] });
+      } else {
+        // 첫 번째 자격증 항목의 이름만 업데이트 (기본 동작)
+        certificates[0] = { ...certificates[0], certificateName: name };
+      }
+
+      return { ...prev, [lang]: { certificates } };
+    });
+  };
+
+  // 웹 전용: 언어별 자격증 사본 파일 선택 처리
+  const onLanguageCertFileChangeWeb = (lang: string, certIndex: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    try {
+      const files: File[] = Array.from(e.target?.files || []);
+      if (!files.length) return;
+      setLanguageCerts((prev) => {
+        const current = prev[lang] || { certificates: [] };
+        const certificates = [...current.certificates];
+        
+        // 자격증이 없으면 새로 생성
+        if (certificates.length === 0) {
+          certificates.push({ certificateName: '', files: [] });
+        }
+        
+        // 지정된 인덱스의 자격증이 없으면 마지막 자격증에 추가
+        const targetCertIndex = certIndex < certificates.length ? certIndex : certificates.length - 1;
+        const added = files.map((f) => ({ name: f.name, size: f.size, uri: URL.createObjectURL(f) }));
+        
+        certificates[targetCertIndex] = {
+          ...certificates[targetCertIndex],
+          files: [...certificates[targetCertIndex].files, ...added]
+        };
+        
+        return {
+          ...prev,
+          [lang]: { ...current, certificates },
+        };
+      });
+    } catch (err) {
+      console.warn('언어 자격증 사본 선택 처리 중 오류:', err);
+    } finally {
+      if (e?.target) (e.target as HTMLInputElement).value = '';
+    }
+  };
+
+  const triggerLanguageCertFileSelect = (lang: string, certIndex: number) => {
+    if (Platform.OS === 'web') {
+      // 해당 언어의 특정 자격증 인덱스를 위한 파일 input 생성 및 클릭
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.multiple = true;
+      input.accept = '.pdf,.jpg,.jpeg,.png';
+      input.onchange = (e) => onLanguageCertFileChangeWeb(lang, certIndex, e as any);
+      input.click();
+    } else {
+      Alert.alert('안내', '모바일 앱에서는 파일 업로드가 추후 지원될 예정입니다.');
+    }
+  };
+
+  const removeLanguageCertFile = (lang: string, certIndex: number, fileIndex: number) => {
+    setLanguageCerts((prev) => {
+      const current = prev[lang];
+      if (!current) return prev;
+      const certificates = [...current.certificates];
+      if (certificates[certIndex]) {
+        certificates[certIndex] = {
+          ...certificates[certIndex],
+          files: certificates[certIndex].files.filter((_, i) => i !== fileIndex)
+        };
+      }
+      return { ...prev, [lang]: { ...current, certificates } };
+    });
+  };
+
+  // 새로운 자격증 추가
+  const addLanguageCertificate = (lang: string) => {
+    setLanguageCerts((prev) => {
+      const current = prev[lang] || { certificates: [] };
+      return {
+        ...prev,
+        [lang]: {
+          ...current,
+          certificates: [...current.certificates, { certificateName: '', files: [] }]
+        }
+      };
+    });
+  };
+
+  // 자격증 정보 업데이트
+  const updateLanguageCertificate = (lang: string, certIndex: number, field: keyof LangCertificate, value: string) => {
+    setLanguageCerts((prev) => {
+      const current = prev[lang];
+      if (!current) return prev;
+      const certificates = [...current.certificates];
+      if (certificates[certIndex]) {
+        certificates[certIndex] = {
+          ...certificates[certIndex],
+          [field]: value
+        };
+      }
+      return { ...prev, [lang]: { ...current, certificates } };
+    });
+  };
+
+  // 자격증 삭제
+  const removeLanguageCertificate = (lang: string, certIndex: number) => {
+    setLanguageCerts((prev) => {
+      const current = prev[lang];
+      if (!current) return prev;
+      const certificates = current.certificates.filter((_, i) => i !== certIndex);
+      return { ...prev, [lang]: { ...current, certificates } };
+    });
+  };
+
   const validateAndSubmit = () => {
     if (!name.trim() || !introduction.trim() || !experienceYears) {
       Alert.alert('필수 입력', '이름, 자기소개, 경력년수를 입력하세요.');
@@ -181,7 +382,7 @@ export const ExpertRecruitmentFromMockup: React.FC = () => {
       expertise: expertise.includes('other') ? [...expertise.filter(e => e !== 'other'), otherExpertise] : expertise,
       services,
       experienceYears,
-      workplaces,
+      experiences,
       certFiles,
       portfolioFiles,
       portfolioDesc,
@@ -190,6 +391,15 @@ export const ExpertRecruitmentFromMockup: React.FC = () => {
       availabilityDays,
       timeSlots,
       languages: [...selectedLanguages, ...customLanguages],
+      languageCertificates: Object.entries(languageCerts).map(([lang, info]) => ({
+        language: lang,
+        certificates: info.certificates.map(cert => ({
+          certificateName: cert.certificateName,
+          issuingBody: cert.issuingBody,
+          issueDate: cert.issueDate,
+          files: cert.files.map((f) => ({ name: f.name, size: f.size })),
+        })),
+      })),
     };
 
     console.log('Submit Expert:', form);
@@ -351,20 +561,72 @@ export const ExpertRecruitmentFromMockup: React.FC = () => {
             <TextInput style={styles.input} value={experienceYears} onChangeText={setExperienceYears} placeholder="예: 3~5년" />
           </View>
 
+          {/* 이전 직장 입력 섹션 제거됨 */}
+
+          {/* 상세 경력 추가 */}
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>이전 직장</Text>
-            <View style={{ flexDirection: 'row', gap: 8 }}>
-              <TextInput style={[styles.input, { flex: 1 }]} value={workplaceInput} onChangeText={setWorkplaceInput} placeholder="회사명을 입력하세요" />
-              <TouchableOpacity onPress={handleAddWorkplace} style={{ backgroundColor: '#28a745', padding: 10, borderRadius: 6, justifyContent: 'center' }}>
-                <FontAwesome5 name="plus" size={14} color="#fff" />
+            <Text style={styles.label}>상세 경력 추가</Text>
+            <TextInput
+              style={styles.input}
+              value={expTitle}
+              onChangeText={setExpTitle}
+              placeholder="직함/역할 (예: 보안 컨설턴트)"
+            />
+            <TextInput
+              style={[styles.input, { marginTop: 8 }]}
+              value={expCompany}
+              onChangeText={setExpCompany}
+              placeholder="회사명 (예: ABC 컨설팅)"
+            />
+            <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
+              <TextInput
+                style={[styles.input, { flex: 1 }]}
+                value={expStartDate}
+                onChangeText={setExpStartDate}
+                placeholder="시작일 (YYYY-MM)"
+              />
+              <TextInput
+                style={[styles.input, { flex: 1 }]}
+                value={expEndDate}
+                onChangeText={setExpEndDate}
+                placeholder="종료일 (YYYY-MM)"
+              />
+            </View>
+            <TextInput
+              style={[styles.input, styles.textArea, { marginTop: 8 }]}
+              value={expDescription}
+              onChangeText={setExpDescription}
+              placeholder="경력 상세 설명 (담당 업무, 성과 등)"
+              multiline
+              numberOfLines={3}
+            />
+            <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginTop: 8 }}>
+              <TouchableOpacity onPress={addExperience} style={{ backgroundColor: '#28a745', paddingVertical: 10, paddingHorizontal: 14, borderRadius: 6 }}>
+                <Text style={{ color: '#fff', fontWeight: '600' }}>추가</Text>
               </TouchableOpacity>
             </View>
 
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 10 }}>
-              {workplaces.map((w, i) => (
-                <Tag key={i} label={w} onRemove={() => removeWorkplace(i)} />
-              ))}
-            </View>
+            {/* 추가된 상세 경력 목록 */}
+            {experiences.length > 0 && (
+              <View style={{ marginTop: 12 }}>
+                {experiences.map((exp, idx) => (
+                  <View key={idx} style={{ padding: 10, backgroundColor: '#f8f9fa', borderRadius: 8, marginBottom: 8, borderWidth: 1, borderColor: '#e9ecef' }}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                      <Text style={{ fontWeight: '600' }}>{exp.title} · {exp.company}</Text>
+                      <TouchableOpacity onPress={() => removeExperience(idx)}>
+                        <FontAwesome5 name="times" size={14} color="#e74c3c" />
+                      </TouchableOpacity>
+                    </View>
+                    <Text style={{ color: '#666', marginTop: 4 }}>
+                      {(exp.startDate || exp.endDate) ? `${exp.startDate || ''} ~ ${exp.endDate || ''}` : '기간 미입력'}
+                    </Text>
+                    {exp.description ? (
+                      <Text style={{ marginTop: 6 }}>{exp.description}</Text>
+                    ) : null}
+                  </View>
+                ))}
+              </View>
+            )}
           </View>
         </View>
 
@@ -511,6 +773,111 @@ export const ExpertRecruitmentFromMockup: React.FC = () => {
               </View>
             )}
           </View>
+
+          {/* 언어별 자격증 및 사본 업로드 */}
+          {([...selectedLanguages, ...customLanguages].length > 0) && (
+            <View style={{ marginTop: 12 }}>
+              {([...selectedLanguages, ...customLanguages]).map((lang) => {
+                const info = languageCerts[lang] || { certificates: [] };
+                const displayLabel = lang === 'korean' ? '한국어' : lang;
+                return (
+                  <View key={`lang-cert-${lang}`} style={[styles.inputGroup, { marginBottom: 16 }]}>
+                    <Text style={styles.label}>{displayLabel} 자격증</Text>
+                    
+                    {/* 기존 자격증 목록 */}
+                    {info.certificates.map((cert, certIndex) => (
+                      <View key={`${lang}-cert-${certIndex}`} style={{ 
+                          borderWidth: 1, 
+                          borderColor: '#e9ecef', 
+                          borderRadius: 8, 
+                          padding: 12, 
+                          marginBottom: 12,
+                          backgroundColor: '#f8f9fa'
+                        }}>
+                          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                            <Text style={{ fontWeight: '600', color: '#495057' }}>자격증 {certIndex + 1}</Text>
+                            <TouchableOpacity onPress={() => removeLanguageCertificate(lang, certIndex)}>
+                              <FontAwesome5 name="times" size={16} color="#e74c3c" />
+                            </TouchableOpacity>
+                          </View>
+                          
+                          <TextInput
+                            style={[styles.input, { marginBottom: 8 }]}
+                            value={cert.certificateName}
+                            onChangeText={(v) => updateLanguageCertificate(lang, certIndex, 'certificateName', v)}
+                            placeholder="예: TOEIC 900, IELTS 7.0, JLPT N2"
+                          />
+                          
+                          <TextInput
+                            style={[styles.input, { marginBottom: 8 }]}
+                            value={cert.issuingBody || ''}
+                            onChangeText={(v) => updateLanguageCertificate(lang, certIndex, 'issuingBody', v)}
+                            placeholder="발급기관"
+                          />
+                          
+                          <TextInput
+                            style={[styles.input, { marginBottom: 8 }]}
+                            value={cert.issueDate || ''}
+                            onChangeText={(v) => updateLanguageCertificate(lang, certIndex, 'issueDate', v)}
+                            placeholder="발급일 (YYYY-MM-DD)"
+                          />
+                          
+                          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+                            <TouchableOpacity 
+                              onPress={() => triggerLanguageCertFileSelect(lang, certIndex)} 
+                              style={{ backgroundColor: '#0066CC', paddingVertical: 8, paddingHorizontal: 12, borderRadius: 6 }}
+                            >
+                              <Text style={{ color: '#fff', fontWeight: '600', fontSize: 12 }}>사본 업로드</Text>
+                            </TouchableOpacity>
+                            <Text style={{ fontSize: 11, color: '#999', marginLeft: 8 }}>PDF, JPG, JPEG, PNG</Text>
+                          </View>
+                        
+                        {/* 선택된 파일 목록 */}
+                        {cert.files.length > 0 && (
+                          <View style={{ marginTop: 8 }}>
+                            {cert.files.map((f, fileIndex) => (
+                              <View key={`${lang}-file-${certIndex}-${fileIndex}`} style={{ 
+                                flexDirection: 'row', 
+                                alignItems: 'center', 
+                                justifyContent: 'space-between', 
+                                paddingVertical: 6,
+                                paddingHorizontal: 8,
+                                backgroundColor: '#fff',
+                                borderRadius: 4,
+                                marginBottom: 4
+                              }}>
+                                <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+                                  <FontAwesome5 name="file" size={12} color="#4a6fdc" style={{ marginRight: 8 }} />
+                                  <Text style={{ color: '#333', fontSize: 12, flex: 1 }} numberOfLines={1}>{f.name}</Text>
+                                </View>
+                                <TouchableOpacity onPress={() => removeLanguageCertFile(lang, certIndex, fileIndex)}>
+                                  <FontAwesome5 name="times" size={12} color="#e74c3c" />
+                                </TouchableOpacity>
+                              </View>
+                            ))}
+                          </View>
+                        )}
+                      </View>
+                    ))}
+                    
+                    {/* 새 자격증 추가 버튼 */}
+                    <TouchableOpacity 
+                      onPress={() => addLanguageCertificate(lang)} 
+                      style={{ 
+                        backgroundColor: '#28a745', 
+                        paddingVertical: 8, 
+                        paddingHorizontal: 12, 
+                        borderRadius: 6,
+                        alignSelf: 'flex-start'
+                      }}
+                    >
+                      <Text style={{ color: '#fff', fontWeight: '600', fontSize: 12 }}>+ 자격증 추가</Text>
+                    </TouchableOpacity>
+                  </View>
+                );
+              })}
+            </View>
+          )}
         </View>
 
         {/* Submit */}

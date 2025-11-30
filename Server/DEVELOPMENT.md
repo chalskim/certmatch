@@ -1,6 +1,6 @@
-# CertMatch Backend 개발 가이드
+# SuperSlice Backend 개발 가이드
 
-이 문서는 CertMatch 백엔드 개발을 위한 상세한 가이드를 제공합니다.
+이 문서는 SuperSlice 백엔드 개발을 위한 상세한 가이드를 제공합니다.
 
 ## 📋 목차
 
@@ -481,14 +481,14 @@ services:
       - "3001:3001"
     environment:
       - NODE_ENV=production
-      - DATABASE_URL=postgresql://user:password@db:5432/certmatch
+      - DATABASE_URL=postgresql://user:password@db:5432/superslice_dev
     depends_on:
       - db
 
   db:
     image: postgres:15
     environment:
-      - POSTGRES_DB=certmatch
+      - POSTGRES_DB=superslice_dev
       - POSTGRES_USER=user
       - POSTGRES_PASSWORD=password
     volumes:

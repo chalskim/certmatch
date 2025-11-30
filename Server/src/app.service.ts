@@ -3,6 +3,6 @@ import { Injectable } from '@nestjs/common';
 @Injectable()
 export class AppService {
   getHello(): string {
-    return 'CertMatch Backend API is running! 🚀';
+    return 'SuperSlice Backend API is running! 🚀';
   }
 }

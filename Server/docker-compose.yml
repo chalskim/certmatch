@@ -7,12 +7,12 @@ services:
       context: .
       dockerfile: Dockerfile
       target: production
-    container_name: certmatch-api
+    container_name: superslice-api
     ports:
       - "${PORT:-3001}:3001"
     environment:
       - NODE_ENV=production
-      - DATABASE_URL=postgresql://${POSTGRES_USER:-certmatch}:${POSTGRES_PASSWORD:-password}@db:5432/${POSTGRES_DB:-certmatch}
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-superslice_dev}:${POSTGRES_PASSWORD:-password}@db:5432/${POSTGRES_DB:-superslice_dev}
       - JWT_SECRET=${JWT_SECRET:-your-super-secret-jwt-key}
       - JWT_EXPIRES_IN=${JWT_EXPIRES_IN:-24h}
       - CORS_ORIGIN=${CORS_ORIGIN:-http://localhost:3000}
@@ -20,7 +20,7 @@ services:
       db:
         condition: service_healthy
     networks:
-      - certmatch-network
+      - superslice-network
     restart: unless-stopped
     volumes:
       - ./uploads:/app/uploads
@@ -34,10 +34,10 @@ services:
   # PostgreSQL Database
   db:
     image: postgres:15-alpine
-    container_name: certmatch-db
+    container_name: superslice-db
     environment:
-      - POSTGRES_DB=${POSTGRES_DB:-certmatch}
-      - POSTGRES_USER=${POSTGRES_USER:-certmatch}
+      - POSTGRES_DB=${POSTGRES_DB:-superslice_dev}
+      - POSTGRES_USER=${POSTGRES_USER:-superslice_dev}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-password}
       - POSTGRES_INITDB_ARGS=--encoding=UTF-8 --lc-collate=C --lc-ctype=C
     ports:
@@ -46,10 +46,10 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
     networks:
-      - certmatch-network
+      - superslice-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-certmatch} -d ${POSTGRES_DB:-certmatch}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-superslice_dev} -d ${POSTGRES_DB:-superslice_dev}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -58,13 +58,13 @@ services:
   # Redis for Caching (Optional)
   redis:
     image: redis:7-alpine
-    container_name: certmatch-redis
+    container_name: superslice-redis
     ports:
       - "${REDIS_PORT:-6379}:6379"
     volumes:
       - redis_data:/data
     networks:
-      - certmatch-network
+      - superslice-network
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
@@ -75,7 +75,7 @@ services:
   # Nginx Reverse Proxy (Optional)
   nginx:
     image: nginx:alpine
-    container_name: certmatch-nginx
+    container_name: superslice-nginx
     ports:
       - "80:80"
       - "443:443"
@@ -85,7 +85,7 @@ services:
     depends_on:
       - api
     networks:
-      - certmatch-network
+      - superslice-network
     restart: unless-stopped
 
 volumes:
@@ -95,5 +95,5 @@ volumes:
     driver: local
 
 networks:
-  certmatch-network:
+  superslice-network:
     driver: bridge

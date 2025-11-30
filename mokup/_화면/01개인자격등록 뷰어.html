@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CertMatch - 컨설턴트 프로필</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-blue: #0066CC;
+            --success-green: #2EBD59;
+            --neutral-gray: #333333;
+            --light-gray: #F5F5F5;
+            --warm-orange: #FF8C42;
+            --alert-red: #E74C3C;
+            --calm-purple: #7B68EE;
+            --border-color: #E0E0E0;
+            --text-light: #666666;
+            --shadow: 0 2px 8px rgba(0,0,0,0.08);
+            --shadow-hover: 0 8px 24px rgba(0,0,0,0.12);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Noto Sans KR', sans-serif;
+            background-color: #f8f9fa;
+            color: var(--neutral-gray);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            background-color: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-blue);
+        }
+
+        .logo i {
+            margin-right: 10px;
+            font-size: 28px;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        /* Compact Profile Header */
+        .profile-header {
+            background: linear-gradient(135deg, var(--primary-blue), #0052A3);
+            color: white;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+
+        .profile-header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .profile-title-section {
+            flex: 1;
+        }
+
+        .profile-name {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .profile-title {
+            font-size: 18px;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .profile-badges {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .profile-badge {
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .profile-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-edit {
+            background-color: white;
+            color: var(--primary-blue);
+        }
+
+        .btn-edit:hover {
+            background-color: #f0f0f0;
+        }
+
+        .btn-delete {
+            background-color: rgba(231, 76, 60, 0.8);
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background-color: rgba(231, 76, 60, 1);
+        }
+
+        /* Profile Container */
+        .profile-container-main {
+            background-color: white;
+            border-radius: 12px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+        }
+
+        /* Profile Sections */
+        .profile-section {
+            margin-bottom: 40px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title i {
+            color: var(--primary-blue);
+        }
+
+        .btn-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-edit-icon {
+            background-color: rgba(0, 102, 204, 0.1);
+            color: var(--primary-blue);
+        }
+
+        .btn-edit-icon:hover {
+            background-color: rgba(0, 102, 204, 0.2);
+        }
+
+        .btn-delete-icon {
+            background-color: rgba(231, 76, 60, 0.1);
+            color: var(--alert-red);
+        }
+
+        .btn-delete-icon:hover {
+            background-color: rgba(231, 76, 60, 0.2);
+        }
+
+        .btn-download-icon {
+            background-color: rgba(46, 189, 89, 0.1);
+            color: var(--success-green);
+        }
+
+        .btn-download-icon:hover {
+            background-color: rgba(46, 189, 89, 0.2);
+        }
+
+        /* Profile Info Grid */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .info-item {
+            margin-bottom: 15px;
+        }
+
+        .info-label {
+            font-weight: 500;
+            margin-bottom: 5px;
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        .info-value {
+            font-size: 16px;
+        }
+
+        /* Profile Photo Section */
+        .profile-photo-section {
+            display: flex;
+            align-items: flex-start;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .profile-photo-container {
+            position: relative;
+        }
+
+        .profile-photo {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .profile-photo:hover {
+            box-shadow: var(--shadow);
+        }
+
+        .photo-actions {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .photo-action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background-color: white;
+            border: 2px solid var(--border-color);
+        }
+
+        .photo-action-btn:hover {
+            background-color: var(--light-gray);
+        }
+
+        .photo-action-btn.edit {
+            color: var(--primary-blue);
+        }
+
+        .photo-action-btn.delete {
+            color: var(--alert-red);
+        }
+
+        .profile-info-section {
+            flex: 1;
+        }
+
+        /* Inline Info Display */
+        .inline-info {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            font-size: 16px;
+            line-height: 1.8;
+        }
+
+        .inline-info-item {
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .inline-info-item:not(:last-child)::after {
+            content: ",";
+            margin-left: 8px;
+            color: var(--text-light);
+        }
+
+        .inline-info-label {
+            font-weight: 500;
+            color: var(--text-light);
+            margin-right: 5px;
+        }
+
+        /* Specialty Tags */
+        .specialty-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .specialty-tag {
+            background-color: var(--light-gray);
+            border: 1px solid var(--border-color);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+
+        /* Country Tags */
+        .country-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .country-tag {
+            background-color: var(--light-gray);
+            border: 1px solid var(--border-color);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .country-tag i {
+            font-size: 12px;
+        }
+
+        /* Experience Cards */
+        .experience-cards {
+            display: grid;
+            gap: 20px;
+        }
+
+        .experience-card {
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .experience-card:hover {
+            box-shadow: var(--shadow);
+        }
+
+        .experience-title {
+            font-weight: 600;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .experience-period {
+            color: var(--text-light);
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .experience-company {
+            color: var(--text-light);
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .experience-description {
+            font-size: 15px;
+        }
+
+        /* Certification Cards */
+        .certification-cards {
+            display: grid;
+            gap: 20px;
+        }
+
+        .certification-card {
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(0, 102, 204, 0.02), rgba(46, 189, 89, 0.02));
+            transition: all 0.3s ease;
+        }
+
+        .certification-card:hover {
+            box-shadow: var(--shadow);
+        }
+
+        .certification-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .certification-name {
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        .certification-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            border: 1px solid var(--border-color);
+            background: white;
+        }
+
+        .certification-status.valid {
+            background-color: var(--success-green);
+            color: white;
+            border-color: var(--success-green);
+        }
+
+        .certification-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .cert-detail-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .cert-detail-item i {
+            color: var(--text-light);
+        }
+
+        /* File List */
+        .file-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background-color: var(--light-gray);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .file-item:hover {
+            background-color: #EEEEEE;
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .file-icon {
+            font-size: 20px;
+            color: var(--primary-blue);
+        }
+
+        .file-name {
+            font-weight: 500;
+        }
+
+        .file-size {
+            color: var(--text-light);
+            font-size: 13px;
+        }
+
+        .file-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .profile-header-container {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .profile-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+            
+            .profile-photo-section {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .inline-info {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .inline-info-item:not(:last-child)::after {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-container">
+                <div class="logo">
+                    <i class="fas fa-check-circle"></i>
+                    CertMatch
+                </div>
+                <div class="user-menu">
+                    <div class="user-profile">
+                        <img src="https://picsum.photos/seed/consultant/40/40.jpg" alt="User Avatar" class="user-avatar">
+                        <span>컨설턴트</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Compact Profile Header -->
+    <div class="profile-header">
+        <div class="container">
+            <div class="profile-header-container">
+                <div class="profile-actions">
+                    <button class="btn btn-edit" onclick="editProfile()">
+                        <i class="fas fa-edit"></i>
+                        프로필 수정
+                    </button>
+                    <button class="btn btn-delete" onclick="deleteProfile()">
+                        <i class="fas fa-trash"></i>
+                        프로필 삭제
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Container -->
+    <div class="container">
+        <div class="profile-container-main">
+            <!-- 기본 정보 섹션 -->
+            <div class="profile-section">
+                <div class="section-header">
+                    <h3 class="section-title">
+                        <i class="fas fa-user"></i>
+                        기본 정보
+                    </h3>
+                </div>
+                
+                <!-- Profile Photo Section -->
+                <div class="profile-photo-section">
+                    <div class="profile-photo-container">
+                        <img src="https://picsum.photos/seed/defaultavatar/100/100.jpg" alt="Profile" class="profile-photo">
+                        <div class="photo-actions">
+                            <div class="photo-action-btn edit" onclick="editPhoto()" title="사진 수정">
+                                <i class="fas fa-camera"></i>
+                            </div>
+                            <div class="photo-action-btn delete" onclick="deletePhoto()" title="사진 삭제">
+                                <i class="fas fa-trash"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="profile-info-section">
+                        <!-- Inline Info Display -->
+                        <div class="inline-info">
+                            <div class="inline-info-item">
+                                <span class="inline-info-label">이름:</span>
+                                <span>홍길동</span>
+                            </div>
+                            <div class="inline-info-item">
+                                <span class="inline-info-label">연락처:</span>
+                                <span>010-1234-5678</span>
+                            </div>
+                            <div class="inline-info-item">
+                                <span class="inline-info-label">이메일:</span>
+                                <span>hong.gildong@example.com</span>
+                            </div>
+                            <div class="inline-info-item">
+                                <span class="inline-info-label">경력년수:</span>
+                                <span>5년</span>
+                            </div>
+                            <div class="inline-info-item">
+                                <span class="inline-info-label">시간당 요금대:</span>
+                                <span>50-100만원 (협의 가능)</span>
+                            </div>
+                            <div class="inline-info-item">
+                                <span class="inline-info-label">활동 지역:</span>
+                                <span>서울, 경기, 온라인</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="info-item" style="margin-top: 20px;">
+                    <div class="info-label">자기소개</div>
+                    <div class="info-value">정보보호 분야에서 5년간 경험을 쌓은 전문 컨설턴트입니다. ISMS-P, ISO 27001 인증 컨설팅을 전문적으로 수행하며, 다양한 산업 분야의 보안 강화에 기여해왔습니다. 최신 보안 동향과 기술에 대한 깊은 이해를 바탕으로 고객에게 최적의 솔루션을 제공합니다.</div>
+                </div>
+            </div>
+
+            <!-- 전문 분야 섹션 -->
+            <div class="profile-section">
+                <div class="section-header">
+                    <h3 class="section-title">
+                        <i class="fas fa-briefcase"></i>
+                        전문 분야
+                    </h3>
+                </div>
+
+                <div class="specialty-group">
+                    <div class="info-label">산업 분야</div>
+                    <div class="specialty-container">
+                        <div class="specialty-tag">금융</div>
+                        <div class="specialty-tag">IT</div>
+                        <div class="specialty-tag">공공</div>
+                    </div>
+                </div>
+
+                <div class="specialty-group">
+                    <div class="info-label">인증 분야</div>
+                    <div class="specialty-container">
+                        <div class="specialty-tag">ISMS-P</div>
+                        <div class="specialty-tag">ISO 27001</div>
+                        <div class="specialty-tag">ISO 27701</div>
+                    </div>
+                </div>
+
+                <div class="country-group">
+                    <div class="info-label">해외 프로젝트 및 인증</div>
+                    <div class="country-container">
+                        <div class="country-tag">
+                            <i class="fas fa-flag-usa"></i>
+                            <span>미국</span>
+                        </div>
+                        <div class="country-tag">
+                            <i class="fas fa-flag"></i>
+                            <span>일본</span>
+                        </div>
+                        <div class="country-tag">
+                            <i class="fas fa-flag"></i>
+                            <span>싱가포르</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 경력 섹션 -->
+            <div class="profile-section">
+                <div class="section-header">
+                    <h3 class="section-title">
+                        <i class="fas fa-history"></i>
+                        경력 사항
+                    </h3>
+                </div>
+                
+                <div class="experience-cards" id="experienceCards">
+                    <div class="experience-card">
+                        <div class="experience-title">정보보호 컨설턴트</div>
+                        <div class="experience-period">2020.01 - 현재</div>
+                        <div class="experience-company">(주)보안솔루션</div>
+                        <div class="experience-description">ISMS-P, ISO 27001 컨설팅 수행</div>
+                    </div>
+                    
+                    <div class="experience-card">
+                        <div class="experience-title">보안 엔지니어</div>
+                        <div class="experience-period">2018.03 - 2019.12</div>
+                        <div class="experience-company">(주)시큐리티테크</div>
+                        <div class="experience-description">네트워크 보안 시스템 구축 및 운영</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 자격증 섹션 -->
+            <div class="profile-section">
+                <div class="section-header">
+                    <h3 class="section-title">
+                        <i class="fas fa-certificate"></i>
+                        자격증
+                    </h3>
+                </div>
+                
+                <div class="certification-cards" id="certificationCards">
+                    <div class="certification-card">
+                        <div class="certification-header">
+                            <div class="certification-name">정보보호전문가</div>
+                            <div class="certification-status valid">유효</div>
+                            <div class="btn-icon btn-download-icon" onclick="downloadCertification('정보보호전문가.jpg')" title="자격증 다운로드">
+                                <i class="fas fa-download"></i>
+                            </div>
+                        </div>
+                        <div class="certification-details">
+                            <div class="cert-detail-item">
+                                <i class="fas fa-calendar"></i>
+                                <span>발급일: 2018.05</span>
+                            </div>
+                            <div class="cert-detail-item">
+                                <i class="fas fa-calendar-check"></i>
+                                <span>만료일: 2025.05</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="certification-card">
+                        <div class="certification-header">
+                            <div class="certification-name">정보시스템 감사사</div>
+                            <div class="certification-status valid">유효</div>
+                            <div class="btn-icon btn-download-icon" onclick="downloadCertification('정보시스템감사사.jpg')" title="자격증 다운로드">
+                                <i class="fas fa-download"></i>
+                            </div>
+                        </div>
+                        <div class="certification-details">
+                            <div class="cert-detail-item">
+                                <i class="fas fa-calendar"></i>
+                                <span>발급일: 2019.10</span>
+                            </div>
+                            <div class="cert-detail-item">
+                                <i class="fas fa-calendar-check"></i>
+                                <span>만료일: 2024.10</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 서류 섹션 -->
+            <div class="profile-section">
+                <div class="section-header">
+                    <h3 class="section-title">
+                        <i class="fas fa-file-upload"></i>
+                        서류
+                    </h3>
+                </div>
+                
+                <div class="file-list">
+                    <div class="file-item">
+                        <div class="file-info">
+                            <i class="fas fa-file-pdf file-icon"></i>
+                            <div>
+                                <div class="file-name">홍길동_이력서.pdf</div>
+                                <div class="file-size">2.3 MB</div>
+                            </div>
+                        </div>
+                        <div class="file-actions">
+                            <div class="btn-icon btn-download-icon" onclick="downloadFile('홍길동_이력서.pdf')" title="파일 다운로드">
+                                <i class="fas fa-download"></i>
+                            </div>
+                            <div class="btn-icon btn-edit-icon" onclick="editFile('홍길동_이력서.pdf')" title="파일 수정">
+                                <i class="fas fa-edit"></i>
+                            </div>
+                            <div class="btn-icon btn-delete-icon" onclick="deleteFile(this)" title="파일 삭제">
+                                <i class="fas fa-trash"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="file-item">
+                        <div class="file-info">
+                            <i class="fas fa-file-image file-icon"></i>
+                            <div>
+                                <div class="file-name">정보보호전문가_자격증.jpg</div>
+                                <div class="file-size">1.5 MB</div>
+                            </div>
+                        </div>
+                        <div class="file-actions">
+                            <div class="btn-icon btn-download-icon" onclick="downloadFile('정보보호전문가_자격증.jpg')" title="파일 다운로드">
+                                <i class="fas fa-download"></i>
+                            </div>
+                            <div class="btn-icon btn-edit-icon" onclick="editFile('정보보호전문가_자격증.jpg')" title="파일 수정">
+                                <i class="fas fa-edit"></i>
+                            </div>
+                            <div class="btn-icon btn-delete-icon" onclick="deleteFile(this)" title="파일 삭제">
+                                <i class="fas fa-trash"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="file-item">
+                        <div class="file-info">
+                            <i class="fas fa-file-image file-icon"></i>
+                            <div>
+                                <div class="file-name">정보시스템감사사_자격증.jpg</div>
+                                <div class="file-size">1.2 MB</div>
+                            </div>
+                        </div>
+                        <div class="file-actions">
+                            <div class="btn-icon btn-download-icon" onclick="downloadFile('정보시스템감사사_자격증.jpg')" title="파일 다운로드">
+                                <i class="fas fa-download"></i>
+                            </div>
+                            <div class="btn-icon btn-edit-icon" onclick="editFile('정보시스템감사사_자격증.jpg')" title="파일 수정">
+                                <i class="fas fa-edit"></i>
+                            </div>
+                            <div class="btn-icon btn-delete-icon" onclick="deleteFile(this)" title="파일 삭제">
+                                <i class="fas fa-trash"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Profile actions
+        function editProfile() {
+            // Navigate to edit page
+            window.location.href = "edit-profile.html";
+        }
+        
+        function deleteProfile() {
+            if (confirm("정말로 프로필을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.")) {
+                // Delete profile logic
+                alert("프로필이 삭제되었습니다.");
+                window.location.href = "dashboard.html";
+            }
+        }
+        
+        function editSection(section) {
+            // Navigate to edit page with section parameter
+            window.location.href = `edit-profile.html?section=${section}`;
+        }
+        
+        // Photo actions
+        function editPhoto() {
+            // Trigger file input for photo upload
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        document.querySelector('.profile-photo').src = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+            input.click();
+        }
+        
+        function deletePhoto() {
+            if (confirm("프로필 사진을 삭제하시겠습니까?")) {
+                document.querySelector('.profile-photo').src = 'https://picsum.photos/seed/defaultavatar/100/100.jpg';
+            }
+        }
+        
+        // Certification actions
+        function downloadCertification(fileName) {
+            // Create a temporary link element to trigger download
+            const link = document.createElement('a');
+            link.href = `files/certifications/${fileName}`;
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        
+        // File actions
+        function downloadFile(fileName) {
+            // Create a temporary link element to trigger download
+            const link = document.createElement('a');
+            link.href = `files/documents/${fileName}`;
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        
+        function editFile(fileName) {
+            // Navigate to edit page with file parameter
+            window.location.href = `edit-profile.html?section=documents&file=${fileName}`;
+        }
+        
+        function deleteFile(button) {
+            if (confirm("이 파일을 삭제하시겠습니까?")) {
+                button.closest('.file-item').remove();
+            }
+        }
+    </script>
+</body>
+</html>

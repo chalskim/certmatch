@@ -1,6 +1,6 @@
-# CertLine Mobile Frontend
+# SuperSlice Mobile Frontend
 
-React Native mobile application for the CertLine platform.
+React Native mobile application for the SuperSlice platform.
 
 ## Available Scripts
 
@@ -29,9 +29,9 @@ mobile_front/
 ```
 
 
-# CertLine Mobile Application
+# SuperSlice Mobile Application
 
-CertLine Mobile is a React Native application built with Expo that connects businesses with certification experts, educational resources, and job opportunities in the certification industry.
+SuperSlice Mobile is a React Native application built with Expo that connects businesses with certification experts, educational resources, and job opportunities in the certification industry.
 
 ## Features
 

@@ -6,8 +6,7 @@ module.exports = async function (env, argv) {
   // Dev-only: loosen CSP to allow local API ports and optionally proxy /api to backend
   config.devServer = config.devServer || {};
   config.devServer.headers = Object.assign({}, config.devServer.headers, {
-    // NOTE: This header is for local development only. Remove or tighten for production.
-    'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' blob: http://localhost:8082 ws://localhost:8082; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' ws://localhost:8082 http://localhost:8082 ws://localhost:3001 http://localhost:3001 ws://localhost:3002 http://localhost:3002 https://*.expo.dev http://192.168.0.0/16; font-src 'self' data:; frame-src 'self' blob:;",
+    'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' blob: http://localhost:8082 ws://localhost:8082; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' ws://localhost:8082 http://localhost:8082 ws://localhost:3001 http://localhost:3001 ws://localhost:3002 http://localhost:3002 https://*.expo.dev http://*.exp.direct https://*.exp.direct ws://*.exp.direct wss://*.exp.direct http://192.168.0.0/16; font-src 'self' data:; frame-src 'self' blob:",
   });
 
   // Optional: same-origin dev proxy to avoid CSP issues entirely

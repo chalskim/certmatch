@@ -208,7 +208,7 @@ const AdminManagement: React.FC<any> = ({ navigation }) => {
 
       <View style={styles.headerBar}>
         <FontAwesome5 name="tachometer-alt" size={16} color="#4a6bdf" />
-        <Text style={styles.headerTitle}>CertMatch Admin</Text>
+        <Text style={styles.headerTitle}>SuperSlice Admin</Text>
         <View style={{ flex: 1 }} />
         <View style={styles.searchBar}>
           <TextInput placeholder="전체 검색..." style={styles.searchInput} />

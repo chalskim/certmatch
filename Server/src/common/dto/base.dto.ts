@@ -46,7 +46,11 @@ export class BaseResponseDto {
   @ApiProperty({ description: 'Success status', example: true })
   success: boolean;
 
-  @ApiProperty({ description: 'Response message', example: 'Operation successful', required: false })
+  @ApiProperty({
+    description: 'Response message',
+    example: 'Operation successful',
+    required: false,
+  })
   message?: string;
 
   @ApiProperty({ description: 'Timestamp', example: '2024-01-01T00:00:00.000Z' })

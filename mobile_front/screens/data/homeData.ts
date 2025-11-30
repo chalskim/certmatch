@@ -20,6 +20,30 @@ export type Notice = {
   date: string; // YYYY.MM.DD
 };
 
+// 전시(專時) - 단기 의뢰 프로젝트 타입
+export type Project = {
+  id: string;
+  title: string;
+  company: string;
+  urgency: string; // 긴급, 일반, 마감임박
+  budget: string;
+  duration: string;
+  description: string;
+  category: string; // 개발, 마케팅, 기획 등
+  skills: string[];
+  postDate: string;
+  deadline: string;
+  status: string; // 모집중, 마감, 진행중
+};
+
+// 프로젝트 카테고리
+export type ProjectCategory = {
+  name: string;
+  icon: string; // Ionicons 이름
+  count: number;
+  color: string;
+};
+
 export const consultants: Consultant[] = [
   { name: '김보안', title: 'ISMS-P 컨설턴트', expertise: ['ISMS-P', '개인정보보호'], rating: 4.8, location: '서울 강남' },
   { name: '이클라우드', title: '클라우드 보안 아키텍트', expertise: ['AWS', 'Azure', 'DevSecOps'], rating: 4.6, location: '경기 판교' },
@@ -27,9 +51,9 @@ export const consultants: Consultant[] = [
 ];
 
 export const courses: Course[] = [
-  { title: 'ISMS-P 실무자 과정', provider: 'CertLine Academy', period: '3주', price: '무료(정부지원)', tags: ['오프라인', '주말반'] },
-  { title: '클라우드 보안 기초', provider: 'CertLine Academy', period: '2주', price: '20만원', tags: ['온라인', '초급'] },
-  { title: 'GDPR 컴플라이언스', provider: 'CertLine Academy', period: '4주', price: '35만원', tags: ['온라인', '중급'] },
+  { title: 'ISMS-P 실무자 과정', provider: 'SuperSlice Academy', period: '3주', price: '무료(정부지원)', tags: ['오프라인', '주말반'] },
+  { title: '클라우드 보안 기초', provider: 'SuperSlice Academy', period: '2주', price: '20만원', tags: ['온라인', '초급'] },
+  { title: 'GDPR 컴플라이언스', provider: 'SuperSlice Academy', period: '4주', price: '35만원', tags: ['온라인', '중급'] },
 ];
 
 export const notices: Notice[] = [

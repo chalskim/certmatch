@@ -11,13 +11,16 @@ import { SignupScreen } from './screens/SignupScreen';
 import { apiService } from './services/apiService';
 import { MessageProvider } from './hooks/useMessage';
 import { UserProvider } from './contexts/UserContext';
+import { MainTabNavigator } from './navigation/MainTabNavigator';
 
 // 알림 센터 화면
 import AlarmManagement from './screens/menu/AlarmManagement';
 
 // 메뉴 화면들
 import  RegistrationPersonal  from './screens/menu/RegistrationPersonal';
+import  PersonalRegistrationEdit from './screens/menu/PersonalRegistrationEdit';
 import  RegistrationCompany from './screens/menu/RegistrationCompany';
+import  CompanyRegistrationEdit from './screens/menu/CompanyRegistrationEdit';
 
 // 등록화면
 import InputExpertRecruitment from './screens/menu/InputExpertRecruitment';
@@ -57,11 +60,11 @@ import SuccessCases from './screens/menu/SuccessCases';
 import PaymentManagementCorporate from './screens/menu/PaymentManagementCorporate';
 import PaymentManagementPersonal from './screens/menu/PaymentManagementPersonal';
 import Settings from './screens/menu/Settings';
-import MyPage from './screens/menu/MyPage';
 
+import MyPagePerson from './screens/menu/MyPagePerson';
+import MyPageCorperation from './screens/menu/MyPageCorperation';
 
 //관리자 메뉴
-
 import QA_Answers from './screens/menu/QA_Answers';
 import AnnounceManagement from './screens/menu/AnnounceManagement';
 import BannerManagement from './screens/menu/BannerManagement';
@@ -156,23 +159,30 @@ export default function App() {
     <UserProvider>
       <MessageProvider>
         <NavigationContainerAny>
-          <SafeAreaView style={styles.root}>
-            <StackNavigatorAny 
+          <View style={styles.root}>
+            <StackNavigatorAny
               initialRouteName="Home"
-              screenOptions={{ 
-                headerShown: false // We're using our custom header
+              screenOptions={{
+                headerShown: true // Enable header for main navigation
               }}
             >
-              <Stack.Screen name="Home" component={HomeScreenWrapper} />
-              <Stack.Screen name="Main" component={AppContent} />
+              <Stack.Screen
+                name="Home"
+                component={HomeScreenWrapper}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen name="MainTabs" component={MainTabNavigator} />
               <Stack.Screen name="Login" component={LoginScreen} />
               <Stack.Screen name="Signup" component={SignupScreen} />
 
+              {/* 기타 설정 및 관리 화면들 */}
               <Stack.Screen name="AlarmManagement" component={AlarmManagement} />
-              
+
               <Stack.Screen name="RegistrationPersonal" component={RegistrationPersonal} />
+              <Stack.Screen name="PersonalRegistrationEdit" component={PersonalRegistrationEdit} />
               <Stack.Screen name="RegistrationCompany" component={RegistrationCompany} />
-              
+              <Stack.Screen name="CompanyRegistrationEdit" component={CompanyRegistrationEdit} />
+
               <Stack.Screen
                 name="InputExpertRecruitment"
                 component={InputExpertRecruitment}
@@ -186,50 +196,6 @@ export default function App() {
                 component={InputEducationRegistration}
               />
 
-              <Stack.Screen
-                name="ExpertRecruitmentList"
-                component={ExpertRecruitmentList}
-              />
-              <Stack.Screen
-                name="ExpertRecruitmentListDetail"
-                component={ExpertRecruitmentListDetail}
-              />
-              <Stack.Screen
-                name="ExpertProfessionalList"
-                component={ExpertProfessionalList}
-              />
-              {/* 전문가 상세 (React Native/TSX 변환본) */}
-              <Stack.Screen
-                name="ProfessionalistDetail"
-                component={ProfessionalistDetail}
-              />
-              <Stack.Screen
-                name="EducationList"
-                component={EducationList}
-              />
-              <Stack.Screen
-                name="EducationListDetail"
-                component={EducationListDetail}
-              />
-              {/* 신규 RN/TSX 변환된 전문 교육 상세 화면 */}
-              <Stack.Screen
-                name="EduListDetail"
-                component={EduListDetail}
-              />
-              {/* 공지사항 및 뉴스 상세 화면 */}
-              <Stack.Screen
-                name="NoticeItemlistDetail"
-                component={NoticeItemlistDetail}
-              />
-              {/* 공지사항 및 뉴스 목록/등록/수정 */}
-              <Stack.Screen
-                name="NoticeNewsList"
-                component={NoticeNewsList}
-              />
-              <Stack.Screen
-                name="NoticeNewsReg"
-                component={NoticeNewsReg}
-              />
               <Stack.Screen
                 name="CertAudRegistration"
                 component={CertAudRegistration}
@@ -252,13 +218,6 @@ export default function App() {
               <Stack.Screen
                 name="BookmarkCorporate"
                 component={BookmarkCorporate}
-              />
-
-              
-              {/* Q&A 목록 화면 */}
-              <Stack.Screen
-                name="QnaList"
-                component={QnaList}
               />
 
               {/* 새로운 화면들 */}
@@ -284,10 +243,14 @@ export default function App() {
               />
               <Stack.Screen
                 name="MyPage"
-                component={MyPage}
+                component={MyPagePerson}
               />
 
-              
+              <Stack.Screen
+                name="MyPageCorperation"
+                component={MyPageCorperation}
+              />
+
               <Stack.Screen
                 name="QA_Answers"
                 component={QA_Answers}
@@ -315,7 +278,7 @@ export default function App() {
               />
             </StackNavigatorAny>
             <StatusBar style="auto" />
-          </SafeAreaView>
+          </View>
         </NavigationContainerAny>
       </MessageProvider>
     </UserProvider>

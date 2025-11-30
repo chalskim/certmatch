@@ -31,7 +31,7 @@ export class AuthController {
         throw new UnauthorizedException('Invalid password');
       }
     }
-    
+
     return this.authService.login(req.user);
   }
 
@@ -47,7 +47,11 @@ export class AuthController {
         password: { type: 'string', example: 'password123' },
         name: { type: 'string', example: 'John Doe' },
         phone: { type: 'string', example: '010-1234-5678' },
-        role: { type: 'string', enum: ['company', 'consultant', 'educator', 'admin'], example: 'company' },
+        role: {
+          type: 'string',
+          enum: ['company', 'consultant', 'educator', 'admin'],
+          example: 'company',
+        },
       },
       required: ['email', 'password', 'name'],
     },

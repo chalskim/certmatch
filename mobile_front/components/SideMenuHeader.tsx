@@ -16,6 +16,7 @@ type RootStackParamList = {
   ShoppingCartCorp: undefined;
   ShoppingCartPerson: undefined;
   AlarmManagement: undefined;
+  MyPage: undefined;
 };
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
@@ -24,8 +25,8 @@ export const Header: React.FC<HeaderProps> = ({ onMenuPress, notificationCount =
   const navigation = useNavigation<NavigationProp>();
 
   const handleProfilePress = () => {
-    // Navigate to login screen
-    navigation.navigate('Login');
+    // 사용자 아이콘: 로그인 대신 마이페이지로 이동
+    navigation.navigate('MyPage');
   };
 
   const handleShoppingCartCorp = () => {
@@ -36,7 +37,8 @@ export const Header: React.FC<HeaderProps> = ({ onMenuPress, notificationCount =
     navigation.navigate('ShoppingCartPerson');
   };
 
-  const handleAlarmManagement = () => {
+  const handleMyPage = () => {
+    // 종(벨) 아이콘: 알림 관리 화면으로 이동
     navigation.navigate('AlarmManagement');
   };
 
@@ -45,9 +47,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuPress, notificationCount =
       <TouchableOpacity style={styles.leftIcon} onPress={onMenuPress} accessibilityRole="button" accessibilityLabel="Open menu">
         <FontAwesome5 name="bars" size={20} color="#fff" />
       </TouchableOpacity>
-      <TouchableOpacity onPress={handleAlarmManagement} accessibilityRole="button" accessibilityLabel="알림 관리로 이동">
-        <Text style={styles.title}>CertLine</Text>
-      </TouchableOpacity>
+      <Text style={styles.title}>SuperSlice</Text>
       <View style={styles.rightIcons}>
         {/* Corporate and Personal Shopping Cart icons */}
         <TouchableOpacity
@@ -69,12 +69,12 @@ export const Header: React.FC<HeaderProps> = ({ onMenuPress, notificationCount =
         
         <TouchableOpacity
           style={styles.iconWithBadge}
-          onPress={handleAlarmManagement}
+          onPress={handleMyPage}
           accessibilityRole="button"
           accessibilityLabel="알림 화면으로 이동"
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
         >
-          <FontAwesome5 name="bell" size={20} color="#fff" onPress={handleAlarmManagement} />
+          <FontAwesome5 name="bell" size={20} color="#fff" onPress={handleMyPage} />
           {notificationCount > 0 && (
             <View style={[styles.badge, { pointerEvents: 'none' as any }]}>
               <Text style={styles.badgeText}>{notificationCount}</Text>
@@ -84,8 +84,10 @@ export const Header: React.FC<HeaderProps> = ({ onMenuPress, notificationCount =
         <TouchableOpacity 
           style={styles.rightIcon}
           onPress={handleProfilePress}
+          accessibilityRole="button"
+          accessibilityLabel="마이 페이지로 이동"
         >
-          <FontAwesome5 name="user-circle" size={22} color="#fff" />
+          <FontAwesome5 name="user-circle" size={20} color="#fff" />
         </TouchableOpacity>
       </View>
     </View>
@@ -98,7 +100,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 12,
+    paddingHorizontal: 8,
     backgroundColor: '#0066CC',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -119,21 +121,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   iconWithBadge: {
-    marginRight: 15,
+    marginRight: 6,
     position: 'relative',
-    padding: 6,
-    marginHorizontal: 4,
+    padding: 4,
+    marginHorizontal: 2,
     // RN Web 전용: 클릭 UX 향상을 위한 커서 표시
     cursor: 'pointer' as any,
   },
   rightIcon: {
-    padding: 6,
-    marginHorizontal: 4,
+    padding: 4,
+    marginHorizontal: 2,
   },
   badge: {
     position: 'absolute',
-    top: -8,
-    right: -8,
+    top: -6,
+    right: -6,
     backgroundColor: '#FF4444',
     borderRadius: 10,
     minWidth: 20,

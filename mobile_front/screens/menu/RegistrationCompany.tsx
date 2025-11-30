@@ -1,18 +1,46 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, ScrollView, TouchableOpacity, Alert, Modal } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, ScrollView, TouchableOpacity, Alert, Modal, ActivityIndicator } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { styles } from '../styles/menu/RegistrationCompany';
 import SubformHeader from '../components/SubformHeader';
+import mockupData from '../data/mokup.json';
+import { apiService, type User } from '../../services/apiService';
+import { CompanyRegistrationService } from '../../services/companyRegistrationService';
+import {
+  CompanyRegistrationPayload,
+  UserCompany,
+  UserCompanyContactPerson,
+  UserCompanyCertification
+} from '../../types/db/CompanyRegistration';
 
-const getIconForActivity = (activity: string) => {
-  switch(activity) {
-    case '인증': return 'certificate';
-    case '모의인증': return 'search';
-    case '컨설팅': return 'hands-helping';
-    case '정부지원': return 'building';
-    case '교육사업': return 'graduation-cap';
-    default: return 'tag';
+// 산업분야 태그용 아이콘 매핑
+const getIconForIndustry = (industry: string) => {
+  switch (industry) {
+    case '전체':
+      return 'th-large';
+    case '금융':
+      return 'won-sign';
+    case '의료':
+      return 'briefcase-medical';
+    case '제조':
+      return 'industry';
+    case 'IT':
+      return 'laptop-code';
+    case '공공':
+      return 'university';
+    case '유통':
+      return 'store';
+    case '교육':
+      return 'graduation-cap';
+    case '물류':
+      return 'truck';
+    case '환경':
+      return 'leaf';
+    case '식품':
+      return 'apple-alt';
+    default:
+      return 'tags';
   }
 };
 
@@ -31,8 +59,11 @@ const newId = (prefix = '') => `${prefix}${Date.now()}${Math.floor(Math.random()
 
 const CompanyQualificationRegistration = () => {
   const navigation = useNavigation<any>();
-  
-  // Form state
+
+  // 현재 로그인된 사용자 정보 가져오기
+  useEffect(() => {
+    fetchCurrentUser();
+  }, []);
   const [companyName, setCompanyName] = useState('');
   const [bizRegNo, setBizRegNo] = useState('');
   const [ceoName, setCeoName] = useState('');
@@ -52,30 +83,32 @@ const CompanyQualificationRegistration = () => {
   const [terms1, setTerms1] = useState(false);
   const [terms2, setTerms2] = useState(false);
   const [terms3, setTerms3] = useState(false);
-  
+
+  // 현재 로그인된 사용자 정보
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [loadingUser, setLoadingUser] = useState(false);
+
   // Dropdown visibility states
   const [showIndustryDropdown, setShowIndustryDropdown] = useState(false);
   const [showEmployeesDropdown, setShowEmployeesDropdown] = useState(false);
   const [openCertTypeDropdownIndex, setOpenCertTypeDropdownIndex] = useState<number | null>(null);
   const [openCertLevelDropdownIndex, setOpenCertLevelDropdownIndex] = useState<number | null>(null);
   const [openAuditTypeDropdownIndex, setOpenAuditTypeDropdownIndex] = useState<number | null>(null);
-  const [selectedActivities, setSelectedActivities] = useState<string[]>([]);
+  // 기업 자격 등록 > 산업분야: mokup.json 의 filters.industury 기반으로 다중 선택
+  const [selectedIndustries, setSelectedIndustries] = useState<string[]>([]);
   // 인증 분야에서 선택된 인증 종류들 (중복 선택 가능)
   const [selectedCertTypes, setSelectedCertTypes] = useState<string[]>([]);
   const [contactPersons, setContactPersons] = useState<{ name: string; email: string; phone: string; position: string }[]>([]);
-  
+
   // Dropdown options
   const industryOptions = [
     { label: '선택해주세요', value: '' },
-    { label: 'IT 서비스', value: 'it' },
-    { label: '제조업', value: 'manufacturing' },
-    { label: '금융업', value: 'finance' },
-    { label: '의료업', value: 'healthcare' },
-    { label: '유통업', value: 'retail' },
-    { label: '교육업', value: 'education' },
-    { label: '기타', value: 'other' }
+    ...mockupData.filters.industury.map((industry: string) => ({
+      label: industry,
+      value: industry.toLowerCase().replace(/\s+/g, '_')
+    }))
   ];
-  
+
   const employeesOptions = [
     { label: '선택해주세요', value: '' },
     { label: '1-50명', value: '1-50' },
@@ -84,23 +117,24 @@ const CompanyQualificationRegistration = () => {
     { label: '301-500명', value: '301-500' },
     { label: '501명 이상', value: '501+' }
   ];
-  
+
+  // 인증 분야 옵션을 mokup.json의 filters.categories(라인 40-51)로 동기화
   const certTypeOptions = [
     { label: '선택해주세요', value: '' },
-    { label: 'ISMS-P', value: 'isms-p' },
-    { label: 'ISMS', value: 'isms' },
-    { label: 'ISO 27001', value: 'iso27001' },
-    { label: 'GS 인증', value: 'gs' },
-    { label: 'CPPG', value: 'cppg' }
+    ...mockupData.filters.categories.map((cat: string) => ({
+      label: cat,
+      // value는 라벨과 동일하게 설정하여 타입 매핑을 단순화
+      value: cat,
+    }))
   ];
-  
+
   const certLevelOptions = [
     { label: '선택해주세요', value: '' },
     { label: '기본인증', value: 'basic' },
     { label: '종합인증', value: 'comprehensive' },
     { label: '고급인증', value: 'advanced' }
   ];
-  
+
   const auditTypeOptions = [
     { label: '선택해주세요', value: '' },
     { label: '최초 인증', value: 'initial' },
@@ -108,14 +142,14 @@ const CompanyQualificationRegistration = () => {
     { label: '감시 심사', value: 'surveillance' },
     { label: '인증 이전', value: 'transfer' }
   ];
-  
-  
+
+
   // Toggle activity selection
-  const toggleActivity = (activity: string) => {
-    if (selectedActivities.includes(activity)) {
-      setSelectedActivities(selectedActivities.filter(item => item !== activity));
+  const toggleIndustry = (industry: string) => {
+    if (selectedIndustries.includes(industry)) {
+      setSelectedIndustries(selectedIndustries.filter(item => item !== industry));
     } else {
-      setSelectedActivities([...selectedActivities, activity]);
+      setSelectedIndustries([...selectedIndustries, industry]);
     }
   };
 
@@ -130,6 +164,54 @@ const CompanyQualificationRegistration = () => {
   };
   const removeContactPerson = (index: number) => {
     setContactPersons(contactPersons.filter((_, i) => i !== index));
+  };
+
+  // 현재 로그인된 사용자 정보 가져오기
+  const fetchCurrentUser = async () => {
+    // TODO: apiService에 isLoggedIn 메서드가 없어서 임시로 주석 처리
+    // if (!apiService.isLoggedIn()) {
+    //   return;
+    // }
+
+    setLoadingUser(true);
+    try {
+      const user = await apiService.getCurrentUser();
+      setCurrentUser(user);
+    } catch (error) {
+      console.log('Error fetching current user:', error);
+      // 사용자 정보를 가져오지 못해도 폼은 계속 사용 가능
+    } finally {
+      setLoadingUser(false);
+    }
+  };
+
+  // 현재 로그인된 사용자를 담당자로 추가
+  const addCurrentUserAsContact = () => {
+    if (!currentUser) {
+      Alert.alert('알림', '로그인된 사용자 정보를 찾을 수 없습니다.');
+      return;
+    }
+
+    // 이미 같은 사용자가 담당자로 추가되어 있는지 확인
+    const isAlreadyAdded = contactPersons.some(
+      person => person.email === currentUser.email
+    );
+
+    if (isAlreadyAdded) {
+      Alert.alert('알림', '이미 담당자 목록에 포함되어 있습니다.');
+      return;
+    }
+
+    // 현재 사용자 정보를 담당자로 추가
+    const newContact = {
+      name: currentUser.name || '',
+      email: currentUser.email || '',
+      phone: currentUser.phone || '',
+      position: '담당자' // 기본 직책
+    };
+
+    setContactPersons([...contactPersons, newContact]);
+    Alert.alert('성공', '로그인된 사용자 정보가 담당자로 추가되었습니다.');
   };
 
   // Certification info helpers
@@ -156,8 +238,9 @@ const CompanyQualificationRegistration = () => {
       // @ts-ignore - optional dependency in some environments
       const DocumentPicker = await import('expo-document-picker');
       const res = await DocumentPicker.getDocumentAsync({ type: '*/*' });
-      if (res.type === 'success') {
-        setCertInfos(prev => prev.map(ci => (ci.id === id ? { ...ci, files: [...ci.files, { name: res.name, uri: res.uri, size: (res as any).size, mimeType: (res as any).mimeType }] } : ci)));
+      if (!res.canceled && res.assets && res.assets.length > 0) {
+        const file = res.assets[0] as any;
+        setCertInfos(prev => prev.map(ci => (ci.id === id ? { ...ci, files: [...ci.files, { name: file.name, uri: file.uri, size: file.size, mimeType: file.mimeType }] } : ci)));
       }
     } catch (err) {
       console.warn('DocumentPicker not available or failed:', err);
@@ -201,68 +284,123 @@ const CompanyQualificationRegistration = () => {
   };
 
   // Handle form submission
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     // Basic validation
-    if (!companyName || !bizRegNo || !ceoName || !establishDate || !industry || 
-        !employees || !address || !contactPerson || !contactEmail || !contactPhone ||
-        !terms1 || !terms2 || !terms3) {
+    if (!companyName || !bizRegNo || !ceoName || !establishDate || !industry ||
+      !employees || !address || !contactPerson || !contactEmail || !contactPhone ||
+      !terms1 || !terms2 || !terms3) {
       Alert.alert('필수 정보 누락', '모든 필수 정보를 입력해주세요.');
       return;
     }
-    
+
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(contactEmail)) {
       Alert.alert('이메일 형식 오류', '올바른 이메일 주소를 입력해주세요.');
       return;
     }
-    
-    // Certification info validation
+
+    // Possessed certifications validation
     if (certInfos.length === 0) {
-      Alert.alert('인증 정보 필요', '최소 하나 이상의 인증 정보를 추가해주세요.');
+      Alert.alert('보유 인증 필요', '최소 하나 이상의 보유 인증을 추가해주세요.');
       return;
     }
     const invalid = certInfos.find(ci => !ci.certType || !ci.desiredDate);
     if (invalid) {
-      Alert.alert('인증 정보 누락', '각 인증 정보에 인증 명과 희망 심사일을 입력해주세요.');
+      Alert.alert('보유 인증 누락', '각 보유 인증에 인증 명과 희망 심사일을 입력해주세요.');
       return;
     }
 
-    // Submit logic - collect payload
-    const payload = {
-      company: { companyName, bizRegNo, ceoName, establishDate, industry, employees, postcode, address, detailAddress },
-      contact: { contactPerson, contactEmail, contactPhone, contactPersons },
-      interests: selectedActivities,
-      certifications: certInfos,
-      terms: { terms1, terms2, terms3 },
-    };
-    console.log('Company qualification submit', payload);
-    Alert.alert(
-      '등록 완료',
-      '기업 자격 등록이 완료되었습니다. 검토 후 승인될 예정입니다.',
-      [
-        {
-          text: '확인',
-          onPress: () => navigation.goBack(),
+    try {
+      // API를 통해 데이터 제출
+      // DDL에 맞게 데이터 구성
+      const data: CompanyRegistrationPayload = {
+        company: {
+          comp_name: companyName,
+          comp_biz_reg_no: bizRegNo,
+          comp_owner_name: ceoName,
+          comp_founded_date: establishDate,
+          comp_industry_gb: 'INDUSTRY',
+          comp_industry_key: industry,
+          comp_employee_count: parseInt(employees.replace(/[^0-9]/g, '')) || 0,
+          comp_address: `${postcode} ${address} ${detailAddress}`.trim(),
+          comp_profile_state: 'draft'
         },
-      ]
-    );
+        contactPersons: contactPersons.map((cp, index) => ({
+          cper_name: cp.name,
+          cper_email: cp.email,
+          cper_phone: cp.phone,
+          cper_position: cp.position,
+          cper_seq: index + 1,
+          cper_is_primary: index === 0
+        })),
+        certifications: certInfos.map((ci, index) => ({
+          ccert_type_gb: 'CERT_TYPE',
+          ccert_type_key: ci.certType,
+          ccert_level_gb: 'CERT_LEVEL',
+          ccert_level_key: ci.certLevel,
+          ccert_audit_type_gb: 'AUDIT_TYPE',
+          ccert_audit_type_key: ci.auditType,
+          ccert_scope: ci.certScope,
+          ccert_desired_date: ci.desiredDate,
+          ccert_seq: index + 1
+        }))
+      };
+
+      // API를 통해 데이터 제출
+      const result = await CompanyRegistrationService.createCompanyRegistration(data);
+
+      if (result.success) {
+        Alert.alert(
+          '등록 완료',
+          result.message || '기업 자격 등록이 완료되었습니다. 검토 후 승인될 예정입니다.',
+          [
+            {
+              text: '확인',
+              onPress: () => navigation.goBack(),
+            },
+          ]
+        );
+      } else {
+        Alert.alert(
+          '등록 실패',
+          result.message || '기업 자격 등록에 실패했습니다.',
+          [
+            {
+              text: '확인',
+            },
+          ]
+        );
+        console.error('Registration error:', result.error);
+      }
+    } catch (error: any) {
+      console.error('Submission error:', error);
+      Alert.alert(
+        '오류 발생',
+        '서버 통신 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
+        [
+          {
+            text: '확인',
+          },
+        ]
+      );
+    }
   };
-  
+
   // Handle draft save
   const saveDraft = () => {
     // Save draft logic would go here
     Alert.alert('임시 저장', '임시 저장이 완료되었습니다.');
   };
-  
+
   // (Removed) updateCertScope helper - not needed with multi-cert entries
-  
+
   // Render dropdown component
   const renderDropdown = (
-    visible: boolean, 
-    onClose: () => void, 
-    options: Array<{label: string, value: string}>, 
-    selectedValue: string, 
+    visible: boolean,
+    onClose: () => void,
+    options: Array<{ label: string, value: string }>,
+    selectedValue: string,
     onSelect: (value: string) => void
   ) => {
     return (
@@ -272,8 +410,8 @@ const CompanyQualificationRegistration = () => {
         animationType="fade"
         onRequestClose={onClose}
       >
-        <TouchableOpacity 
-          style={styles.dropdownOverlay} 
+        <TouchableOpacity
+          style={styles.dropdownOverlay}
           onPress={onClose}
         >
           <View style={styles.dropdownContainer}>
@@ -282,7 +420,7 @@ const CompanyQualificationRegistration = () => {
                 <TouchableOpacity
                   key={index}
                   style={[
-                    styles.dropdownItem, 
+                    styles.dropdownItem,
                     selectedValue === option.value && styles.dropdownItemSelected
                   ]}
                   onPress={() => {
@@ -313,9 +451,9 @@ const CompanyQualificationRegistration = () => {
         navigation={navigation}
         onHome={() => (navigation as any)?.navigate?.('Home')}
       />
-      
+
       {/* Progress Indicator removed as requested */}
-      
+
       {/* Form Container */}
       <View style={styles.formContainer}>
         <View style={styles.formHeader}>
@@ -330,19 +468,19 @@ const CompanyQualificationRegistration = () => {
             </View>
             <Text style={styles.helpText}>프로필이 완성될수록 더 많은 기업에게 노출됩니다</Text>
             <View style={styles.completionBar}>
-              <View style={[styles.completionFill, { width: '65%' }]} />
+              <View style={[styles.completionFill, { width: '0%' }]} />
             </View>
           </View>
-          <Text style={styles.completionPercentage}>65%</Text>
+          <Text style={styles.completionPercentage}>0%</Text>
         </View>
-        
+
         {/* Basic Information Section */}
         <View style={styles.formSection}>
           <View style={styles.sectionHeader}>
             <FontAwesome5 name="building" size={18} color="#0066CC" />
             <Text style={styles.sectionTitle}>기본 정보</Text>
           </View>
-          
+
           <View style={styles.formGrid}>
             <View style={styles.formGroup}>
               <Text style={styles.label}>회사명 <Text style={styles.required}>*</Text></Text>
@@ -354,7 +492,7 @@ const CompanyQualificationRegistration = () => {
               />
               <Text style={styles.helpText}>사업자등록증 상의 정확한 상호를 입력해주세요.</Text>
             </View>
-            
+
             <View style={styles.formGroup}>
               <Text style={styles.label}>사업자등록번호 <Text style={styles.required}>*</Text></Text>
               <TextInput
@@ -365,7 +503,7 @@ const CompanyQualificationRegistration = () => {
                 keyboardType="numeric"
               />
             </View>
-            
+
             <View style={styles.formGroup}>
               <Text style={styles.label}>대표자명 <Text style={styles.required}>*</Text></Text>
               <TextInput
@@ -375,7 +513,7 @@ const CompanyQualificationRegistration = () => {
                 placeholder="대표자명을 입력하세요"
               />
             </View>
-            
+
             <View style={styles.formGroup}>
               <Text style={styles.label}>설립일 <Text style={styles.required}>*</Text></Text>
               <TextInput
@@ -385,11 +523,11 @@ const CompanyQualificationRegistration = () => {
                 placeholder="YYYY-MM-DD"
               />
             </View>
-            
+
             <View style={styles.formGroup}>
               <Text style={styles.label}>산업 분류 <Text style={styles.required}>*</Text></Text>
-              <TouchableOpacity 
-                style={styles.input} 
+              <TouchableOpacity
+                style={styles.input}
                 onPress={() => setShowIndustryDropdown(true)}
               >
                 <Text style={industry ? styles.dropdownText : styles.dropdownPlaceholder}>
@@ -405,11 +543,11 @@ const CompanyQualificationRegistration = () => {
                 setIndustry
               )}
             </View>
-            
+
             <View style={styles.formGroup}>
               <Text style={styles.label}>직원 수 <Text style={styles.required}>*</Text></Text>
-              <TouchableOpacity 
-                style={styles.input} 
+              <TouchableOpacity
+                style={styles.input}
                 onPress={() => setShowEmployeesDropdown(true)}
               >
                 <Text style={employees ? styles.dropdownText : styles.dropdownPlaceholder}>
@@ -425,7 +563,7 @@ const CompanyQualificationRegistration = () => {
                 setEmployees
               )}
             </View>
-            
+
             <View style={[styles.formGroup, styles.fullWidth]}>
               <Text style={styles.label}>주소 <Text style={styles.required}>*</Text></Text>
               <View style={styles.inputGroup}>
@@ -453,13 +591,51 @@ const CompanyQualificationRegistration = () => {
                 placeholder="상세 주소"
               />
             </View>
-            
+
             {/* 담당자 정보 버튼 */}
             <View style={[styles.formGroup, styles.fullWidth]}>
-              <TouchableOpacity style={styles.primaryButton} onPress={addContactPerson}>
-                <FontAwesome5 name="plus" size={16} color="white" />
-                <Text style={styles.primaryButtonText}>담당자 정보 추가</Text>
-              </TouchableOpacity>
+              <View style={{ flexDirection: 'row', gap: 10 }}>
+                {/* 수동으로 담당자 정보 추가 */}
+                <TouchableOpacity style={[styles.primaryButton, { flex: 1 }]} onPress={addContactPerson}>
+                  <FontAwesome5 name="plus" size={16} color="white" />
+                  <Text style={styles.primaryButtonText}>수동 담당자 추가</Text>
+                </TouchableOpacity>
+
+                {/* 현재 로그인 사용자를 담당자로 추가 */}
+                {currentUser && !loadingUser && (
+                  <TouchableOpacity
+                    style={[styles.primaryButton, { flex: 1, backgroundColor: '#28a745' }]}
+                    onPress={addCurrentUserAsContact}
+                  >
+                    <FontAwesome5 name="user" size={16} color="white" />
+                    <Text style={styles.primaryButtonText}>내 정보 추가</Text>
+                  </TouchableOpacity>
+                )}
+
+                {loadingUser && (
+                  <View style={[styles.primaryButton, { flex: 1, backgroundColor: '#6c757d' }]}>
+                    <ActivityIndicator size="small" color="white" />
+                    <Text style={styles.primaryButtonText}>로딩 중...</Text>
+                  </View>
+                )}
+              </View>
+
+              {/* 현재 로그인된 사용자 정보 표시 */}
+              {currentUser && !loadingUser && (
+                <View style={{ marginTop: 10, padding: 10, backgroundColor: '#f8f9fa', borderRadius: 6 }}>
+                  <Text style={{ fontSize: 12, color: '#666', marginBottom: 5 }}>
+                    현재 로그인된 사용자:
+                  </Text>
+                  <Text style={{ fontSize: 14, fontWeight: '600' }}>
+                    {currentUser.name} ({currentUser.email})
+                  </Text>
+                  {currentUser.phone && (
+                    <Text style={{ fontSize: 12, color: '#666' }}>
+                      {currentUser.phone}
+                    </Text>
+                  )}
+                </View>
+              )}
             </View>
             {contactPersons.map((person, index) => (
               <View
@@ -512,54 +688,54 @@ const CompanyQualificationRegistration = () => {
                 </View>
               </View>
             ))}
-            {/* 관심 분야 섹션 */}
+            {/* 산업분야 섹션 (mokup.json filters.industury 사용) */}
             <View style={[styles.formGroup, styles.fullWidth]}>
               <View style={styles.sectionHeader}>
                 <FontAwesome5 name="heart" size={16} color="#0066CC" />
-                <Text style={styles.label}>관심 분야</Text>
+                <Text style={styles.label}>산업분야</Text>
                 <Text style={styles.helpText}>중복 선택 가능</Text>
               </View>
-              
+
               <View style={styles.interestContainer}>
-                {['인증', '모의인증', '컨설팅', '정부지원', '교육사업'].map((activity, index) => (
+                {mockupData.filters.industury.map((industry, index) => (
                   <TouchableOpacity
                     key={index}
                     style={[
                       styles.interestTag,
-                      selectedActivities.includes(activity) && styles.interestTagSelected
+                      selectedIndustries.includes(industry) && styles.interestTagSelected
                     ]}
-                    onPress={() => toggleActivity(activity)}
+                    onPress={() => toggleIndustry(industry)}
                     activeOpacity={0.7}
                   >
                     <View style={styles.interestTagContent}>
-                      <FontAwesome5 
-                        name={getIconForActivity(activity)} 
-                        size={14} 
-                        color={selectedActivities.includes(activity) ? "#fff" : "#0066CC"} 
+                      <FontAwesome5
+                        name={getIconForIndustry(industry)}
+                        size={12}
+                        color={selectedIndustries.includes(industry) ? "#fff" : "#0066CC"}
                       />
                       <Text style={[
                         styles.interestTagText,
-                        selectedActivities.includes(activity) && styles.interestTagTextSelected
+                        selectedIndustries.includes(industry) && styles.interestTagTextSelected
                       ]}>
-                        {activity}
+                        {industry}
                       </Text>
                     </View>
-                    {selectedActivities.includes(activity) && (
-                      <FontAwesome5 name="check-circle" size={14} color="#fff" />
+                    {selectedIndustries.includes(industry) && (
+                      <FontAwesome5 name="check-circle" size={12} color="#fff" />
                     )}
                   </TouchableOpacity>
                 ))}
               </View>
-              
-              {selectedActivities.length > 0 && (
+
+              {selectedIndustries.length > 0 && (
                 <View style={styles.selectedInterests}>
-                  <Text style={styles.selectedInterestsLabel}>선택된 관심 분야:</Text>
+                  <Text style={styles.selectedInterestsLabel}>선택된 산업분야:</Text>
                   <View style={styles.selectedInterestsContainer}>
-                    {selectedActivities.map((activity, index) => (
+                    {selectedIndustries.map((industry, index) => (
                       <View key={index} style={styles.selectedInterestChip}>
-                        <Text style={styles.selectedInterestText}>{activity}</Text>
-                        <TouchableOpacity 
-                          onPress={() => toggleActivity(activity)}
+                        <Text style={styles.selectedInterestText}>{industry}</Text>
+                        <TouchableOpacity
+                          onPress={() => toggleIndustry(industry)}
                           style={styles.removeInterestButton}
                         >
                           <FontAwesome5 name="times" size={12} color="#fff" />
@@ -572,17 +748,17 @@ const CompanyQualificationRegistration = () => {
             </View>
           </View>
         </View>
-        
+
         {/* Certification Field: select certification types and auto-register */}
         <View style={styles.formSection}>
           <View style={styles.sectionHeader}>
             <FontAwesome5 name="tags" size={18} color="#0066CC" />
-            <Text style={styles.sectionTitle}>인증 분야</Text>
+            <Text style={styles.sectionTitle}>관심 분야</Text>
           </View>
 
           <View style={styles.formGroup}>
-            <Text style={styles.label}>인증의 종류 선택</Text>
-            <Text style={styles.helpText}>중복 선택 가능. 선택된 항목은 아래 '인증 정보'에 자동으로 추가됩니다.</Text>
+            <Text style={styles.label}>관심 분야 선택</Text>
+            <Text style={styles.helpText}>중복 선택 가능. 선택된 항목은 아래 '보유 인증'에 자동으로 추가됩니다.</Text>
           </View>
 
           <View style={styles.interestContainer}>
@@ -597,7 +773,7 @@ const CompanyQualificationRegistration = () => {
                 activeOpacity={0.7}
               >
                 <View style={styles.interestTagContent}>
-                  <FontAwesome5 
+                  <FontAwesome5
                     name={selectedCertTypes.includes(opt.value) ? "check-circle" : "certificate"}
                     size={14}
                     color={selectedCertTypes.includes(opt.value) ? "#fff" : "#0066CC"}
@@ -618,14 +794,14 @@ const CompanyQualificationRegistration = () => {
 
           {selectedCertTypes.length > 0 && (
             <View style={styles.selectedInterests}>
-              <Text style={styles.selectedInterestsLabel}>선택된 인증 종류:</Text>
+              <Text style={styles.selectedInterestsLabel}>선택된 관심 분야:</Text>
               <View style={styles.selectedInterestsContainer}>
                 {selectedCertTypes.map((type) => {
                   const label = certTypeOptions.find(opt => opt.value === type)?.label || type;
                   return (
                     <View key={`type_${type}`} style={styles.selectedInterestChip}>
                       <Text style={styles.selectedInterestText}>{label}</Text>
-                      <TouchableOpacity 
+                      <TouchableOpacity
                         onPress={() => toggleSelectCertType(type)}
                         style={styles.removeInterestButton}
                       >
@@ -643,7 +819,7 @@ const CompanyQualificationRegistration = () => {
         <View style={styles.formSection}>
           <View style={styles.sectionHeader}>
             <FontAwesome5 name="shield-alt" size={18} color="#0066CC" />
-            <Text style={styles.sectionTitle}>인증 정보</Text>
+            <Text style={styles.sectionTitle}>보유 인증</Text>
           </View>
 
           <View style={styles.infoCard}>
@@ -656,10 +832,10 @@ const CompanyQualificationRegistration = () => {
             </Text>
           </View>
 
-          <View style={[styles.formGroup, styles.fullWidth]}> 
+          <View style={[styles.formGroup, styles.fullWidth]}>
             <TouchableOpacity style={styles.primaryButton} onPress={addCertInfo}>
               <FontAwesome5 name="plus" size={16} color="#fff" />
-              <Text style={styles.primaryButtonText}>인증 정보 추가</Text>
+              <Text style={styles.primaryButtonText}>보유 인증 추가</Text>
             </TouchableOpacity>
           </View>
 
@@ -790,14 +966,14 @@ const CompanyQualificationRegistration = () => {
             </View>
           ))}
         </View>
-        
+
         {/* Document Submission Section */}
         <View style={styles.formSection}>
           <View style={styles.sectionHeader}>
             <FontAwesome5 name="file-upload" size={18} color="#0066CC" />
             <Text style={styles.sectionTitle}>필수 서류 제출</Text>
           </View>
-          
+
           <View style={styles.infoCard}>
             <View style={styles.infoCardTitle}>
               <FontAwesome5 name="exclamation-triangle" size={16} color="#0066CC" />
@@ -807,9 +983,9 @@ const CompanyQualificationRegistration = () => {
               모든 서류는 최신 버전으로 제출해야 하며, PDF 형식을 권장합니다. 파일 크기는 개당 10MB를 초과할 수 없습니다.
             </Text>
           </View>
-          
+
           <View style={styles.formGrid}>
-            
+
             <View style={[styles.formGroup, styles.fullWidth]}>
               <Text style={styles.label}>사업자등록증 <Text style={styles.required}>*</Text></Text>
               <TouchableOpacity style={styles.fileUpload}>
@@ -820,7 +996,7 @@ const CompanyQualificationRegistration = () => {
                 </View>
               </TouchableOpacity>
             </View>
-            
+
             <View style={[styles.formGroup, styles.fullWidth]}>
               <Text style={styles.label}>회사 소개</Text>
               <TouchableOpacity style={styles.fileUpload}>
@@ -832,7 +1008,7 @@ const CompanyQualificationRegistration = () => {
               </TouchableOpacity>
             </View>
           </View>
-          
+
           <View>
             <View style={[styles.formGroup, styles.fullWidth]}>
               <Text style={styles.label}>인증 서류</Text>
@@ -846,14 +1022,14 @@ const CompanyQualificationRegistration = () => {
             </View>
           </View>
         </View>
-    
+
         {/* Terms Agreement Section */}
         <View style={styles.formSection}>
           <View style={styles.sectionHeader}>
             <FontAwesome5 name="check-square" size={18} color="#0066CC" />
             <Text style={styles.sectionTitle}>약관 동의</Text>
           </View>
-          
+
           <View style={styles.formGrid}>
             <View style={[styles.formGroup, styles.fullWidth]}>
               <TouchableOpacity style={styles.checkboxItem} onPress={() => setTerms1(!terms1)}>
@@ -862,14 +1038,14 @@ const CompanyQualificationRegistration = () => {
               </TouchableOpacity>
               <Text style={styles.helpText}>수집된 개인정보는 심사 진행 및 결과 통보 목적으로만 사용됩니다.</Text>
             </View>
-            
+
             <View style={[styles.formGroup, styles.fullWidth]}>
               <TouchableOpacity style={styles.checkboxItem} onPress={() => setTerms2(!terms2)}>
                 <FontAwesome5 name={terms2 ? "check-square" : "square"} size={16} color="#0066CC" />
                 <Text style={styles.checkboxLabel}>심사 규정 및 절차에 동의 <Text style={styles.required}>*</Text></Text>
               </TouchableOpacity>
             </View>
-            
+
             <View style={[styles.formGroup, styles.fullWidth]}>
               <TouchableOpacity style={styles.checkboxItem} onPress={() => setTerms3(!terms3)}>
                 <FontAwesome5 name={terms3 ? "check-square" : "square"} size={16} color="#0066CC" />
@@ -879,7 +1055,7 @@ const CompanyQualificationRegistration = () => {
             </View>
           </View>
         </View>
-        
+
         {/* Form Actions */}
         <View style={styles.formActions}>
           <View></View>

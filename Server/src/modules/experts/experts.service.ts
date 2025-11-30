@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
-import { Expert, Prisma } from '@prisma/client';
+import { Prisma, user_expert_professional_info, expert_rate_type_enum } from '@prisma/client';
 import { CreateExpertDto, UpdateExpertDto } from './dto/expert.dto';
 
 @Injectable()
 export class ExpertsService {
   constructor(private prisma: PrismaService) {}
 
-  async create(dto: CreateExpertDto): Promise<Expert> {
+  async create(dto: CreateExpertDto): Promise<user_expert_professional_info> {
     const {
       userId,
       name,
@@ -25,61 +25,55 @@ export class ExpertsService {
     const specialtyJson = specialty ? safeJsonParse(specialty) : undefined;
     const availabilityJson = availability ? safeJsonParse(availability) : undefined;
 
-    return this.prisma.expert.create({
+    return this.prisma.user_expert_professional_info.create({
       data: {
-        user: { connect: { id: userId } },
-        name,
-        bio,
-        specialty: specialtyJson,
-        experienceYears,
-        hourlyRate,
-        dailyRate,
-        location,
-        languages,
-        availability: availabilityJson,
+        users: { connect: { id: userId } },
+        expf_name: name,
+        expf_introduction: bio ?? undefined,
+        expf_expertise: specialtyJson ?? undefined,
+        expf_experience_years_text: experienceYears != null ? String(experienceYears) : undefined,
+        expf_rate_type: 'hourly' as expert_rate_type_enum,
+        expf_hourly_rate: hourlyRate as any,
+        expf_daily_rate: dailyRate as any,
+        expf_regions: location ? ([location] as any) : undefined,
+        expf_languages: Array.isArray(languages) ? (languages as any) : undefined,
+        expf_time_slots: availabilityJson ?? undefined,
       },
       include: {
-        user: {
-          select: { id: true, email: true, name: true, phone: true },
+        users: {
+          select: { id: true, user_email: true, user_display_name: true },
         },
       },
     });
   }
 
-  async findAll(): Promise<Expert[]> {
-    return this.prisma.expert.findMany({
+  async findAll(): Promise<user_expert_professional_info[]> {
+    return this.prisma.user_expert_professional_info.findMany({
       include: {
-        user: {
-          select: {
-            id: true,
-            email: true,
-            name: true,
-            phone: true,
-          },
-        },
+        users: { select: { id: true, user_email: true, user_display_name: true } },
       },
     });
   }
 
-  async findOne(id: string): Promise<Expert | null> {
-    return this.prisma.expert.findUnique({
-      where: { id },
+  async findOne(expf_id: string): Promise<user_expert_professional_info | null> {
+    return this.prisma.user_expert_professional_info.findUnique({
+      where: { expf_id },
       include: {
-        user: { select: { id: true, email: true, name: true, phone: true } },
+        users: { select: { id: true, user_email: true, user_display_name: true } },
       },
     });
   }
 
-  async findByUserId(userId: string): Promise<Expert | null> {
-    return this.prisma.expert.findUnique({
-      where: { userId },
+  async findByUserId(userId: string): Promise<user_expert_professional_info | null> {
+    return this.prisma.user_expert_professional_info.findUnique({
+      where: { user_id: userId },
       include: {
-        user: { select: { id: true, email: true, name: true, phone: true } },
+        users: { select: { id: true, user_email: true, user_display_name: true } },
       },
     });
   }
 
-  async update(id: string, dto: UpdateExpertDto): Promise<Expert> {
+  async update(expf_id: string, dto: UpdateExpertDto): Promise<user_expert_professional_info> {
     const {
       name,
       bio,
@@ -95,65 +89,60 @@ export class ExpertsService {
     const specialtyJson = specialty ? safeJsonParse(specialty) : undefined;
     const availabilityJson = availability ? safeJsonParse(availability) : undefined;
 
-    return this.prisma.expert.update({
-      where: { id },
+    return this.prisma.user_expert_professional_info.update({
+      where: { expf_id },
       data: {
-        name,
-        bio,
-        specialty: specialtyJson,
-        experienceYears,
-        hourlyRate,
-        dailyRate,
-        location,
-        languages,
-        availability: availabilityJson,
+        expf_name: name,
+        expf_introduction: bio ?? undefined,
+        expf_expertise: specialtyJson ?? undefined,
+        expf_experience_years_text: experienceYears != null ? String(experienceYears) : undefined,
+        expf_hourly_rate: hourlyRate as any,
+        expf_daily_rate: dailyRate as any,
+        expf_regions: location ? ([location] as any) : undefined,
+        expf_languages: Array.isArray(languages) ? (languages as any) : undefined,
+        expf_time_slots: availabilityJson ?? undefined,
       },
       include: {
-        user: { select: { id: true, email: true, name: true, phone: true } },
+        users: { select: { id: true, user_email: true, user_display_name: true } },
       },
     });
   }
 
-  async remove(id: string): Promise<Expert> {
-    return this.prisma.expert.delete({
-      where: { id },
+  async remove(expf_id: string): Promise<user_expert_professional_info> {
+    return this.prisma.user_expert_professional_info.delete({
+      where: { expf_id },
     });
   }
 
   async searchExperts(query: {
     location?: string;
     languages?: string[] | string;
-    minRating?: number;
-  }): Promise<Expert[]> {
-    const where: Prisma.ExpertWhereInput = {};
+  }): Promise<user_expert_professional_info[]> {
+    const where: Prisma.user_expert_professional_infoWhereInput = {} as any;
 
     if (query.location) {
-      where.location = query.location;
+      (where as any).expf_regions = { array_contains: [query.location] } as any;
     }
 
     const langs = Array.isArray(query.languages)
       ? query.languages
       : typeof query.languages === 'string' && query.languages.length > 0
-        ? query.languages.split(',').map((s) => s.trim()).filter(Boolean)
+        ? query.languages
+            .split(',')
+            .map(s => s.trim())
+            .filter(Boolean)
         : [];
 
     if (langs.length > 0) {
-      where.languages = { hasSome: langs };
+      (where as any).expf_languages = { array_contains: langs } as any;
     }
 
-    if (typeof query.minRating === 'number') {
-      where.rating = { gte: query.minRating } as any; // rating is Decimal
-    }
-
-    return this.prisma.expert.findMany({
+    return this.prisma.user_expert_professional_info.findMany({
       where,
       include: {
-        user: { select: { id: true, email: true, name: true, phone: true } },
+        users: { select: { id: true, user_email: true, user_display_name: true } },
       },
-      orderBy: [
-        { rating: 'desc' },
-        { reviewCount: 'desc' },
-      ],
+      orderBy: { updated_at: 'desc' } as any,
     });
   }
 }

@@ -34,7 +34,7 @@ const initialCartItems: CartItem[] = [
     quantity: 1,
     duration: 1,
     provider: '인증 전문가 매칭센터',
-    contact: 'help@certmatch.com',
+    contact: 'help@superslice.com',
     selected: true,
   },
   {

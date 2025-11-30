@@ -327,22 +327,22 @@ export const styles = StyleSheet.create({
     color: '#999',
   },
 
-// 관심 분야 섹션 스타일
+// 산업분야 섹션 스타일
 interestContainer: {
   flexDirection: 'row',
   flexWrap: 'wrap',
   justifyContent: 'space-between',
-  marginTop: 10,
-  marginBottom: 15,
+  marginTop: 6,
+  marginBottom: 10,
 },
 
 interestTag: {
-  width: '48%',
+  width: '32%',
   backgroundColor: '#f8f9fa',
-  borderRadius: 12,
-  padding: 15,
-  marginBottom: 10,
-  borderWidth: 1.5,
+  borderRadius: 10,
+  padding: 10,
+  marginBottom: 8,
+  borderWidth: 1,
   borderColor: '#e9ecef',
   flexDirection: 'row',
   alignItems: 'center',
@@ -371,10 +371,10 @@ interestTagContent: {
 },
 
 interestTagText: {
-  fontSize: 14,
+  fontSize: 12,
   fontWeight: '500',
   color: '#333',
-  marginLeft: 8,
+  marginLeft: 6,
 },
 
 interestTagTextSelected: {
@@ -382,7 +382,7 @@ interestTagTextSelected: {
   fontWeight: '600',
 },
 
-// 선택된 관심 분야 표시
+// 선택된 산업분야 표시
 selectedInterests: {
   marginTop: 5,
   paddingTop: 15,
@@ -391,7 +391,7 @@ selectedInterests: {
 },
 
 selectedInterestsLabel: {
-  fontSize: 14,
+  fontSize: 13,
   fontWeight: '600',
   color: '#333',
   marginBottom: 10,
@@ -406,15 +406,15 @@ selectedInterestChip: {
   flexDirection: 'row',
   alignItems: 'center',
   backgroundColor: '#0066CC',
-  borderRadius: 20,
-  paddingHorizontal: 12,
-  paddingVertical: 6,
+  borderRadius: 16,
+  paddingHorizontal: 10,
+  paddingVertical: 5,
   marginRight: 8,
   marginBottom: 8,
 },
 
 selectedInterestText: {
-  fontSize: 12,
+  fontSize: 11,
   color: '#fff',
   marginRight: 6,
 },

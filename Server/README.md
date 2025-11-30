@@ -1,6 +1,6 @@
-# CertMatch Backend
+# SuperSlice Backend
 
-CertMatch는 기업과 전문가를 연결하는 플랫폼의 백엔드 API 서버입니다. NestJS, Prisma, PostgreSQL을 기반으로 구축되었습니다.
+SuperSlice는 기업과 전문가를 연결하는 플랫폼의 백엔드 API 서버입니다. NestJS, Prisma, PostgreSQL을 기반으로 구축되었습니다.
 
 ## 🚀 기술 스택
 
@@ -156,10 +156,10 @@ npx prisma migrate dev --name migration_name
 
 ```bash
 # Docker 이미지 빌드
-docker build -t certmatch-backend .
+docker build -t superslice-backend .
 
 # 컨테이너 실행
-docker run -p 3001:3001 --env-file .env certmatch-backend
+docker run -p 3001:3001 --env-file .env superslice-backend
 ```
 
 ### 환경별 설정
@@ -212,4 +212,4 @@ docker run -p 3001:3001 --env-file .env certmatch-backend
 
 ---
 
-**CertMatch Backend** - 전문가와 기업을 연결하는 플랫폼
+**SuperSlice Backend** - 전문가와 기업을 연결하는 플랫폼

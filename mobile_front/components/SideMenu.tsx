@@ -69,10 +69,20 @@ export const SideMenu: React.FC<SideMenuProps> = ({ visible, onClose }) => {
     navigation.navigate('RegistrationPersonal');
   };
 
+  const handlePersonalEdit = () => {
+    handleClose();
+    navigation.navigate('PersonalRegistrationEdit' as never);
+  };
+
   // Handle navigation to Company Registration screen
   const handleCompanyRegistration = () => {
     handleClose();
     navigation.navigate('RegistrationCompany' as never);
+  };
+
+  const handleCompanyEdit = () => {
+    handleClose();
+    navigation.navigate('CompanyRegistrationEdit' as never);
   };
 
   // 인증 인력모집 목록 화면으로 이동
@@ -81,18 +91,19 @@ export const SideMenu: React.FC<SideMenuProps> = ({ visible, onClose }) => {
     navigation.navigate('ExpertRecruitmentList' as never);
   };
 
-   // 전문가 등록 목록 화면으로 이동
+  // 전문가 등록 목록 화면으로 이동
   const handleExpertProfessionalList = () => {
     handleClose();
     navigation.navigate('ExpertProfessionalList' as never);
   };
 
-   // 전문가 인증교육 목록으로 이동
+  // 전문가 인증교육 목록으로 이동
   const handleEducationList = () => {
     handleClose();
     navigation.navigate('EducationList' as never);
   };
-   // 인증심사원 자격등록 화면으로 이동
+
+  // 인증심사원 자격등록 화면으로 이동
   const handleCertAudRegistration = () => {
     handleClose();
     navigation.navigate('CertAudRegistration' as never);
@@ -199,10 +210,16 @@ export const SideMenu: React.FC<SideMenuProps> = ({ visible, onClose }) => {
     navigation.navigate('Settings' as never);
   };
 
-  // 마이페이지 화면으로 이동
-  const handleMyPage = () => {
+  // 마이페이지(개인) 화면으로 이동
+  const handleMyPagePersonal = () => {
     handleClose();
     navigation.navigate('MyPage' as never);
+  };
+
+  // 마이페이지(기업) 화면으로 이동
+  const handleMyPageCorporate = () => {
+    handleClose();
+    navigation.navigate('MyPageCorperation' as never);
   };
 
   // Q&A 답변 화면으로 이동
@@ -235,7 +252,6 @@ export const SideMenu: React.FC<SideMenuProps> = ({ visible, onClose }) => {
     // 실제 관리자 메인 화면 라우트 이름에 맞게 수정하세요
     safeNavigate('AdminManagement');
   };
-
 
   // Function to get user type label
   const getUserTypeLabel = (role: string) => {
@@ -348,7 +364,9 @@ export const SideMenu: React.FC<SideMenuProps> = ({ visible, onClose }) => {
             showsVerticalScrollIndicator={true}
           >
             <MenuItem icon="id-badge" label="개인 정보 등록" onPress={handlePersonalRegistration} />
+            <MenuItem icon="edit" label="개인 정보 수정" onPress={handlePersonalEdit} />
             <MenuItem icon="building" label="기업 정보 등록" onPress={handleCompanyRegistration} />
+            <MenuItem icon="edit" label="기업 정보 수정" onPress={handleCompanyEdit} />
             
             <View style={styles.divider} />
 
@@ -381,7 +399,8 @@ export const SideMenu: React.FC<SideMenuProps> = ({ visible, onClose }) => {
 
             <MenuItem icon="cog" label="설정" onPress={handleSettings} />
             <MenuItem icon="question-circle" label="도움말" />
-            <MenuItem icon="user-circle" label="내정보" onPress={handleMyPage} />
+            <MenuItem icon="user-circle" label="내정보(개인)" onPress={handleMyPagePersonal} />
+            <MenuItem icon="user-circle" label="내정보(기업)" onPress={handleMyPageCorporate} />
             <View style={styles.divider} />
 
             <TouchableOpacity style={styles.menuItem} onPress={handleAuthAction}>

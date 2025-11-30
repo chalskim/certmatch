@@ -1,4 +1,3 @@
-
 import React, { useMemo, useState, useEffect, useRef } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, TextInput, Modal, Alert, Image, ImageSourcePropType } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
@@ -7,9 +6,9 @@ import { Images } from '../../assets/index';
 import { styles } from '../styles/menu/BannerManagement';
 
 // 로컬 배너 이미지 (React Native는 require 방식 권장)
-const banner1 = require('../../assets/icon/banner1.jpg');
-const banner2 = require('../../assets/icon/banner2.jpg');
-const banner4 = require('../../assets/icon/banner4.jpg');
+// const banner1 = require('../../assets/icon/banner1.jpg'); // Replaced by Images.banner1
+// const banner2 = require('../../assets/icon/banner2.jpg'); // Replaced by Images.banner2
+// const banner4 = require('../../assets/icon/banner4.jpg'); // Replaced by Images.banner4
 
 // 배너 타입
 type BannerItem = {
@@ -64,7 +63,7 @@ const initialBannerData: Record<string, BannerItem[]> = {
       title: '2025년 정부지원 인증 프로그램',
       description: '최대 70% 지원금으로 인증 비용 절감 혜택을 받으세요',
       buttonText: '자세히 보기',
-      image: banner1,
+      image: Images.banner1,
       startDate: '2025-01-15',
       endDate: '2025-02-28',
       link: 'https://example.com/support',
@@ -74,7 +73,7 @@ const initialBannerData: Record<string, BannerItem[]> = {
       title: 'ISMS-P 전문가 양성 과정',
       description: '실무 중심의 맞춤형 교육으로 전문가로 성장하세요',
       buttonText: '과정 신청',
-      image: banner2,
+      image: Images.banner2,
       startDate: '2025-01-10',
       endDate: '2025-03-31',
       link: 'https://example.com/course',
@@ -94,7 +93,7 @@ const initialBannerData: Record<string, BannerItem[]> = {
       title: '글로벌 인증 전문가',
       description: 'ISO 27001, GDPR 등 해외 인증 성공률 98%',
       buttonText: '상담하기',
-      image: banner4,
+      image: Images.banner4,
       startDate: '2025-01-25',
       endDate: '2025-05-31',
       link: 'https://example.com/expert',
@@ -324,7 +323,7 @@ const BannerManagement: React.FC<any> = ({ navigation }) => {
               <View style={styles.previewContent}>
                 <Text style={styles.previewTitle}>{item.title}</Text>
                 <Text style={styles.previewDesc}>{item.description}</Text>
-                <View style={styles.previewButton}> 
+                <View style={styles.previewButton}>
                   <Text style={styles.previewButtonText}>{item.buttonText || '자세히 보기'}</Text>
                 </View>
               </View>
@@ -422,9 +421,9 @@ const BannerManagement: React.FC<any> = ({ navigation }) => {
           <View style={styles.calendarGrid}>
             {calendarCells.map((cell, idx) => (
               <TouchableOpacity key={idx} style={[styles.calendarDay,
-                cell.isOtherMonth ? styles.calendarDayOther : undefined,
-                cell.isSelected ? styles.calendarDaySelected : undefined,
-                cell.isToday ? styles.calendarDayToday : undefined,
+              cell.isOtherMonth ? styles.calendarDayOther : undefined,
+              cell.isSelected ? styles.calendarDaySelected : undefined,
+              cell.isToday ? styles.calendarDayToday : undefined,
               ]} onPress={() => !cell.isOtherMonth && selectDate(cell.dateStr)}>
                 <Text style={styles.calendarDayText}>{cell.label}</Text>
                 {cell.hasBanner ? <View style={styles.bannerIndicator} /> : null}
